@@ -1,0 +1,11 @@
+# HTTPSリダイレクト
+http://*  https://:splat  301!
+
+# 古いパスからの301リダイレクト例
+# /old-page    /new-page    301
+
+# ワイルドカードリダイレクト例
+# /blog/tag/:tag    /tags/:tag    301
+
+# 404ページへのフォールバック
+/*    /404.html    404

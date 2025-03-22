@@ -66,3 +66,55 @@ Check out [our documentation](https://docs.astro.build) or jump into our [Discor
 ## Credit
 
 This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+
+## 🚀 Cloudflare Pages へのデプロイ
+
+このプロジェクトは Cloudflare Pages へのデプロイに最適化されています。以下の手順に従ってデプロイしてください。
+
+### 前提条件
+
+- Cloudflare アカウント
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) (オプション: CLIでのデプロイに必要)
+
+### デプロイ方法
+
+#### GitHubからの自動デプロイ設定
+
+1. GitHubリポジトリにプロジェクトをプッシュします
+2. [Cloudflare Pages ダッシュボード](https://dash.cloudflare.com/?to=/:account/pages)にアクセスします
+3. 「Create a project」をクリックし、GitHubリポジトリと接続します
+4. 以下のビルド設定を行います:
+   - **Framework preset**: Astro
+   - **Build command**: npm run build
+   - **Build output directory**: dist
+   - **環境変数**: 必要に応じて追加（.envファイルの内容）
+
+#### Wrangler CLIを使用したデプロイ (オプション)
+
+1. Wrangler CLIをインストールします（まだの場合）:
+```bash
+npm install -g wrangler
+```
+
+2. Cloudflareアカウントにログインします:
+```bash
+wrangler login
+```
+
+3. プロジェクトをビルドします:
+```bash
+npm run build
+```
+
+4. デプロイします:
+```bash
+wrangler pages publish dist
+```
+
+### カスタム設定
+
+- **ヘッダー設定**: `public/_headers` ファイルでカスタムHTTPヘッダーを設定できます
+- **リダイレクト設定**: `public/_redirects` ファイルでリダイレクトルールを設定できます
+- **ルーティング設定**: `public/_routes.json` ファイルで静的/動的ルーティングを設定できます
+
+詳細については [Cloudflare Pages のドキュメント](https://developers.cloudflare.com/pages/) を参照してください。
