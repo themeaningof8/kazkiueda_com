@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+---
+
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <main>
+    <!-- Hero Section -->
+    <section class="container px-4 py-24 mx-auto">
+      <div class="max-w-3xl mx-auto text-center">
+        <h1 class="text-6xl font-bold tracking-tighter mb-8">
+          Stories, insights, & perspectives
+        </h1>
+        <p class="text-xl text-muted-foreground mb-8">
+          Exploring ideas at the intersection of design, technology, and creativity.
+          Written by designers, developers, and thinkers.
+        </p>
+        <Button client:load variant="default" size="lg" asChild>
+          <a href="/blog">View All Posts</a>
+        </Button>
+      </div>
+    </section>
+
+    <!-- Featured Posts -->
+    <section class="container px-4 pb-24 mx-auto">
+      <h2 class="text-3xl font-bold tracking-tighter mb-12">Latest Stories</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        {
+          posts.map((post) => (
+            <article class="group">
+              <a href={`/blog/${post.id}/`} class="block">
+                <div class="relative aspect-[4/3] overflow-hidden rounded-xl mb-6">
+                  <img
+                    src={post.data.heroImage}
+                    alt=""
+                    class="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <div class="space-y-3">
+                  <h3 class="text-2xl font-medium leading-tight group-hover:text-primary">
+                    {post.data.title}
+                  </h3>
+                  <p class="text-muted-foreground line-clamp-2">
+                    {post.data.description}
+                  </p>
+                </div>
+              </a>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="container px-4 pb-24 mx-auto">
+      <div class="max-w-2xl mx-auto text-center">
+        <h2 class="text-3xl font-bold tracking-tighter mb-4">
+          Stay in the loop
+        </h2>
+        <p class="text-muted-foreground mb-8">
+          Subscribe to our newsletter for updates, insights, and exclusive content.
+        </p>
+        <form class="flex gap-4 max-w-md mx-auto">
+          <Input
+            client:load
+            type="email"
+            placeholder="Enter your email"
+          />
+          <Button client:load type="submit" variant="default">
+            Subscribe
+          </Button>
+        </form>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
