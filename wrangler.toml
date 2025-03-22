@@ -1,6 +1,6 @@
 # Cloudflare Pages Wrangler設定
 name = "kazkiueda-com"
-compatibility_date = "2023-12-01"
+compatibility_date = "2025-03-01"
 
 # Cloudflare Pagesの基本設定
 [site]
@@ -8,7 +8,7 @@ bucket = "./dist"
 
 # Cloudflare Pagesのビルド設定
 [build]
-command = "npm run build"
+command = "bun run build"
 
 # 環境変数の設定例（Cloudflare Dashboardでも設定可能）
 [vars]

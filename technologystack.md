@@ -6,10 +6,10 @@
 - **AIモデル: Claude-3.7-Sonnet ← バージョン変更禁止**
 
 ## フロントエンド
-- Astro: ^5.2.5
-- React: ^18.2.0
+- Astro: ^5.5.4
+- React: ^19.0.0
 - Tailwind CSS: ^3.4.1
-- MDX: ^4.0.8
+- MDX: ^4.2.1
 - Radix UI: ^1.0.5
 
 ## ホスティング・デプロイ
