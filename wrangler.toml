@@ -1,6 +1,7 @@
 # Cloudflare Pages Wrangler設定
 name = "kazkiueda-com"
 compatibility_date = "2025-03-01"
+main = "worker-site/index.js"
 
 # Cloudflare Pagesの基本設定
 [site]

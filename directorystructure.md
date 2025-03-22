@@ -83,8 +83,7 @@
 │   │       └── utils.ts
 │   ├── stores                 # 状態管理
 │   ├── styles                 # スタイル定義
-│   │   ├── global.css
-│   │   └── globals.css
+│   │   └── global.css
 │   ├── types                  # 共有型定義
 │   │   └── env.d.ts
 │   └── utils                  # 共有ユーティリティ関数
