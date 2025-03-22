@@ -1,9 +1,9 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import { Sidebar } from '../components/Sidebar';
-import { MobileNav } from '../components/MobileNav';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE } from '../consts';
+import BaseHead from "../components/BaseHead.astro";
+import { Sidebar } from "../components/Sidebar";
+import { MobileNav } from "../components/MobileNav";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE } from "../consts";
 
 const { title, description } = Astro.props;
 ---
@@ -15,9 +15,11 @@ const { title, description } = Astro.props;
   </head>
   <body>
     <div class="relative flex min-h-screen flex-col">
-      <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:hidden">
+      <header
+        class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:hidden"
+      >
         <div class="container flex h-14 items-center">
-          <MobileNav client:load />
+          <MobileNav client:visible />
           <div class="flex flex-1 items-center justify-between">
             <a href="/" class="font-semibold">{SITE_TITLE}</a>
           </div>
@@ -27,7 +29,7 @@ const { title, description } = Astro.props;
       <div class="grid lg:grid-cols-5">
         <aside class="hidden lg:block">
           <div class="h-full border-r bg-background">
-            <Sidebar client:load className="p-6" />
+            <Sidebar client:visible className="p-6" />
           </div>
         </aside>
         <div class="col-span-3 lg:col-span-4">

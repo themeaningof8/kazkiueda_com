@@ -1,11 +1,12 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import { getCollection } from 'astro:content';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { getCollection } from "astro:content";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { NewsletterSignup } from "../components/NewsletterSignup";
 
-const posts = (await getCollection('blog'))
+const posts = (await getCollection("blog"))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
 ---
@@ -19,10 +20,10 @@ const posts = (await getCollection('blog'))
           Stories, insights, & perspectives
         </h1>
         <p class="text-xl text-muted-foreground mb-8">
-          Exploring ideas at the intersection of design, technology, and creativity.
-          Written by designers, developers, and thinkers.
+          Exploring ideas at the intersection of design, technology, and
+          creativity. Written by designers, developers, and thinkers.
         </p>
-        <Button client:load variant="default" size="lg" asChild>
+        <Button client:visible variant="default" size="lg" asChild>
           <a href="/blog">View All Posts</a>
         </Button>
       </div>
@@ -65,18 +66,10 @@ const posts = (await getCollection('blog'))
           Stay in the loop
         </h2>
         <p class="text-muted-foreground mb-8">
-          Subscribe to our newsletter for updates, insights, and exclusive content.
+          Subscribe to our newsletter for updates, insights, and exclusive
+          content.
         </p>
-        <form class="flex gap-4 max-w-md mx-auto">
-          <Input
-            client:load
-            type="email"
-            placeholder="Enter your email"
-          />
-          <Button client:load type="submit" variant="default">
-            Subscribe
-          </Button>
-        </form>
+        <NewsletterSignup client:only="react" />
       </div>
     </section>
   </main>
