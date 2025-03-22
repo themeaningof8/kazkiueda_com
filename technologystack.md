@@ -8,7 +8,7 @@
 ## フロントエンド
 - Astro: ^5.5.4
 - React: ^19.0.0
-- Tailwind CSS: ^3.4.1
+- Tailwind CSS: ^4.0.15
 - MDX: ^4.2.1
 - Radix UI: ^1.0.5
 
