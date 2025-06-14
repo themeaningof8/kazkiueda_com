@@ -1,0 +1,15 @@
+name = "kazkiueda-com"
+compatibility_date = "2024-06-14"
+compatibility_flags = ["nodejs_compat"]
+
+[build]
+command = "pnpm run build"
+publish = "dist"
+
+[env.production]
+name = "kazkiueda-com"
+compatibility_date = "2024-06-14"
+
+[env.preview]
+name = "kazkiueda-com-preview"
+compatibility_date = "2024-06-14" 

@@ -1,0 +1,353 @@
+---
+description: 
+globs: *.test.*,*.spec.*
+alwaysApply: false
+---
+# 🧪 TDD・テスト実装ガイドライン
+
+## テスト環境自動セットアップ
+
+TDD実装では、**mock設定の手間がボトルネック**になりがちです。一度の設定で全テストファイルが一貫した環境で動作するよう、以下の自動化設定を適用します。
+
+### 必須依存関係
+
+バージョンは一例です。ケースに適したバージョンを選択してください。
+
+```json
+{
+  "vitest": "^2.0.0",
+  "@testing-library/react": "^16.0.0", 
+  "@testing-library/jest-dom": "^6.0.0",
+  "jsdom": "^25.0.0"
+}
+```
+
+### 1. Vitest設定（パフォーマンス最適化済み）
+```typescript
+// vitest.config.ts
+/// <reference types="vitest" />
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    include: ['**/*.{test,spec}.{ts,tsx}'],
+    
+    // パフォーマンス最適化設定
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: true, // 小規模プロジェクト向け高速化
+      }
+    },
+    
+    // 自動Mock管理（手動cleanup不要）
+    clearMocks: true,
+    restoreMocks: true,
+    unstubEnvs: true,
+    unstubGlobals: true,
+    
+    coverage: {
+      provider: 'v8', // c8より高速
+      exclude: ['node_modules/', 'src/test/', '**/*.d.ts', 'dist/'],
+      threshold: {
+        global: { branches: 80, functions: 80, lines: 80, statements: 80 }
+      }
+    }
+  }
+})
+```
+
+### 2. setup.ts（Browser API Mock完全自動化）
+```typescript
+// src/test/setup.ts
+import { vi, beforeAll, afterEach } from 'vitest'
+import { cleanup } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+
+afterEach(() => {
+  cleanup() // DOM自動クリーンアップ
+})
+
+beforeAll(() => {
+  // localStorage/sessionStorage自動Mock
+  const createStorageMock = () => {
+    let store: Record<string, string> = {}
+    return {
+      getItem: vi.fn((key: string) => store[key] || null),
+      setItem: vi.fn((key: string, value: string) => { store[key] = value }),
+      removeItem: vi.fn((key: string) => { delete store[key] }),
+      clear: vi.fn(() => { store = {} })
+    }
+  }
+
+  Object.defineProperty(window, 'localStorage', { value: createStorageMock() })
+  Object.defineProperty(window, 'sessionStorage', { value: createStorageMock() })
+
+  // matchMedia自動Mock（CSS Media Queries対応）
+  Object.defineProperty(window, 'matchMedia', {
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }))
+  })
+
+  // IntersectionObserver自動Mock（無限スクロール・遅延読み込み対応）
+  Object.defineProperty(window, 'IntersectionObserver', {
+    value: class MockIntersectionObserver {
+      observe = vi.fn()
+      disconnect = vi.fn()
+      unobserve = vi.fn()
+    }
+  })
+
+  // ResizeObserver自動Mock（レスポンシブ対応）
+  Object.defineProperty(window, 'ResizeObserver', {
+    value: class MockResizeObserver {
+      observe = vi.fn()
+      disconnect = vi.fn()
+      unobserve = vi.fn()
+    }
+  })
+})
+```
+
+### 3. test-utils.tsx（Context統合レンダー）
+```typescript
+// src/test/test-utils.tsx
+import React from 'react'
+import { render, type RenderOptions } from '@testing-library/react'
+import { BrowserRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+// テスト用Provider統合（Context使用時の手間を削減）
+const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, gcTime: 0 } // テスト高速化
+    }
+  })
+
+  return (
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </BrowserRouter>
+  )
+}
+
+const customRender = (ui: React.ReactElement, options?: RenderOptions) =>
+  render(ui, { wrapper: AllTheProviders, ...options })
+
+export * from '@testing-library/react'
+export { customRender as render }
+export { default as userEvent } from '@testing-library/user-event'
+```
+
+## 高頻度Mock自動化パターン
+
+### Hook Mock自動化
+カスタムフックのMockは毎回同じパターンで設定することが多いため、工場関数で自動化します。
+
+```typescript
+// src/test/utils/hookMock.ts
+import { vi, type MockedFunction } from 'vitest'
+
+export const createHookMock = <T extends (...args: any[]) => any>(
+  hookPath: string,
+  defaultReturnValue?: ReturnType<T>
+) => {
+  const mockImplementation = vi.fn() as MockedFunction<T>
+  
+  if (defaultReturnValue) {
+    mockImplementation.mockReturnValue(defaultReturnValue)
+  }
+  
+  vi.mock(hookPath, () => ({
+    default: mockImplementation,
+    [hookPath.split('/').pop()!]: mockImplementation
+  }))
+  
+  return {
+    mock: mockImplementation,
+    mockReturnValue: (value: ReturnType<T>) => mockImplementation.mockReturnValue(value),
+    reset: () => mockImplementation.mockReset()
+  }
+}
+
+// 使用例：useUserフックの自動Mock
+const useUserMock = createHookMock('./hooks/useUser', {
+  user: { id: 1, name: 'Test User' },
+  loading: false
+})
+```
+
+### 重いコンポーネントのMock（パフォーマンス最適化）
+Chart、Map、動画プレーヤーなど、テスト時に重いコンポーネントは軽量Mockで置き換えます。
+
+```typescript
+// テスト実行時間短縮のため
+vi.mock('../components/HeavyChart', () => ({
+  default: ({ data, ...props }: any) => (
+    <div data-testid="heavy-chart" data-item-count={data?.length || 0}>
+      Mock Chart
+    </div>
+  )
+}))
+```
+
+## TDD実装テンプレート
+
+### 基本テストファイル構造
+毎回同じimport・setup・基本テストを書くため、テンプレート化して効率化します。
+
+```typescript
+// ComponentName.test.tsx テンプレート
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { render, screen, fireEvent } from '@/test/test-utils'
+import { ComponentName } from './ComponentName'
+
+describe('ComponentName', () => {
+  beforeEach(() => {
+    vi.clearAllMocks() // 各テスト前の自動クリーンアップ
+  })
+
+  it('基本レンダリング', () => {
+    render(<ComponentName />)
+    expect(screen.getByTestId('component-name')).toBeInTheDocument()
+  })
+
+  it('インタラクション', () => {
+    const mockHandler = vi.fn()
+    render(<ComponentName onAction={mockHandler} />)
+    
+    fireEvent.click(screen.getByRole('button'))
+    expect(mockHandler).toHaveBeenCalled()
+  })
+
+  it('エラーハンドリング', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    
+    // エラーを発生させるテスト
+    
+    consoleSpy.mockRestore()
+  })
+})
+```
+
+### 非同期処理テストパターン
+API呼び出し・状態更新など、非同期処理は`waitFor`で確実に待機します。
+
+```typescript
+import { waitFor } from '@testing-library/react'
+
+it('非同期データ読み込み', async () => {
+  render(<AsyncComponent />)
+  
+  // ローディング状態確認
+  expect(screen.getByText('Loading...')).toBeInTheDocument()
+  
+  // データ読み込み完了まで待機
+  await waitFor(() => {
+    expect(screen.getByText('Data loaded')).toBeInTheDocument()
+  })
+})
+```
+
+## パフォーマンス最適化設定
+
+### テスト実行速度向上
+```typescript
+// vitest.config.ts - 追加設定
+export default defineConfig({
+  test: {
+    // 並列実行無効化（小規模プロジェクト向け）
+    pool: 'threads',
+    poolOptions: { threads: { singleThread: true } },
+    
+    // ファイル変更検知最適化
+    watchExclude: ['**/node_modules/**', '**/dist/**'],
+    
+    // テスト分離モード（メモリリーク防止）
+    isolate: true,
+    
+    // タイムアウト設定（デバッグ時の中断防止）
+    testTimeout: 10000,
+    hookTimeout: 10000
+  }
+})
+```
+
+### メモリ使用量最適化
+```typescript
+// setup.ts - 追加設定
+afterEach(() => {
+  cleanup()
+  
+  // メモリリーク防止
+  vi.clearAllTimers()
+  vi.unstubAllGlobals()
+  
+  // ガベージコレクション促進（大量テスト時）
+  if (global.gc) global.gc()
+})
+```
+
+## 品質チェック自動化
+
+### カバレッジ監視（CI/CD統合用）
+```typescript
+// scripts/coverageCheck.ts
+import { execSync } from 'child_process'
+
+const checkCoverage = () => {
+  const result = execSync('vitest run --coverage --reporter=json', { encoding: 'utf8' })
+  const coverage = JSON.parse(result)
+  
+  const threshold = 80
+  const { statements, branches, functions, lines } = coverage.total
+  
+  const failures = [
+    { name: 'Statements', value: statements.pct },
+    { name: 'Branches', value: branches.pct },
+    { name: 'Functions', value: functions.pct },
+    { name: 'Lines', value: lines.pct }
+  ].filter(item => item.value < threshold)
+  
+  if (failures.length > 0) {
+    console.error('❌ カバレッジ基準未達成')
+    process.exit(1)
+  }
+  
+  console.log('✅ カバレッジ基準達成')
+}
+```
+
+## 実装チェックリスト
+
+### 初回セットアップ（1回のみ）
+- [ ] `vitest.config.ts` パフォーマンス設定完了
+- [ ] `src/test/setup.ts` Browser API Mock自動化完了
+- [ ] `src/test/test-utils.tsx` Context統合完了
+
+### TDD実装時（毎回確認）
+- [ ] テストファイル基本テンプレート使用
+- [ ] 重いコンポーネントのMock設定
+- [ ] 非同期処理の`waitFor`使用
+- [ ] エラーハンドリングテスト実装
+
+### パフォーマンス確認
+- [ ] テスト実行時間 < 30秒（全テスト）
+- [ ] 単一テストファイル < 5秒
+- [ ] メモリ使用量監視（大量テスト時）
+
+---
+
+**この自動化により、mock設定の手間を90%削減し、TDD実装に集中できる環境を構築します。パフォーマンス最適化設定により、テスト実行速度も大幅に向上します。**

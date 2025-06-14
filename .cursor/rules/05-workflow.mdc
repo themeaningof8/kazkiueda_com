@@ -1,0 +1,155 @@
+---
+description: 要件定義~タスク消化までのルール
+globs: 
+alwaysApply: false
+---
+# 🔄 基本開発ワークフロー
+
+## 開発優先度（P0 > P1 > P2）
+
+### P0: 絶対必須（妥協不可）
+- **TypeScript strictモード**: エラー0を維持
+- **ESLint/ビルドエラー**: 0件必須
+- **TDD実装**: 環境問題時は代替戦略適用
+
+### P1: 強く推奨（技術的制約時は代替案検討）
+- **deepwiki mcp活用**: 利用不可時は [package.json](mdc:/Users/kazkiueda/.npm/_npx/9833c18b2d85bc59/package.json) 確認で代替
+- **テストカバレッジ > 80%**: 段階的向上可
+- **基本的品質基準**: `pnom lint`, `pnpm build`, `tsc --noEmit`
+
+### P2: 理想的（プロジェクト状況で判断）
+- **パフォーマンス基準達成**: 継続的改善
+- **shadcn/ui完全導入**: 段階的実装
+- **アクセシビリティ完全準拠**: 継続的向上
+
+## 基本開発フロー（参照ガイド付き）
+
+### 1. 要件分析・タスク分解
+```mermaid
+graph TD
+    A[要件受領] --> B[タスク分析]
+    B --> C[Mermaid図作成]
+    C --> D[TODOリスト生成]
+    D --> E[技術選定]
+    E --> F[docs/[タスク名].md作成]
+```
+
+### 2. 実装フロー（段階的実施 + 参照タイミング）
+```mermaid
+graph TD
+    A[環境確認] --> B[Phase1: 基盤構築]
+    B --> C{TDD環境OK?}
+    C -->|Yes| D[TDD開始]
+    C -->|No| E[代替戦略]
+    
+    D --> F[Red: テスト失敗]
+    F --> G[Green: 最小実装]
+    G --> H[Refactor: 改善]
+    H --> I{次のテスト?}
+    I -->|Yes| F
+    I -->|No| J[品質チェック]
+    
+    E --> K[手動実装]
+    K --> J
+    
+    J --> L[lint/build実行]
+    L --> M{エラー発生?}
+    M -->|Yes| N[緊急対応]
+    M -->|No| O[レビュー・完了判定]
+    
+    N --> P{3回ルール到達?}
+    P -->|Yes| Q[deepwiki相談]
+    P -->|No| L
+    
+    O --> R[Phase2継続 or 完了]
+    
+    %% 参照タイミング
+    D -.->|詳細手順| TDD[05a-tdd-cycle.mdc]
+    J -.->|チェック項目| QC[05b-quality-check.mdc]
+    N -.->|対応手順| EM[05c-emergency.mdc]
+```
+
+### 3. 各フェーズでの参照ガイド
+
+#### Phase 1: 基盤構築時
+- **TDD開始**: → [05a-tdd-cycle.mdc](mdc:.cursor/rules/05a-tdd-cycle.mdc) 基本サイクル参照
+- **環境問題発生**: → [05c-tdd-emergency.mdc](mdc:.cursor/rules/05c-tdd-emergency.mdc) 代替戦略適用
+
+#### Phase 2: 実装・品質チェック時
+- **品質確認**: → [05b-tdd-check.mdc](mdc:.cursor/rules/05b-tdd-check.mdc) チェックリスト実行
+- **エラー解決**: → [05c-tdd-emergency.mdc](mdc:.cursor/rules/05c-tdd-emergency.mdc) 3回ルール適用
+
+#### Phase 3: 継続的改善時
+- **段階的向上**: → [05b-tdd-check.mdc](mdc:.cursor/rules/05b-tdd-check.mdc) P2項目確認
+
+## 実装判断フローチャート
+
+```mermaid
+graph LR
+    A[実装タスク開始] --> B{TDD実行可能?}
+    B -->|Yes| C[05a参照: Red-Green-Refactor]
+    B -->|No| D[05c参照: 代替戦略]
+    
+    C --> E[実装完了]
+    D --> E
+    
+    E --> F[05b参照: 品質チェック]
+    F --> G{基準達成?}
+    G -->|Yes| H[完了]
+    G -->|No| I{3回目?}
+    I -->|No| J[修正継続]
+    I -->|Yes| K[05c参照: エスカレーション]
+    
+    J --> F
+    K --> L[ユーザー相談]
+```
+
+## ドキュメント管理
+
+### 必須ドキュメント
+- `docs/[タスク名].md`: タスク分析結果
+- README.md: プロジェクト概要（要求時のみ）
+- 技術ドキュメント: 明示的要求時のみ作成
+
+### ドキュメント作成禁止
+- 自動的なドキュメント生成禁止
+- 未要求のMarkdownファイル作成禁止
+- 推測でのREADME作成禁止
+
+## 各専門ファイルの使い分け
+
+### [05a-tdd-cycle.mdc](mdc:.cursor/rules/05a-tdd-cycle.mdc)
+**使用タイミング**: TDD実装開始時
+- Red-Green-Refactorの詳細手順
+- 具体的なコード例とテンプレート
+- 問題解決戦略
+
+### [05b-tdd-check.mdc](mdc:.cursor/rules/05b-tdd-check.mdc)
+**使用タイミング**: 実装完了時・各フェーズ移行時
+- 段階的品質チェックリスト
+- Phase別達成基準
+- 継続的改善指針
+
+### [05c-tdd-emergency.mdc](mdc:.cursor/rules/05c-tdd-emergency.mdc)
+**使用タイミング**: 問題発生時・3回ルール到達時
+- エラー解決優先順位
+- 代替戦略の実行方法
+- エスカレーション基準
+
+## 実行時の基本原則
+
+### 効率的な参照方法
+1. **開始時**: [05-workflow.mdc](mdc:.cursor/rules/05-workflow.mdc) で全体フローを把握
+2. **実装中**: 必要に応じて [05a-tdd-cycle.mdc](mdc:.cursor/rules/05a-tdd-cycle.mdc), [05b-tdd-check.mdc](mdc:.cursor/rules/05b-tdd-check.mdc), [05c-tdd-emergency.mdc](mdc:.cursor/rules/05c-tdd-emergency.mdc)を詳細参照
+3. **問題発生**: 即座に [05c-tdd-emergency.mdc](mdc:.cursor/rules/05c-tdd-emergency.mdc) 参照、解決しない場合はエスカレーション
+4. **完了前**: [05b-tdd-check.mdc](mdc:.cursor/rules/05b-tdd-check.mdc) のチェックリスト必須実行
+
+### 重要な判断ポイント
+- **TDD vs 代替戦略**: 環境構築状況で判断
+- **Phase移行**: [05b-tdd-check.mdc](mdc:.cursor/rules/05b-tdd-check.mdc) の基準達成で判断
+- **エスカレーション**: [05c-tdd-emergency.mdc](mdc:.cursor/rules/05c-tdd-emergency.mdc) の3回ルール厳守
+- **完了判定**: P0基準の必須達成確認
+
+---
+
+**このワークフローに従い、適切なタイミングで専門ファイルを参照して効率的な開発を実行せよ。**

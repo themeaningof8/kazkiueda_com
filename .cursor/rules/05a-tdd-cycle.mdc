@@ -1,0 +1,295 @@
+---
+description: 05d-workflow-core.mdcが詳細について求めたら参照する
+globs: 
+alwaysApply: false
+---
+# 🔴🟢🔵 TDD実装サイクル
+
+[05b-tdd-check.mdc](mdc:.cursor/rules/05b-tdd-check.mdc) を参考にTDDでの各PhaseとさらにTDD Cycleにて必要最小限のタスクに分類する。
+
+## 基本サイクル（Red-Green-Refactor）
+
+### 1. Red: 失敗するテストを書く
+- まだ実装していない機能のテスト
+- 「何を作りたいか」を明確化
+- **必須**: [06-testing.mdc](mdc:.cursor/rules/06-testing.mdc) に基づくmock設定
+
+### 2. Green: 最小限のコードで通す
+- 美しさや効率は後回し
+- とにかくテストを通すことに集中
+
+### 3. Refactor: 改善する
+- テスト通過状態でコード改善
+- 重複除去、可読性向上
+
+## 実践的実装フロー
+
+### Step 1: コンポーネント設計
+```typescript
+// 1. 型定義から開始（Red段階の準備）
+interface ButtonProps {
+  children: React.ReactNode
+  variant?: 'primary' | 'secondary'
+  onClick?: () => void
+}
+
+// 2. テストファイル作成
+// Button.test.tsx
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@/test/test-utils'
+import { Button } from './Button'
+
+describe('Button', () => {
+  it('基本的なレンダリング', () => {
+    render(<Button>クリック</Button>)
+    expect(screen.getByRole('button', { name: 'クリック' })).toBeInTheDocument()
+  })
+})
+```
+
+### Step 2: Red-Green-Refactor実行
+```typescript
+// 🔴 Red: 失敗するテスト
+it('primary variantが適用される', () => {
+  render(<Button variant="primary">ボタン</Button>)
+  expect(screen.getByRole('button')).toHaveClass('bg-primary')
+})
+
+// 🟢 Green: 最小実装
+export function Button({ children, variant = 'secondary', ...props }: ButtonProps) {
+  return (
+    <button 
+      className={variant === 'primary' ? 'bg-primary' : 'bg-secondary'}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
+
+// 🔵 Refactor: 改善
+export function Button({ children, variant = 'secondary', ...props }: ButtonProps) {
+  const variantClasses = {
+    primary: 'bg-primary text-primary-foreground',
+    secondary: 'bg-secondary text-secondary-foreground'
+  }
+  
+  return (
+    <button 
+      className={cn('px-4 py-2 rounded-md', variantClasses[variant])}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
+```
+
+### Step 3: 機能拡張サイクル
+```typescript
+// 次の機能: クリックハンドリング
+
+// 🔴 Red: クリックテスト
+it('クリック時にhandlerが呼ばれる', () => {
+  const mockClick = vi.fn()
+  render(<Button onClick={mockClick}>ボタン</Button>)
+  
+  fireEvent.click(screen.getByRole('button'))
+  expect(mockClick).toHaveBeenCalledTimes(1)
+})
+
+// 🟢 Green: onClickを追加
+export function Button({ children, variant = 'secondary', onClick, ...props }: ButtonProps) {
+  // 既存のコードにonClickを追加するだけ
+}
+
+// 🔵 Refactor: エラーハンドリング追加
+it('disabled状態でクリックされない', () => {
+  const mockClick = vi.fn()
+  render(<Button onClick={mockClick} disabled>ボタン</Button>)
+  
+  fireEvent.click(screen.getByRole('button'))
+  expect(mockClick).not.toHaveBeenCalled()
+})
+```
+
+## 高速サイクル実行のポイント
+
+### 時間管理
+- **各ステップ5分以内**: 長時間考え込まない
+- **1機能1サイクル**: 複数機能を同時実装しない
+- **テスト実行は常時**: 保存時自動実行推奨
+
+### 最小実装の例
+```typescript
+// ❌ 避ける: 過度な実装
+function Button(props) {
+  // 50行の完璧な実装...
+}
+
+// ✅ 推奨: 最小実装
+function Button({ children }) {
+  return <button>{children}</button>
+}
+```
+
+### Transformation Priority（実装優先順位）
+```
+{} → nil → constant → constant+ → scalar →
+statement → statements → unconditional → if →
+scalar → array → array → container
+```
+
+**実践例:**
+1. `{}` → 空のコンポーネント作成
+2. `constant` → 固定値返却
+3. `scalar` → props受け取り
+4. `if` → 条件分岐追加
+5. `array` → 複数要素対応
+
+## 問題解決戦略
+
+### 環境構築で躓いた場合
+```typescript
+// 優先順位1: DOM環境修正
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    environment: 'jsdom' // happy-dom → jsdom
+  }
+})
+
+// 優先順位2: mock設定確認
+// src/test/setup.ts でブラウザAPI mock
+
+// 優先順位3: 3回ルール適用
+// 同一問題で3回失敗 → deepwiki相談
+```
+
+### テスト失敗パターンと対処
+```typescript
+// パターン1: import エラー
+// → test-utils.tsx のパス確認
+
+// パターン2: mock関数が動かない
+// → vi.fn() の設定確認、beforeEach でのクリア
+
+// パターン3: DOM要素が見つからない
+// → screen.debug() でDOM構造確認
+// → getByRole, getByText の使い分け
+
+// パターン4: 非同期処理の失敗
+// → waitFor, findBy系の使用
+```
+
+## コード例テンプレート
+
+### 基本テストテンプレート
+```typescript
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { render, screen, fireEvent, cleanup } from '@/test/test-utils'
+import { ComponentName } from './ComponentName'
+
+describe('ComponentName', () => {
+  beforeEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+  })
+
+  it('基本レンダリング', () => {
+    render(<ComponentName />)
+    expect(screen.getByText('期待するテキスト')).toBeInTheDocument()
+  })
+
+  it('インタラクション', () => {
+    const mockHandler = vi.fn()
+    render(<ComponentName onAction={mockHandler} />)
+    
+    fireEvent.click(screen.getByRole('button'))
+    expect(mockHandler).toHaveBeenCalled()
+  })
+
+  it('エラーハンドリング', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    
+    render(<ComponentName invalidProp={true} />)
+    
+    expect(consoleSpy).toHaveBeenCalled()
+    consoleSpy.mockRestore()
+  })
+})
+```
+
+### フォームコンポーネントのTDD
+```typescript
+// 🔴 Red: フォーム送信テスト
+it('有効な入力で送信される', async () => {
+  const mockSubmit = vi.fn()
+  render(<ContactForm onSubmit={mockSubmit} />)
+  
+  await userEvent.type(screen.getByLabelText('名前'), '田中太郎')
+  await userEvent.type(screen.getByLabelText('メール'), 'tanaka@example.com')
+  
+  fireEvent.click(screen.getByRole('button', { name: '送信' }))
+  
+  expect(mockSubmit).toHaveBeenCalledWith({
+    name: '田中太郎',
+    email: 'tanaka@example.com'
+  })
+})
+
+// 🟢 Green: 最小実装
+function ContactForm({ onSubmit }) {
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    onSubmit({
+      name: formData.get('name'),
+      email: formData.get('email')
+    })
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="name">名前</label>
+      <input id="name" name="name" />
+      
+      <label htmlFor="email">メール</label>
+      <input id="email" name="email" type="email" />
+      
+      <button type="submit">送信</button>
+    </form>
+  )
+}
+
+// 🔵 Refactor: バリデーション追加
+it('無効な入力でエラー表示', async () => {
+  render(<ContactForm onSubmit={vi.fn()} />)
+  
+  fireEvent.click(screen.getByRole('button', { name: '送信' }))
+  
+  expect(screen.getByText('名前は必須です')).toBeInTheDocument()
+})
+```
+
+## TDD成功のチェックリスト
+
+### 各サイクルで確認
+- [ ] Red: テストが確実に失敗している
+- [ ] Green: テストが成功している
+- [ ] Refactor: テストが継続して成功している
+- [ ] 次のサイクル準備: 新しい機能のテスト準備完了
+
+### 品質維持
+- [ ] テストカバレッジ維持（新機能追加時）
+- [ ] テスト実行時間 < 30秒（高速フィードバック）
+- [ ] mock設定の適切性（過度なmockを避ける）
+- [ ] 実装とテストの適切なバランス（テストのためのテスト禁止）
+
+## 継続的改善
+
+### 定期レビュー（週1回）
+- [ ] テストの品質確認
+- [ ] TDDサイクル時間の測定・改善
+- [ ] 難しいテストケースの共有・改善
+- [ ] mock戦略の見直し
