@@ -1,6 +1,6 @@
 ---
 description: 
-globs: *.ts,*.tsx,*.js,*.jsx
+globs: *.ts,*.tsx,*.js,*.jsx,*.astro
 alwaysApply: false
 ---
 # 🔍 品質管理・ツール設定

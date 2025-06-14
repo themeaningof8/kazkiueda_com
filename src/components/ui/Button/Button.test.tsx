@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@/test/test-utils';
-import { Button } from './button';
+import { Button } from './Button';
 
 describe('Button', () => {
   beforeEach(() => {

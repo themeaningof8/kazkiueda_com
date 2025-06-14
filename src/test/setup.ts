@@ -8,9 +8,6 @@ afterEach(() => {
   // メモリリーク防止
   vi.clearAllTimers();
   vi.unstubAllGlobals();
-
-  // ガベージコレクション促進（大量テスト時）
-  if (global.gc) global.gc();
 });
 
 beforeAll(() => {

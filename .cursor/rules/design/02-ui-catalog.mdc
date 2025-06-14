@@ -36,7 +36,6 @@ export default {
   addons: [
     '@storybook/addon-essentials',      // 基本機能
     '@storybook/addon-a11y',            // アクセシビリティ
-    '@storybook/addon-design-tokens',   // デザイントークン
     '@storybook/addon-viewport',        // レスポンシブ確認
     '@storybook/addon-interactions',    // インタラクションテスト
   ]
