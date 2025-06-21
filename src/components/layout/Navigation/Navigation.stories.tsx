@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
+
 import { BrowserRouter } from 'react-router-dom'
+
 import Navigation from './Navigation'
 
 const meta = {
@@ -9,7 +11,7 @@ const meta = {
     layout: 'fullscreen',
   },
   decorators: [
-    (Story) => (
+    Story => (
       <BrowserRouter>
         <Story />
       </BrowserRouter>
@@ -21,4 +23,4 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {} 
+export const Default: Story = {}

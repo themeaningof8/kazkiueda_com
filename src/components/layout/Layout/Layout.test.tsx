@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react'
+
 import { BrowserRouter } from 'react-router-dom'
+
 import Layout from './Layout'
 
 const LayoutWithRouter = ({ children }: { children: React.ReactNode }) => (
@@ -24,4 +26,4 @@ describe('Layout', () => {
     // 子コンポーネントの確認
     expect(screen.getByText('Test Content')).toBeInTheDocument()
   })
-}) 
+})

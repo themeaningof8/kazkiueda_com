@@ -5,8 +5,9 @@ alwaysApply: true
 ---
 # コーディングルール
 
-- パッケージマネージャーはbunを使用
-- タスクを終了する前に必ず`check`,`build`,`test`コマンドを実行
+- パッケージマネージャーはbunを使用、
+- タスクを終了する前に必ず`bun run check`,`bun run build`,`bun run test`コマンドを実行、bun testは禁止
 - ディレクトリ構成はreact-bulletproofで
 - 各ファイルはサブディレクトリを作成し、コロケーション戦略に基づき管理
 - ファイル作成時は同時にtestファイルを準備
+- UIパーツは`src/components/ui`内のコンポーネントを使用
