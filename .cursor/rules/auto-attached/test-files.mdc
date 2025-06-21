@@ -1,0 +1,8 @@
+---
+description: 
+globs: *.test.ts,*.test.tsx
+alwaysApply: false
+---
+# テストファイル開発ルール
+
+- 直接DOMファイルを記載する偽装テストは禁止

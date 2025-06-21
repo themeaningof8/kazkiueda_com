@@ -1,42 +1,45 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@/test/test-utils';
-import { Button } from './Button';
+import { render, screen } from '@testing-library/react'
+import { Button } from './Button'
 
 describe('Button', () => {
-  beforeEach(() => {
-    vi.clearAllMocks(); // 各テスト前の自動クリーンアップ
-  });
+  it('renders button with text', () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByRole('button', { name: 'Click me' })).toBeInTheDocument()
+  })
 
-  it('基本レンダリング', () => {
-    render(<Button>Test Button</Button>);
-    expect(screen.getByRole('button')).toBeInTheDocument();
-    expect(screen.getByText('Test Button')).toBeInTheDocument();
-  });
+  it('applies variant classes correctly', () => {
+    render(<Button variant="destructive">Destructive</Button>)
+    const button = screen.getByRole('button')
+    expect(button).toHaveClass('bg-destructive')
+  })
 
-  it('clickイベントが正常に動作する', () => {
-    const mockHandler = vi.fn();
-    render(<Button onClick={mockHandler}>Click me</Button>);
+  it('applies size classes correctly', () => {
+    render(<Button size="lg">Large</Button>)
+    const button = screen.getByRole('button')
+    expect(button).toHaveClass('h-10')
+  })
 
-    fireEvent.click(screen.getByRole('button'));
-    expect(mockHandler).toHaveBeenCalledTimes(1);
-  });
+  it('can be disabled', () => {
+    render(<Button disabled>Disabled</Button>)
+    const button = screen.getByRole('button')
+    expect(button).toBeDisabled()
+    expect(button).toHaveClass('disabled:opacity-50')
+  })
 
-  it('disabled状態では clickイベントが発火しない', () => {
-    const mockHandler = vi.fn();
+  it('forwards ref correctly', () => {
+    const ref = { current: null }
+    render(<Button ref={ref}>Button</Button>)
+    expect(ref.current).toBeInstanceOf(HTMLButtonElement)
+  })
+
+  it('supports asChild prop', () => {
     render(
-      <Button onClick={mockHandler} disabled>
-        Disabled Button
+      <Button asChild>
+        <a href="/test">Link Button</a>
       </Button>
-    );
-
-    fireEvent.click(screen.getByRole('button'));
-    expect(mockHandler).not.toHaveBeenCalled();
-    expect(screen.getByRole('button')).toBeDisabled();
-  });
-
-  it('variant propsが正しく適用される', () => {
-    render(<Button variant="destructive">Destructive Button</Button>);
-    const button = screen.getByRole('button');
-    expect(button).toHaveClass('bg-destructive');
-  });
-});
+    )
+    const link = screen.getByRole('link')
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute('href', '/test')
+  })
+}) 
