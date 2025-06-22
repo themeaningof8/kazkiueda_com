@@ -15,11 +15,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  render: () => <Calendar />,
+  render: () => <Calendar mode='single' />,
 }
 
 export const WithSelectedDate: Story = {
-  render: () => <Calendar />,
+  render: () => <Calendar mode='single' selected={new Date()} />,
 }
 
 export const WithDateRange: Story = {
