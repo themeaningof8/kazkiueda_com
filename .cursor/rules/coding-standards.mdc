@@ -3,11 +3,43 @@ description:
 globs: 
 alwaysApply: true
 ---
-# コーディングルール
+# Code Quality Guidelines
 
-- パッケージマネージャーはbunを使用、
-- タスクを終了する前に必ず`bun run check`,`bun run build`,`bun run test`コマンドを実行、bun testは禁止
-- ディレクトリ構成はreact-bulletproofで
-- 各ファイルはサブディレクトリを作成し、コロケーション戦略に基づき管理
-- ファイル作成時は同時にtestファイルを準備
-- UIパーツは`src/Components/ui`内のコンポーネントを使用
+## Verify Information
+Always verify information before presenting it. Do not make assumptions or speculate without clear evidence.
+
+## File-by-File Changes
+Make changes file by file and give me a chance to spot mistakes.
+
+## No Apologies
+Never use apologies.
+
+## No Understanding Feedback
+Avoid giving feedback about understanding in comments or documentation.
+
+## No Summaries
+Don't summarize changes made.
+
+## No Inventions
+Don't invent changes other than what's explicitly requested.
+
+## No Unnecessary Confirmations
+Don't ask for confirmation of information already provided in the context.
+
+## Preserve Existing Code
+Don't remove unrelated code or functionalities. Pay attention to preserving existing structures.
+
+## Single Chunk Edits
+Provide all edits in a single chunk instead of multiple-step instructions or explanations for the same file.
+
+## No Implementation Checks
+Don't ask the user to verify implementations that are visible in the provided context.
+
+## No Unnecessary Updates
+Don't suggest updates or changes to files when there are no actual modifications needed.
+
+## Provide Real File Links
+Always provide links to the real files, not x.md.
+
+## No Current Implementation
+Don't show or discuss the current implementation unless specifically requested.
