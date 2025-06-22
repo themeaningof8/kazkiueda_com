@@ -19,9 +19,9 @@ alwaysApply: false
 
 ## Performance
 - Use React.memo for expensive components
-- Implement proper key props for list items
 - Avoid creating objects and functions in render
 - Use useMemo and useCallback judiciously
+- Implement Skeleton components for data loading states in props
 
 ## Component Structure
 - Keep JSX readable with proper indentation
