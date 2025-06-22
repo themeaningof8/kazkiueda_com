@@ -1,9 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs'
 
 const meta: Meta<typeof Tabs> = {
-  title: 'UI/Tabs',
+  title: 'Components/UI/Tabs',
   component: Tabs,
   parameters: {
     layout: 'centered',

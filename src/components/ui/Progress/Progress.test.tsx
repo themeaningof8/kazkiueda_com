@@ -8,7 +8,7 @@ describe('Progress', () => {
     const progress = screen.getByTestId('progress')
     expect(progress).toBeInTheDocument()
     expect(progress).toHaveAttribute('data-slot', 'progress')
-    // Radix UI Progress doesn't automatically set data-value attribute
+    // Radix ui Progress doesn't automatically set data-value attribute
   })
 
   it('applies custom className', () => {

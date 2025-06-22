@@ -10,4 +10,4 @@ alwaysApply: true
 - ディレクトリ構成はreact-bulletproofで
 - 各ファイルはサブディレクトリを作成し、コロケーション戦略に基づき管理
 - ファイル作成時は同時にtestファイルを準備
-- UIパーツは`src/components/ui`内のコンポーネントを使用
+- UIパーツは`src/Components/ui`内のコンポーネントを使用

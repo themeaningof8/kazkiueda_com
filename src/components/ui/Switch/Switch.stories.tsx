@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { Label } from '@/components/ui/Label/Label'
+import { Label } from '@/components/ui/Label'
 
 import { Switch } from './Switch'
 

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import {
   Breadcrumb,
@@ -11,7 +11,7 @@ import {
 } from './Breadcrumb'
 
 const meta: Meta<typeof Breadcrumb> = {
-  title: 'UI/Breadcrumb',
+  title: 'Components/UI/Breadcrumb',
   component: Breadcrumb,
   parameters: {
     layout: 'centered',

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
   Bar,
   BarChart,
@@ -20,7 +20,7 @@ import {
 } from './Chart'
 
 const meta = {
-  title: 'UI/Chart',
+  title: 'Components/UI/Chart',
   component: ChartContainer,
   parameters: {
     layout: 'centered',

@@ -3,7 +3,7 @@ import { vi } from 'vitest' // グローバルオブジェクトの設定
 
 ;(globalThis as any).vi = vi
 
-// ResizeObserver mock for Radix UI components
+// ResizeObserver mock for Radix ui components
 global.ResizeObserver = class ResizeObserver {
   callback: ResizeObserverCallback
 

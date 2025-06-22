@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
 } from './Dialog'
 
 const meta: Meta<typeof Dialog> = {
-  title: 'UI/Dialog',
+  title: 'Components/UI/Dialog',
   component: Dialog,
   parameters: {
     layout: 'centered',
@@ -95,7 +95,7 @@ export const Simple: Story = {
         <DialogHeader>
           <DialogTitle>About This Application</DialogTitle>
           <DialogDescription>
-            This is a simple dialog example built with Radix UI primitives and Tailwind CSS.
+            This is a simple dialog example built with Radix ui primitives and Tailwind CSS.
           </DialogDescription>
         </DialogHeader>
       </DialogContent>

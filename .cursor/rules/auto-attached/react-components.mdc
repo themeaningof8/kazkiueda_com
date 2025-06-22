@@ -49,7 +49,7 @@ alwaysApply: false
 - Implement Error Boundaries
 - Handle async errors properly
 - Show user-friendly error messages
-- Implement proper fallback UI
+- Implement proper fallback ui
 - Log errors appropriately
 - Handle edge cases gracefully
 

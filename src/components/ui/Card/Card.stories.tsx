@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Bell, MoreHorizontal, Settings } from 'lucide-react'
 
-import { Button } from '@/components/ui/Button/Button'
+import { Button } from '@/components/ui/Button'
 
 import {
   Card,

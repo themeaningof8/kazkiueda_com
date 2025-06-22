@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import {
   NavigationMenu,
@@ -37,7 +37,7 @@ export const Default: Story = {
                   >
                     <div className='mb-2 mt-4 text-lg font-medium'>shadcn/ui</div>
                     <p className='text-sm leading-tight text-muted-foreground'>
-                      Beautifully designed components built with Radix UI and Tailwind CSS.
+                      Beautifully designed components built with Radix ui and Tailwind CSS.
                     </p>
                   </a>
                 </NavigationMenuLink>
@@ -50,7 +50,7 @@ export const Default: Story = {
                   >
                     <div className='text-sm font-medium leading-none'>Introduction</div>
                     <p className='line-clamp-2 text-sm leading-snug text-muted-foreground'>
-                      Re-usable components built using Radix UI and Tailwind CSS.
+                      Re-usable components built using Radix ui and Tailwind CSS.
                     </p>
                   </a>
                 </NavigationMenuLink>

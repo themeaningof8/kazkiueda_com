@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from '@storybook/test'
 import {
   Cloud,
@@ -37,13 +37,13 @@ import {
 } from './DropdownMenu'
 
 const meta = {
-  title: 'UI/DropdownMenu',
+  title: 'Components/UI/DropdownMenu',
   component: DropdownMenu,
   parameters: {
     layout: 'centered',
     docs: {
       description: {
-        component: 'A versatile dropdown menu component built on top of Radix UI.',
+        component: 'A versatile dropdown menu component built on top of Radix ui.',
       },
     },
   },

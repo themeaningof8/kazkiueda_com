@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import {
   Select,
@@ -12,7 +12,7 @@ import {
 } from './Select'
 
 const meta: Meta<typeof Select> = {
-  title: 'UI/Select',
+  title: 'Components/UI/Select',
   component: Select,
   parameters: {
     layout: 'centered',

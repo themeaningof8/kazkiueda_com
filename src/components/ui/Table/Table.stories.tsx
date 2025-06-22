@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import {
   Table,
@@ -12,7 +12,7 @@ import {
 } from './Table'
 
 const meta: Meta<typeof Table> = {
-  title: 'UI/Table',
+  title: 'Components/UI/Table',
   component: Table,
   parameters: {
     layout: 'centered',
