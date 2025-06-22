@@ -2,7 +2,7 @@ import { Suspense, lazy } from 'react'
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 
 import Layout from '@/components/layout'
-import { ErrorBoundary } from '@/components/layout/ErrorBoundary'
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { useLoadPerformance, useMemoryMonitor } from '@/hooks/usePerformanceMonitor'
 
 // ページコンポーネントの遅延読み込み
