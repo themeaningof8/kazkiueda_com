@@ -24,5 +24,15 @@ const config: StorybookConfig = {
       "propFilter": (prop) => (prop.parent ? !/node_modules/.test(prop.parent.fileName) : true),
     },
   },
+  async viteFinal(config) {
+    // Fix "process is not defined" error
+    config.define = {
+      ...config.define,
+      'process.env': '{}',
+      global: 'globalThis',
+    };
+    
+    return config;
+  },
 };
 export default config;
