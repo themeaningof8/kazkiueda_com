@@ -5,11 +5,13 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Breadcrumb({ ...props }: React.ComponentProps<'nav'>) {
+const Breadcrumb = React.memo(({ ...props }: React.ComponentProps<'nav'>) => {
   return <nav aria-label='breadcrumb' data-slot='breadcrumb' {...props} />
-}
+})
 
-function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>) {
+Breadcrumb.displayName = 'Breadcrumb'
+
+const BreadcrumbList = React.memo(({ className, ...props }: React.ComponentProps<'ol'>) => {
   return (
     <ol
       data-slot='breadcrumb-list'
@@ -20,9 +22,11 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>) {
       {...props}
     />
   )
-}
+})
 
-function BreadcrumbItem({ className, ...props }: React.ComponentProps<'li'>) {
+BreadcrumbList.displayName = 'BreadcrumbList'
+
+const BreadcrumbItem = React.memo(({ className, ...props }: React.ComponentProps<'li'>) => {
   return (
     <li
       data-slot='breadcrumb-item'
@@ -30,27 +34,33 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<'li'>) {
       {...props}
     />
   )
-}
+})
 
-function BreadcrumbLink({
-  asChild,
-  className,
-  ...props
-}: React.ComponentProps<'a'> & {
-  asChild?: boolean
-}) {
-  const Comp = asChild ? Slot : 'a'
+BreadcrumbItem.displayName = 'BreadcrumbItem'
 
-  return (
-    <Comp
-      data-slot='breadcrumb-link'
-      className={cn('hover:text-foreground transition-colors', className)}
-      {...props}
-    />
-  )
-}
+const BreadcrumbLink = React.memo(
+  ({
+    asChild,
+    className,
+    ...props
+  }: React.ComponentProps<'a'> & {
+    asChild?: boolean
+  }) => {
+    const Comp = asChild ? Slot : 'a'
 
-function BreadcrumbPage({ className, ...props }: React.ComponentProps<'span'>) {
+    return (
+      <Comp
+        data-slot='breadcrumb-link'
+        className={cn('hover:text-foreground transition-colors', className)}
+        {...props}
+      />
+    )
+  }
+)
+
+BreadcrumbLink.displayName = 'BreadcrumbLink'
+
+const BreadcrumbPage = React.memo(({ className, ...props }: React.ComponentProps<'span'>) => {
   return (
     <span
       data-slot='breadcrumb-page'
@@ -61,23 +71,29 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<'span'>) {
       {...props}
     />
   )
-}
+})
 
-function BreadcrumbSeparator({ children, className, ...props }: React.ComponentProps<'li'>) {
-  return (
-    <li
-      data-slot='breadcrumb-separator'
-      role='presentation'
-      aria-hidden='true'
-      className={cn('[&>svg]:size-3.5', className)}
-      {...props}
-    >
-      {children ?? <ChevronRight />}
-    </li>
-  )
-}
+BreadcrumbPage.displayName = 'BreadcrumbPage'
 
-function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<'span'>) {
+const BreadcrumbSeparator = React.memo(
+  ({ children, className, ...props }: React.ComponentProps<'li'>) => {
+    return (
+      <li
+        data-slot='breadcrumb-separator'
+        role='presentation'
+        aria-hidden='true'
+        className={cn('[&>svg]:size-3.5', className)}
+        {...props}
+      >
+        {children ?? <ChevronRight />}
+      </li>
+    )
+  }
+)
+
+BreadcrumbSeparator.displayName = 'BreadcrumbSeparator'
+
+const BreadcrumbEllipsis = React.memo(({ className, ...props }: React.ComponentProps<'span'>) => {
   return (
     <span
       data-slot='breadcrumb-ellipsis'
@@ -90,7 +106,9 @@ function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<'span'
       <span className='sr-only'>More</span>
     </span>
   )
-}
+})
+
+BreadcrumbEllipsis.displayName = 'BreadcrumbEllipsis'
 
 export {
   Breadcrumb,

@@ -33,9 +33,9 @@ const FormField = <
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
   return (
-    <FormFieldContext.Provider value={{ name: props.name }}>
+    <FormFieldContext value={{ name: props.name }}>
       <Controller {...props} />
-    </FormFieldContext.Provider>
+    </FormFieldContext>
   )
 }
 
@@ -68,7 +68,7 @@ type FormItemContextValue = {
 
 const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue)
 
-function FormItem({ className, ...props }: React.ComponentProps<'div'>) {
+const FormItem = React.memo(({ className, ...props }: React.ComponentProps<'div'>) => {
   const id = React.useId()
 
   return (
@@ -76,23 +76,29 @@ function FormItem({ className, ...props }: React.ComponentProps<'div'>) {
       <div data-slot='form-item' className={cn('grid gap-2', className)} {...props} />
     </FormItemContext.Provider>
   )
-}
+})
 
-function FormLabel({ className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>) {
-  const { error, formItemId } = useFormField()
+FormItem.displayName = 'FormItem'
 
-  return (
-    <Label
-      data-slot='form-label'
-      data-error={!!error}
-      className={cn('data-[error=true]:text-destructive', className)}
-      htmlFor={formItemId}
-      {...props}
-    />
-  )
-}
+const FormLabel = React.memo(
+  ({ className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>) => {
+    const { error, formItemId } = useFormField()
 
-function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
+    return (
+      <Label
+        data-slot='form-label'
+        data-error={!!error}
+        className={cn('data-[error=true]:text-destructive', className)}
+        htmlFor={formItemId}
+        {...props}
+      />
+    )
+  }
+)
+
+FormLabel.displayName = 'FormLabel'
+
+const FormControl = React.memo(({ ...props }: React.ComponentProps<typeof Slot>) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
   return (
@@ -104,9 +110,11 @@ function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
       {...props}
     />
   )
-}
+})
 
-function FormDescription({ className, ...props }: React.ComponentProps<'p'>) {
+FormControl.displayName = 'FormControl'
+
+const FormDescription = React.memo(({ className, ...props }: React.ComponentProps<'p'>) => {
   const { formDescriptionId } = useFormField()
 
   return (
@@ -117,9 +125,11 @@ function FormDescription({ className, ...props }: React.ComponentProps<'p'>) {
       {...props}
     />
   )
-}
+})
 
-function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
+FormDescription.displayName = 'FormDescription'
+
+const FormMessage = React.memo(({ className, ...props }: React.ComponentProps<'p'>) => {
   const { error, formMessageId } = useFormField()
   const body = error ? String(error?.message ?? '') : props.children
 
@@ -137,7 +147,9 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
       {body}
     </p>
   )
-}
+})
+
+FormMessage.displayName = 'FormMessage'
 
 export {
   useFormField,

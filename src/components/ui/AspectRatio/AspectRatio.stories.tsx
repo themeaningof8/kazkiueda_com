@@ -26,11 +26,9 @@ export const Default: Story = {
   render: args => (
     <div className='w-96'>
       <AspectRatio {...args}>
-        <img
-          src='https://via.placeholder.com/800x450'
-          alt='Placeholder'
-          className='rounded-md object-cover w-full h-full'
-        />
+        <div className='bg-muted rounded-md flex items-center justify-center h-full'>
+          <span className='text-muted-foreground'>16:9 Portrait</span>
+        </div>
       </AspectRatio>
     </div>
   ),

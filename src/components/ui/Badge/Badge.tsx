@@ -24,15 +24,31 @@ const badgeVariants = cva(
   }
 )
 
-function Badge({
-  className,
-  variant,
-  asChild = false,
-  ...props
-}: React.ComponentProps<'span'> & VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
-  const Comp = asChild ? Slot : 'span'
+const Badge = React.memo(
+  ({
+    className,
+    variant,
+    asChild = false,
+    ref,
+    ...props
+  }: React.ComponentProps<'span'> &
+    VariantProps<typeof badgeVariants> & {
+      asChild?: boolean
+      ref?: React.Ref<HTMLSpanElement>
+    }) => {
+    const Comp = asChild ? Slot : 'span'
 
-  return <Comp data-slot='badge' className={cn(badgeVariants({ variant }), className)} {...props} />
-}
+    return (
+      <Comp
+        ref={ref}
+        data-slot='badge'
+        className={cn(badgeVariants({ variant }), className)}
+        {...props}
+      />
+    )
+  }
+)
+
+Badge.displayName = 'Badge'
 
 export { Badge, badgeVariants }

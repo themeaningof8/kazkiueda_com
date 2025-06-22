@@ -7,56 +7,68 @@ import * as React from 'react'
 import { buttonVariants } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 
-function AlertDialog({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
-  return <AlertDialogPrimitive.Root data-slot='alert-dialog' {...props} />
-}
+const AlertDialog = React.memo(
+  ({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) => {
+    return <AlertDialogPrimitive.Root data-slot='alert-dialog' {...props} />
+  }
+)
 
-function AlertDialogTrigger({
-  ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Trigger>) {
-  return <AlertDialogPrimitive.Trigger data-slot='alert-dialog-trigger' {...props} />
-}
+AlertDialog.displayName = 'AlertDialog'
 
-function AlertDialogPortal({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) {
-  return <AlertDialogPrimitive.Portal data-slot='alert-dialog-portal' {...props} />
-}
+const AlertDialogTrigger = React.memo(
+  ({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Trigger>) => {
+    return <AlertDialogPrimitive.Trigger data-slot='alert-dialog-trigger' {...props} />
+  }
+)
 
-function AlertDialogOverlay({
-  className,
-  ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Overlay>) {
-  return (
-    <AlertDialogPrimitive.Overlay
-      data-slot='alert-dialog-overlay'
-      className={cn(
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
-        className
-      )}
-      {...props}
-    />
-  )
-}
+AlertDialogTrigger.displayName = 'AlertDialogTrigger'
 
-function AlertDialogContent({
-  className,
-  ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
-  return (
-    <AlertDialogPortal>
-      <AlertDialogOverlay />
-      <AlertDialogPrimitive.Content
-        data-slot='alert-dialog-content'
+const AlertDialogPortal = React.memo(
+  ({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) => {
+    return <AlertDialogPrimitive.Portal data-slot='alert-dialog-portal' {...props} />
+  }
+)
+
+AlertDialogPortal.displayName = 'AlertDialogPortal'
+
+const AlertDialogOverlay = React.memo(
+  ({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Overlay>) => {
+    return (
+      <AlertDialogPrimitive.Overlay
+        data-slot='alert-dialog-overlay'
         className={cn(
-          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg',
+          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
           className
         )}
         {...props}
       />
-    </AlertDialogPortal>
-  )
-}
+    )
+  }
+)
 
-function AlertDialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
+AlertDialogOverlay.displayName = 'AlertDialogOverlay'
+
+const AlertDialogContent = React.memo(
+  ({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Content>) => {
+    return (
+      <AlertDialogPortal>
+        <AlertDialogOverlay />
+        <AlertDialogPrimitive.Content
+          data-slot='alert-dialog-content'
+          className={cn(
+            'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg',
+            className
+          )}
+          {...props}
+        />
+      </AlertDialogPortal>
+    )
+  }
+)
+
+AlertDialogContent.displayName = 'AlertDialogContent'
+
+const AlertDialogHeader = React.memo(({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
     <div
       data-slot='alert-dialog-header'
@@ -64,9 +76,11 @@ function AlertDialogHeader({ className, ...props }: React.ComponentProps<'div'>)
       {...props}
     />
   )
-}
+})
 
-function AlertDialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
+AlertDialogHeader.displayName = 'AlertDialogHeader'
+
+const AlertDialogFooter = React.memo(({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
     <div
       data-slot='alert-dialog-footer'
@@ -74,52 +88,58 @@ function AlertDialogFooter({ className, ...props }: React.ComponentProps<'div'>)
       {...props}
     />
   )
-}
+})
 
-function AlertDialogTitle({
-  className,
-  ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Title>) {
-  return (
-    <AlertDialogPrimitive.Title
-      data-slot='alert-dialog-title'
-      className={cn('text-lg font-semibold', className)}
-      {...props}
-    />
-  )
-}
+AlertDialogFooter.displayName = 'AlertDialogFooter'
 
-function AlertDialogDescription({
-  className,
-  ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Description>) {
-  return (
-    <AlertDialogPrimitive.Description
-      data-slot='alert-dialog-description'
-      className={cn('text-muted-foreground text-sm', className)}
-      {...props}
-    />
-  )
-}
+const AlertDialogTitle = React.memo(
+  ({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Title>) => {
+    return (
+      <AlertDialogPrimitive.Title
+        data-slot='alert-dialog-title'
+        className={cn('text-lg font-semibold', className)}
+        {...props}
+      />
+    )
+  }
+)
 
-function AlertDialogAction({
-  className,
-  ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Action>) {
-  return <AlertDialogPrimitive.Action className={cn(buttonVariants(), className)} {...props} />
-}
+AlertDialogTitle.displayName = 'AlertDialogTitle'
 
-function AlertDialogCancel({
-  className,
-  ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Cancel>) {
-  return (
-    <AlertDialogPrimitive.Cancel
-      className={cn(buttonVariants({ variant: 'outline' }), className)}
-      {...props}
-    />
-  )
-}
+const AlertDialogDescription = React.memo(
+  ({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Description>) => {
+    return (
+      <AlertDialogPrimitive.Description
+        data-slot='alert-dialog-description'
+        className={cn('text-muted-foreground text-sm', className)}
+        {...props}
+      />
+    )
+  }
+)
+
+AlertDialogDescription.displayName = 'AlertDialogDescription'
+
+const AlertDialogAction = React.memo(
+  ({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Action>) => {
+    return <AlertDialogPrimitive.Action className={cn(buttonVariants(), className)} {...props} />
+  }
+)
+
+AlertDialogAction.displayName = 'AlertDialogAction'
+
+const AlertDialogCancel = React.memo(
+  ({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel>) => {
+    return (
+      <AlertDialogPrimitive.Cancel
+        className={cn(buttonVariants({ variant: 'outline' }), className)}
+        {...props}
+      />
+    )
+  }
+)
+
+AlertDialogCancel.displayName = 'AlertDialogCancel'
 
 export {
   AlertDialog,

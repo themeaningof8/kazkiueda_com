@@ -58,4 +58,10 @@ describe('Badge', () => {
     expect(screen.getByText('Destructive')).toHaveClass('bg-destructive')
     expect(screen.getByText('Outline')).toHaveClass('text-foreground')
   })
+
+  it('supports ref forwarding', () => {
+    const ref = { current: null }
+    render(<Badge ref={ref}>Ref Badge</Badge>)
+    expect(ref.current).toBeInstanceOf(HTMLSpanElement)
+  })
 })

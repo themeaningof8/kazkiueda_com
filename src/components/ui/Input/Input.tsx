@@ -2,7 +2,11 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
+type InputProps = React.ComponentProps<'input'> & {
+  ref?: React.Ref<HTMLInputElement>
+}
+
+const Input = React.memo<InputProps>(({ className, type, ref, ...props }) => {
   return (
     <input
       type={type}
@@ -13,9 +17,12 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
         'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
         className
       )}
+      ref={ref}
       {...props}
     />
   )
-}
+})
 
-export { Input }
+Input.displayName = 'Input'
+
+export { Input, type InputProps }

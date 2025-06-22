@@ -20,22 +20,26 @@ const alertVariants = cva(
   }
 )
 
-function Alert({
-  className,
-  variant,
-  ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof alertVariants>) {
-  return (
-    <div
-      data-slot='alert'
-      role='alert'
-      className={cn(alertVariants({ variant }), className)}
-      {...props}
-    />
-  )
-}
+const Alert = React.memo(
+  ({
+    className,
+    variant,
+    ...props
+  }: React.ComponentProps<'div'> & VariantProps<typeof alertVariants>) => {
+    return (
+      <div
+        data-slot='alert'
+        role='alert'
+        className={cn(alertVariants({ variant }), className)}
+        {...props}
+      />
+    )
+  }
+)
 
-function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
+Alert.displayName = 'Alert'
+
+const AlertTitle = React.memo(({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
     <div
       data-slot='alert-title'
@@ -43,9 +47,11 @@ function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
       {...props}
     />
   )
-}
+})
 
-function AlertDescription({ className, ...props }: React.ComponentProps<'div'>) {
+AlertTitle.displayName = 'AlertTitle'
+
+const AlertDescription = React.memo(({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
     <div
       data-slot='alert-description'
@@ -56,6 +62,8 @@ function AlertDescription({ className, ...props }: React.ComponentProps<'div'>) 
       {...props}
     />
   )
-}
+})
+
+AlertDescription.displayName = 'AlertDescription'
 
 export { Alert, AlertTitle, AlertDescription }
