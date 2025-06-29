@@ -4,7 +4,7 @@ import * as TabsPrimitive from '@radix-ui/react-tabs'
 
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
 const Tabs = React.memo(
   ({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) => {

@@ -2,7 +2,14 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { Button } from '../Button'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './Sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from './Sheet'
 
 describe('Sheet', () => {
   it('renders sheet trigger', () => {
@@ -14,6 +21,7 @@ describe('Sheet', () => {
         <SheetContent>
           <SheetHeader>
             <SheetTitle>Test Title</SheetTitle>
+            <SheetDescription>Test Description</SheetDescription>
           </SheetHeader>
         </SheetContent>
       </Sheet>
@@ -33,6 +41,7 @@ describe('Sheet', () => {
         <SheetContent>
           <SheetHeader>
             <SheetTitle>Test Title</SheetTitle>
+            <SheetDescription>Test Description</SheetDescription>
           </SheetHeader>
           <p>Sheet content</p>
         </SheetContent>
@@ -55,6 +64,7 @@ describe('Sheet', () => {
         <SheetContent>
           <SheetHeader>
             <SheetTitle>Controlled Sheet</SheetTitle>
+            <SheetDescription>Test Description</SheetDescription>
           </SheetHeader>
         </SheetContent>
       </Sheet>

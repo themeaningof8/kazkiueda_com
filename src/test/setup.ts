@@ -1,28 +1,18 @@
 import '@testing-library/jest-dom'
-import { vi } from 'vitest' // グローバルオブジェクトの設定
+import { cleanup } from '@testing-library/react'
+import { afterEach, vi } from 'vitest'
 
-;(globalThis as any).vi = vi
+afterEach(() => {
+  cleanup()
+})
 
-// ResizeObserver mock for Radix ui components
-global.ResizeObserver = class ResizeObserver {
-  callback: ResizeObserverCallback
+const ResizeObserver = vi.fn(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}))
 
-  constructor(callback: ResizeObserverCallback) {
-    this.callback = callback
-  }
-
-  observe() {
-    // Mock implementation
-  }
-
-  unobserve() {
-    // Mock implementation
-  }
-
-  disconnect() {
-    // Mock implementation
-  }
-}
+vi.stubGlobal('ResizeObserver', ResizeObserver)
 
 // IntersectionObserver mock with proper implementation
 const mockIntersectionObserver = vi.fn(() => ({

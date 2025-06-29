@@ -6,11 +6,11 @@ describe('Resizable', () => {
   it('renders resizable panel group with panels', () => {
     render(
       <ResizablePanelGroup direction='horizontal'>
-        <ResizablePanel>
+        <ResizablePanel defaultSize={50}>
           <div>Panel 1</div>
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel>
+        <ResizablePanel defaultSize={50}>
           <div>Panel 2</div>
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -27,7 +27,7 @@ describe('Resizable', () => {
         className='custom-panel-group'
         data-testid='panel-group'
       >
-        <ResizablePanel>
+        <ResizablePanel defaultSize={50}>
           <div>Content</div>
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -40,11 +40,11 @@ describe('Resizable', () => {
   it('supports vertical direction', () => {
     render(
       <ResizablePanelGroup direction='vertical' data-testid='panel-group'>
-        <ResizablePanel>
+        <ResizablePanel defaultSize={50}>
           <div>Panel 1</div>
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel>
+        <ResizablePanel defaultSize={50}>
           <div>Panel 2</div>
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -57,11 +57,11 @@ describe('Resizable', () => {
   it('renders handle between panels', () => {
     render(
       <ResizablePanelGroup direction='horizontal'>
-        <ResizablePanel>
+        <ResizablePanel defaultSize={50}>
           <div>Panel 1</div>
         </ResizablePanel>
         <ResizableHandle data-testid='resize-handle' />
-        <ResizablePanel>
+        <ResizablePanel defaultSize={50}>
           <div>Panel 2</div>
         </ResizablePanel>
       </ResizablePanelGroup>

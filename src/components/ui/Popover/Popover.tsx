@@ -1,16 +1,11 @@
 'use client'
 
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
-const Popover = React.memo(({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Root>) => {
-  return <PopoverPrimitive.Root data-slot='popover' {...props} />
-})
-
-Popover.displayName = 'Popover'
+const Popover = PopoverPrimitive.Root
 
 const PopoverTrigger = React.memo(
   ({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) => {
