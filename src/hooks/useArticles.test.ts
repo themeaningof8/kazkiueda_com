@@ -3,6 +3,7 @@ import { HttpResponse, http } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { server } from '@/mocks/server'
+import type { ApiError } from '@/types/api'
 
 import { useArticles } from './useArticles'
 
@@ -37,12 +38,14 @@ describe('useArticles', () => {
 
   it('APIエラー時にエラーメッセージが表示される', async () => {
     // エラーレスポンスを返すハンドラーに置き換え
+    const errorResponse: ApiError = {
+      message: 'サーバーエラーが発生しました',
+      code: 'SERVER_ERROR',
+      status: 500,
+    }
     server.use(
       http.get('https://api.example.com/articles', () => {
-        return HttpResponse.json(
-          { message: 'サーバーエラーが発生しました', code: 'SERVER_ERROR' },
-          { status: 500 }
-        )
+        return HttpResponse.json(errorResponse, { status: 500 })
       })
     )
 

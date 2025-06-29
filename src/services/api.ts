@@ -1,4 +1,5 @@
 import type { ApiError, Article, User } from '@/types/api'
+import type { Result } from '@/types/result'
 
 const API_BASE_URL = 'https://api.example.com'
 
@@ -15,7 +16,7 @@ export class ApiErrorClass extends Error {
 }
 
 // 基本的なfetch関数
-async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
+async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<Result<T, ApiErrorClass>> {
   const url = `${API_BASE_URL}${endpoint}`
 
   try {
@@ -34,37 +35,38 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
         status: response.status,
       }))
 
-      throw new ApiErrorClass(errorData.message, response.status, errorData.code)
+      return { success: false, error: new ApiErrorClass(errorData.message, response.status, errorData.code) }
     }
 
-    return await response.json()
+    const data = await response.json()
+    return { success: true, data }
   } catch (error) {
     if (error instanceof ApiErrorClass) {
-      throw error
+      return { success: false, error }
     }
 
     // ネットワークエラーなどの場合
-    throw new ApiErrorClass('Network error occurred', 0, 'NETWORK_ERROR')
+    return { success: false, error: new ApiErrorClass('Network error occurred', 0, 'NETWORK_ERROR') }
   }
 }
 
 // 記事一覧を取得
-export async function getArticles(): Promise<Article[]> {
+export async function getArticles(): Promise<Result<Article[], ApiErrorClass>> {
   return fetchApi<Article[]>('/articles')
 }
 
 // 特定の記事を取得
-export async function getArticle(id: string): Promise<Article> {
+export async function getArticle(id: string): Promise<Result<Article, ApiErrorClass>> {
   return fetchApi<Article>(`/articles/${id}`)
 }
 
 // ユーザー情報を取得
-export async function getUserProfile(): Promise<User> {
+export async function getUserProfile(): Promise<Result<User, ApiErrorClass>> {
   return fetchApi<User>('/user/profile')
 }
 
 // 記事を検索
-export async function searchArticles(query: string): Promise<Article[]> {
+export async function searchArticles(query: string): Promise<Result<Article[], ApiErrorClass>> {
   const params = new URLSearchParams({ q: query })
   return fetchApi<Article[]>(`/articles/search?${params}`)
 }

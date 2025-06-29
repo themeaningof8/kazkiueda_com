@@ -15,11 +15,8 @@ describe('ArticleList', () => {
   it('記事一覧を正常に表示する', async () => {
     render(<ArticleList />)
 
-    // ローディング状態の確認（スケルトンが表示される）
-    const skeletonElements = screen
-      .getAllByRole('generic')
-      .filter(el => el.className.includes('animate-pulse'))
-    expect(skeletonElements.length).toBeGreaterThan(0)
+    // ローディング状態の確認
+    expect(screen.getByRole('status', { name: '読み込み中' })).toBeInTheDocument()
 
     // データ読み込み完了まで待機
     await waitFor(() => {
@@ -44,11 +41,8 @@ describe('ArticleList', () => {
 
     render(<ArticleList />)
 
-    // ローディングスケルトンの確認
-    const skeletonElements = screen
-      .getAllByRole('generic')
-      .filter(el => el.className.includes('animate-pulse'))
-    expect(skeletonElements.length).toBeGreaterThan(0)
+    // ローディング状態の確認
+    expect(screen.getByRole('status', { name: '読み込み中' })).toBeInTheDocument()
   })
 
   it('エラー状態を正しく表示し、再試行ボタンが機能する', async () => {

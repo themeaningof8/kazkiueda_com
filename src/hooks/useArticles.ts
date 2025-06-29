@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { ApiErrorClass, getArticles } from '@/services/api'
+import { getArticles } from '@/services/api'
 import type { Article } from '@/types/api'
 
 interface UseArticlesReturn {
@@ -16,20 +16,16 @@ export function useArticles(): UseArticlesReturn {
   const [error, setError] = useState<string | null>(null)
 
   const fetchArticles = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const data = await getArticles()
-      setArticles(data)
-    } catch (err) {
-      if (err instanceof ApiErrorClass) {
-        setError(err.message)
-      } else {
-        setError('記事の取得に失敗しました')
-      }
-    } finally {
-      setLoading(false)
+    setLoading(true)
+    setError(null)
+    const result = await getArticles()
+
+    if (result.success) {
+      setArticles(result.data)
+    } else {
+      setError(result.error.message)
     }
+    setLoading(false)
   }
 
   useEffect(() => {

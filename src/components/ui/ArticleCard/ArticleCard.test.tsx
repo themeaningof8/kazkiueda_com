@@ -62,14 +62,15 @@ describe('ArticleCard', () => {
     expect(screen.getByRole('img')).toHaveAttribute('src', publicImageUrl)
   })
 
-  it('縦レイアウト（デフォルト）で正しく表示される', () => {
-    const { asFragment } = render(<ArticleCard {...defaultProps} layout='vertical' />)
-    expect(asFragment()).toMatchSnapshot()
-  })
+  it('レイアウトプロパティに応じて適切なクラスを適用する', () => {
+    const { rerender } = render(<ArticleCard {...defaultProps} layout='vertical' />)
+    // 縦レイアウト（デフォルト）では特定のクラスを持たない
+    expect(screen.getByRole('link')).not.toHaveClass('flex')
 
-  it('横レイアウトで正しく表示される', () => {
-    const { asFragment } = render(<ArticleCard {...defaultProps} layout='horizontal' />)
-    expect(asFragment()).toMatchSnapshot()
+    // 横レイアウトに切り替えてクラスの存在を確認
+    rerender(<ArticleCard {...defaultProps} layout='horizontal' />)
+    expect(screen.getByRole('link')).toHaveClass('flex')
+    expect(screen.getByRole('link')).toHaveClass('items-start')
   })
 
   it('カスタムアスペクト比が適用される', () => {
