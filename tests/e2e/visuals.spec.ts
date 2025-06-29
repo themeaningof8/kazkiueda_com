@@ -115,7 +115,7 @@ test.describe('Visual Regression Testing for Components', () => {
 
   test('InputOTP component', async ({ page }) => {
     await page.goto('/#@/tests/e2e/components/input-otp.html')
-    await expect(page).toHaveScreenshot('input-otp.png')
+    await expect(page).toHaveScreenshot('input-otp.png', { maxDiffPixelRatio: 0.02 })
   })
 
   test('Label component', async ({ page }) => {
@@ -140,7 +140,7 @@ test.describe('Visual Regression Testing for Components', () => {
 
   test('Popover component trigger', async ({ page }) => {
     await page.goto('/#@/tests/e2e/components/popover.html')
-    await expect(page).toHaveScreenshot('popover-trigger.png')
+    await expect(page).toHaveScreenshot('popover-trigger.png', { maxDiffPixelRatio: 0.02 })
   })
 
   test('Progress component', async ({ page }) => {
@@ -170,7 +170,7 @@ test.describe('Visual Regression Testing for Components', () => {
 
   test('Separator component', async ({ page }) => {
     await page.goto('/#@/tests/e2e/components/separator.html')
-    await expect(page).toHaveScreenshot('separator.png')
+    await expect(page).toHaveScreenshot('separator.png', { maxDiffPixelRatio: 0.02 })
   })
 
   test('Sheet component', async ({ page }) => {

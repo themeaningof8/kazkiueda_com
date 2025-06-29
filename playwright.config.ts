@@ -10,6 +10,10 @@ export default defineConfig({
   expect: {
     /* アサーションのタイムアウト */
     timeout: 5000,
+    toHaveScreenshot: {
+      // ブラウザ間のレンダリング差異を許容するための設定
+      maxDiffPixelRatio: 0.002,
+    },
   },
   /* 並列実行の設定 */
   fullyParallel: true,
@@ -44,14 +48,14 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
     // 安定性のため、最初はChromeのみでテスト
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
     // /* モバイルテスト */
     // {
     //   name: 'Mobile Chrome',
