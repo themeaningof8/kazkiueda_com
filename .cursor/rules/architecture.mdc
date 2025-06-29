@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Architecture Guidelines
+
+## Project Structure
+- Follow react-bulletproof directory structure
+- Maintain consistent project organization patterns
+
+## Directory Layout
+- /src/features - Feature-based modules
+- /src/components - Shared components
+- /src/hooks - Custom React hooks
+- /src/utils - Utility functions
+- /src/services - API and external services

@@ -1,0 +1,24 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Workflow
+
+## Quality Assurance Checklist
+Before marking any task as complete:
+1. Run `bun run check` - Ensure linting passes
+2. Run `bun run build` - Verify build succeeds
+3. Run `bun run test` - Confirm all tests pass
+4. Run `bun run test:e2e` - Verify E2E tests pass
+
+## E2E Testing Guidelines
+- E2E tests run in isolated browser environment with MSW disabled
+- API responses are mocked using Playwright's route interception
+- Focus on critical user journeys and accessibility compliance
+- Run E2E tests before major releases and deployments
+
+## Technical Debt Management
+- Refactor continuously during development
+- Fix technical debt early before it accumulates
+- Track technical debt items in project backlog

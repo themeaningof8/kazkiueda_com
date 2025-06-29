@@ -3,6 +3,46 @@ description:
 globs: *.test.ts,*.test.tsx
 alwaysApply: false
 ---
-# テストファイル開発ルール
+# Test File Development Rules
 
-- 直接DOMファイルを記載する偽装テストは禁止
+## Core Methodologies
+- Establish a testing strategy based on Kent C. Dodds' 'Testing Trophy'
+- Adopt a user-centric testing philosophy: 'tests should resemble how software is used'
+- Refer to Josh Goldberg's TypeScript testing patterns
+- Follow Artem Zakharchenko's modern mocking techniques
+
+## Testing Approach
+- Test user behaviour rather than implementation details
+- Use accessibility-first selectors (getByRole, getByLabelText)
+- Prohibit mock tests that directly reference DOM files
+- Avoid shallow rendering and use actual DOM rendering
+- Write tests that give you confidence the app works for users
+
+## Modern Tools & Practices
+- Use Jest/Vitest as test runners
+- Use React Testing Library for component testing
+- Use Mock Service Worker (MSW) for API mocking
+- Simulate user interactions using @testing-library/user-event
+- Prefer userEvent over fireEvent for realistic interactions
+- Use screen object for querying instead of destructuring from render
+
+## Test Distribution (Testing Trophy)
+- Static Tests: ESLint, TypeScript type checking (broad base)
+- Unit Tests: Pure functions, utilities (fewer than integration)
+- Integration Tests: Component integration, API contracts (emphasis)
+- E2E Tests: Critical user journeys (few but essential)
+
+## Specific Guidelines
+- Use meaningful test descriptions that explain business value
+- Avoid testing implementation details like component state
+- Mock external dependencies, not internal modules
+- Use data-testid as escape hatch, prefer semantic selectors
+- Write tests that survive refactoring
+- Focus on testing what the user can see and do
+
+## Anti-Patterns to Avoid
+- Testing component methods directly
+- Excessive mocking that disconnects tests from reality
+- Brittle selectors that break on styling changes
+- Testing library internals instead of user-facing behavior
+- Writing tests that only pass due to implementation coupling

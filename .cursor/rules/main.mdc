@@ -5,65 +5,28 @@ alwaysApply: true
 ---
 # AI Agent Development Guidelines
 
-## Import Management
-- Use `@/` alias for imports, relative paths are prohibited
-- Always prefer absolute imports over relative imports
+## Development Philosophy
+- Prioritize code readability and maintainability
+- Follow clean code principles consistently
+- Ensure comprehensive quality checks before completion
+- Always verify information before presenting it. Do not make assumptions or speculate without clear evidence
 
-## Package Management
-- Use `bun` for all package management commands
-- `npm` and `yarn` are prohibited
-
-## Quality Assurance
-- Run `bun run check`, `bun run build`, and `bun run test` before task completion
-- Ensure all checks pass before finalizing work
-
-## Project Architecture
-- Follow react-bulletproof directory structure
-- Maintain consistent project organization patterns
-
-## File Organization
-- Create new files within subdirectories using colocation strategy
-- Group related files together in dedicated folders
-
-## Testing Strategy
-- Create test files simultaneously when creating components
-- Maintain comprehensive test coverage for new code
-
-## Component Usage
-- Use existing components from `src/components/ui`
-- Prefer established UI library components over custom implementations
-
-## Smart Comments
-- Don't comment on what the code does - make the code self-documenting
+## Documentation Philosophy
 - Use comments to explain why something is done a certain way
 - Document APIs, complex algorithms, and non-obvious side effects
 
-## Single Responsibility
-- Each function should do exactly one thing
-- Functions should be small and focused
-- If a function needs a comment to explain what it does, it should be split
+## Work Process Guidelines
+- Make changes file by file and give me a chance to spot mistakes
+- Preserve existing code and functionalities. Pay attention to preserving existing structures
+- Provide all edits in a single chunk instead of multiple-step instructions or explanations for the same file
+- Provide real file links, not x.md
 
-## Clean Structure
-- Keep related code together
-- Organize code in a logical hierarchy
-- Use consistent file and folder naming conventions
-
-## Encapsulation
-- Hide implementation details
-- Expose clear interfaces
-- Move nested conditionals into well-named functions
-
-## Code Quality Maintenance
-- Refactor continuously
-- Fix technical debt early
-- Leave code cleaner than you found it
-
-## Testing
-- Write tests before fixing bugs
-- Keep tests readable and maintainable
-- Test edge cases and error conditions
-
-## Version Control
-- Write clear commit messages
-- Make small, focused commits
-- Use meaningful branch names 
+## Communication Guidelines
+- Never use apologies
+- Avoid giving feedback about understanding in comments or documentation
+- Don't summarize changes made
+- Don't invent changes other than what's explicitly requested
+- Don't ask for confirmation of information already provided in the context
+- Don't ask the user to verify implementations that are visible in the provided context
+- Don't suggest updates or changes to files when there are no actual modifications needed
+- Don't show or discuss the current implementation unless specifically requested

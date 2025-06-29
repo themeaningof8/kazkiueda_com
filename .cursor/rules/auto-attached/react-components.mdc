@@ -3,40 +3,94 @@ description:
 globs: **/*.tsx,**/components/**/*.tsx
 alwaysApply: false
 ---
-# React Components Best Practices
+# React Component Design Rules
 
-## Component Definition
-- Keep components focused on a single responsibility
-- Prefer composition over inheritance
-- Use descriptive names that convey the component's purpose
-- Extract reusable logic into custom hooks
+_Practical guidelines based on the design concepts of React community leaders_
 
-## Props and State
-- Use TypeScript interfaces for prop definitions
-- Validate props with proper TypeScript types
-- Avoid deeply nested prop objects
-- Use default props sparingly and prefer default parameters
+## Component Structure Design (Kent C. Dodds, Dan Abramov)
 
-## Performance
-- Use React.memo for expensive components
-- Avoid creating objects and functions in render
-- Use useMemo and useCallback judiciously
-- Implement Skeleton components for data loading states in props
-
-## Component Structure
-- Keep JSX readable with proper indentation
+- Adhere to the single responsibility principle and do one thing well
+- Group related components using the Compound Components pattern
+- Prioritise composition over inheritance
+- Component names should clearly express their purpose
 - Extract complex logic into custom hooks
-- Use early returns to reduce nesting
-- Group related functionality together
 
-## Accessibility
-- Include proper ARIA attributes
-- Ensure keyboard navigation works
-- Use semantic HTML elements
+## State Management Design (Kent C. Dodds, Tanner Linsley, Mark Erikson)
+
+- State Colocation: Manage state close to where it is used
+- Clearly separate server state and client state
+- Apply modern Redux patterns using Redux Toolkit
+- Avoid unnecessary global state
+- Maintain immutability when updating state
+
+## Performance Optimisation (Brian Vaughn, React Core Team)
+
+- Use React.memo appropriately to prevent unnecessary re-rendering
+- Effectively utilise useMemo and useCallback
+- Avoid creating objects and functions within renders
+- Apply virtualisation for large datasets
+- Do not execute side effects during rendering
+
+## Data Fetching Design (Tanner Linsley, Dan Abramov)
+
+- Improve UX with Optimistic Updates
+- Declarative loading with Suspense for Data Fetching
+- Proper fallback handling for errors
+- Clearly define cache strategies
+- Utilise parallel data fetching
+
+## Component Extension (Kent C. Dodds, Michael Jackson, React Core Team)
+
+- Separate logic and UI with Render Props patterns
+- Make logic reusable with Custom Hooks
+- Prioritise Hooks over Higher-Order Components
+- Maintain a balance between flexibility and complexity
+- Keep coupling between components low
+
+## Error Handling (Dan Abramov, React Core Team)
+
+- Set appropriate error boundaries with Error Boundaries
+- Provide user-friendly error messages
+- Maintain a usable UI even in error conditions
+- Integrate with error reporting systems
+- Display detailed error information in development environments
+
+## Test Design (Kent C. Dodds)
+
+- Test user behaviour rather than implementation details
+- Follow Testing Library principles
+- Use tests as specifications
+- Focus on testing edge cases and user interactions
+- Properly mock external dependencies
+
+## Accessibility (Ryan Florence, React Community)
+
+- Prioritise the use of semantic HTML elements
+- Set appropriate ARIA attributes
+- Ensure keyboard navigation
 - Provide meaningful alt text for images
+- Adopt a progressive enhancement approach
 
-## Testing
-- Write tests for component behavior, not implementation
-- Test user interactions and edge cases
-- Mock external dependencies appropriately
-- Use testing-library best practices 
+## Type Safety (React Community, Kent C. Dodds)
+
+- Strictly define props using TypeScript interfaces
+- Express state constraints using union types
+- Enhance reusability using generic types
+- Keep code concise by leveraging type inference
+- Minimize runtime type checking
+
+## Server Components (Dan Abramov, React Core Team)
+
+- Leverage data retrieval on the server
+- Clearly define boundaries with client components
+- Optimise hydration strategies
+- Balance SEO and performance
+- Improve UX with streaming
+
+## Code Quality
+
+- Strictly enforce linting rules
+- Use Prettier for consistent formatting
+- Verify pattern compliance through code reviews
+- Manage technical debt through continuous refactoring
+- Share team knowledge through documentation

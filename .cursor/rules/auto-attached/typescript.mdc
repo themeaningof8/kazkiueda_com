@@ -5,24 +5,11 @@ alwaysApply: false
 ---
 # TypeScript Best Practices
 
-## Functions
-- Implement proper error handling with custom error types
-- Use function overloads for complex type scenarios
+## Core Methodologies
+- Implement Kent C. Dodds' 'Fully Typed Web Apps' approach
+- Follow Matt Pocock's type design patterns
 
-## Best Practices
-- Use readonly for immutable properties
-- Use type guards for runtime type checking
-
-## Error Handling
-- Create custom error types for domain-specific errors
-- Use Result types for operations that can fail
-- Implement proper error boundaries
-- Use try-catch blocks with typed catch clauses
-- Handle Promise rejections properly
-
-## Patterns
-- Use the Builder pattern for complex object creation
-- Implement the Repository pattern for data access
-- Use the Factory pattern for object creation
-- Leverage dependency injection
-- Use the Module pattern for encapsulation
+## Framework-Specific
+- Use the Result type for functional error handling
+- Implement React error boundaries
+- Leverage dependency injection (Angular/NestJS)
