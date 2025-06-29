@@ -1,4 +1,6 @@
 import type { Preview } from '@storybook/react-vite'
+import { MemoryRouter } from 'react-router-dom'
+import { createElement } from 'react'
 import '../src/styles/globals.css'
 
 const preview: Preview = {
@@ -11,6 +13,10 @@ const preview: Preview = {
       },
     },
   },
+  decorators: [
+    (Story) => 
+      createElement(MemoryRouter, { initialEntries: ['/'] }, createElement(Story))
+  ],
 }
 
 export default preview

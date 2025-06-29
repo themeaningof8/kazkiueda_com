@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { BrowserRouter } from 'react-router-dom'
-
 import Layout from './Layout'
 
 const meta = {
@@ -10,13 +8,6 @@ const meta = {
   parameters: {
     layout: 'fullscreen',
   },
-  decorators: [
-    Story => (
-      <BrowserRouter>
-        <Story />
-      </BrowserRouter>
-    ),
-  ],
   tags: ['autodocs'],
 } satisfies Meta<typeof Layout>
 
