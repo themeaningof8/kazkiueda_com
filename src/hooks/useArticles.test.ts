@@ -1,4 +1,4 @@
-import { renderHook, waitFor, act } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
@@ -90,7 +90,7 @@ describe('useArticles', () => {
     server.use(
       http.get('https://api.example.com/articles', () => {
         return HttpResponse.json([])
-      }),
+      })
     )
 
     // refetch実行
@@ -121,7 +121,7 @@ describe('useArticles', () => {
       http.get('https://api.example.com/articles', async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return HttpResponse.json(['new data'])
-      }),
+      })
     )
 
     // refetch実行（awaitしない）

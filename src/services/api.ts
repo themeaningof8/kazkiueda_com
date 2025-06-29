@@ -16,7 +16,10 @@ export class ApiErrorClass extends Error {
 }
 
 // 基本的なfetch関数
-async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<Result<T, ApiErrorClass>> {
+async function fetchApi<T>(
+  endpoint: string,
+  options?: RequestInit
+): Promise<Result<T, ApiErrorClass>> {
   const url = `${API_BASE_URL}${endpoint}`
 
   try {
@@ -35,7 +38,10 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<Res
         status: response.status,
       }))
 
-      return { success: false, error: new ApiErrorClass(errorData.message, response.status, errorData.code) }
+      return {
+        success: false,
+        error: new ApiErrorClass(errorData.message, response.status, errorData.code),
+      }
     }
 
     const data = await response.json()
@@ -46,7 +52,10 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<Res
     }
 
     // ネットワークエラーなどの場合
-    return { success: false, error: new ApiErrorClass('Network error occurred', 0, 'NETWORK_ERROR') }
+    return {
+      success: false,
+      error: new ApiErrorClass('Network error occurred', 0, 'NETWORK_ERROR'),
+    }
   }
 }
 

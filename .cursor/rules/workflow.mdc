@@ -10,7 +10,8 @@ Before marking any task as complete:
 1. Run `bun run check` - Ensure linting passes
 2. Run `bun run build` - Verify build succeeds
 3. Run `bun run test` - Confirm all tests pass
-4. Run `bun run test:e2e` - Verify E2E tests pass
+4. Run `bun run test:coverage` - Ensure test coverage meets the threshold
+5. Run `bun run test:e2e` - Verify E2E tests pass
 
 ## E2E Testing Guidelines
 - E2E tests run in isolated browser environment with MSW disabled

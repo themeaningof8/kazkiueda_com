@@ -11,7 +11,8 @@ const mockArticles: Article[] = [
     title: 'React Testing Libraryの使い方',
     category: 'テクノロジー',
     description: 'React Testing Libraryを使った効果的なテストの書き方について解説します。',
-    content: 'React Testing Libraryは、Reactコンポーネントをユーザーの視点でテストするためのライブラリです...',
+    content:
+      'React Testing Libraryは、Reactコンポーネントをユーザーの視点でテストするためのライブラリです...',
     imageUrl:
       'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80',
     href: '/articles/react-testing-library',

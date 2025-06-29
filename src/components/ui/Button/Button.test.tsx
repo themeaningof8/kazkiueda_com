@@ -21,7 +21,7 @@ describe('Button', () => {
   it('renders as a link when using asChild', () => {
     render(
       <Button asChild>
-        <a href="/test">Link Button</a>
+        <a href='/test'>Link Button</a>
       </Button>
     )
     const link = screen.getByRole('link', { name: 'Link Button' })
