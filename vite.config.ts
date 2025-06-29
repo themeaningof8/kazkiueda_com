@@ -11,6 +11,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  define: {
+    'process.env.E2E_TEST': JSON.stringify(process.env.E2E_TEST),
+  },
   server: {
     port: 3000,
     open: true,

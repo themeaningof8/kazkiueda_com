@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
+import { ArticleList } from '@/components/ui/ArticleList'
 import { Button } from '@/components/ui/Button'
 
 const HomePage = memo(() => {
@@ -38,12 +39,18 @@ const HomePage = memo(() => {
   )
 
   return (
-    <div className='flex flex-col items-center justify-center min-h-[60vh] text-center'>
-      <h1 className='text-4xl font-bold tracking-tight sm:text-6xl'>{heroContent.title}</h1>
-      <p className='mt-6 text-lg leading-8 text-muted-foreground max-w-2xl'>
-        {heroContent.description}
-      </p>
-      <div className='mt-10 flex items-center justify-center gap-x-6'>{actionButtons}</div>
+    <div className='space-y-12'>
+      <div className='flex flex-col items-center justify-center min-h-[60vh] text-center'>
+        <h1 className='text-4xl font-bold tracking-tight sm:text-6xl'>{heroContent.title}</h1>
+        <p className='mt-6 text-lg leading-8 text-muted-foreground max-w-2xl'>
+          {heroContent.description}
+        </p>
+        <div className='mt-10 flex items-center justify-center gap-x-6'>{actionButtons}</div>
+      </div>
+
+      <div className='container mx-auto px-4'>
+        <ArticleList />
+      </div>
     </div>
   )
 })

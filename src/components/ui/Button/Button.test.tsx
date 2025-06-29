@@ -1,30 +1,41 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 
 import { Button } from './Button'
 
 describe('Button', () => {
   it('renders button with text', () => {
-    render(<Button>Click me</Button>)
+    const { asFragment } = render(<Button>Click me</Button>)
     expect(screen.getByRole('button', { name: 'Click me' })).toBeInTheDocument()
+    expect(asFragment()).toMatchSnapshot()
   })
 
-  it('applies variant classes correctly', () => {
-    render(<Button variant='destructive'>Destructive</Button>)
-    const button = screen.getByRole('button')
-    expect(button).toHaveClass('bg-destructive')
+  it('handles click events', async () => {
+    const handleClick = vi.fn()
+    render(<Button onClick={handleClick}>Click me</Button>)
+    const button = screen.getByRole('button', { name: 'Click me' })
+    await userEvent.click(button)
+    expect(handleClick).toHaveBeenCalledTimes(1)
   })
 
-  it('applies size classes correctly', () => {
-    render(<Button size='lg'>Large</Button>)
-    const button = screen.getByRole('button')
-    expect(button).toHaveClass('h-10')
+  it('renders as a link when using asChild', () => {
+    const { asFragment } = render(
+      <Button asChild>
+        <a href='/test'>Link Button</a>
+      </Button>
+    )
+    const link = screen.getByRole('link', { name: 'Link Button' })
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute('href', '/test')
+    expect(asFragment()).toMatchSnapshot()
   })
 
-  it('can be disabled', () => {
-    render(<Button disabled>Disabled</Button>)
-    const button = screen.getByRole('button')
+  it('is disabled when disabled prop is true', () => {
+    const { asFragment } = render(<Button disabled>Disabled</Button>)
+    const button = screen.getByRole('button', { name: 'Disabled' })
     expect(button).toBeDisabled()
-    expect(button).toHaveClass('disabled:opacity-50')
+    expect(asFragment()).toMatchSnapshot()
   })
 
   it('forwards ref correctly', () => {
@@ -33,14 +44,20 @@ describe('Button', () => {
     expect(ref.current).toBeInstanceOf(HTMLButtonElement)
   })
 
-  it('supports asChild prop', () => {
-    render(
-      <Button asChild>
-        <a href='/test'>Link Button</a>
-      </Button>
-    )
-    const link = screen.getByRole('link')
-    expect(link).toBeInTheDocument()
-    expect(link).toHaveAttribute('href', '/test')
+  // Variant and Size Snapshot Tests
+  const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'] as const
+  variants.forEach(variant => {
+    it(`renders correctly with variant ${variant}`, () => {
+      const { asFragment } = render(<Button variant={variant}>{variant}</Button>)
+      expect(asFragment()).toMatchSnapshot()
+    })
+  })
+
+  const sizes = ['default', 'sm', 'lg', 'icon'] as const
+  sizes.forEach(size => {
+    it(`renders correctly with size ${size}`, () => {
+      const { asFragment } = render(<Button size={size} />)
+      expect(asFragment()).toMatchSnapshot()
+    })
   })
 })

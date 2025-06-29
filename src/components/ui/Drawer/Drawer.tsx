@@ -2,7 +2,7 @@ import { Drawer as DrawerPrimitive } from 'vaul'
 
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
 const Drawer = React.memo(({ ...props }: React.ComponentProps<typeof DrawerPrimitive.Root>) => {
   return <DrawerPrimitive.Root data-slot='drawer' {...props} />

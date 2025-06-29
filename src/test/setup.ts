@@ -1,10 +1,16 @@
 import '@testing-library/jest-dom'
 import { cleanup } from '@testing-library/react'
-import { afterEach, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 
+import { server } from '@/mocks/server'
+
+// MSWサーバーのセットアップ
+beforeAll(() => server.listen())
 afterEach(() => {
   cleanup()
+  server.resetHandlers()
 })
+afterAll(() => server.close())
 
 const ResizeObserver = vi.fn(() => ({
   observe: vi.fn(),

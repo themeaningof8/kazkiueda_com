@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 
-import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from './Drawer'
+import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from './Drawer'
 
 describe('Drawer', () => {
   it('renders drawer trigger', () => {
@@ -9,6 +9,7 @@ describe('Drawer', () => {
         <DrawerTrigger>Open Drawer</DrawerTrigger>
         <DrawerContent>
           <DrawerTitle>Drawer Title</DrawerTitle>
+          <DrawerDescription>Drawer Description</DrawerDescription>
         </DrawerContent>
       </Drawer>
     )
@@ -22,6 +23,7 @@ describe('Drawer', () => {
         <DrawerTrigger className='custom-trigger'>Open Drawer</DrawerTrigger>
         <DrawerContent>
           <DrawerTitle>Drawer Title</DrawerTitle>
+          <DrawerDescription>Drawer Description</DrawerDescription>
         </DrawerContent>
       </Drawer>
     )
@@ -36,12 +38,14 @@ describe('Drawer', () => {
         <DrawerTrigger>Open Drawer</DrawerTrigger>
         <DrawerContent>
           <DrawerTitle>Drawer Title</DrawerTitle>
+          <DrawerDescription>Drawer Description</DrawerDescription>
           <p>Drawer content</p>
         </DrawerContent>
       </Drawer>
     )
 
     expect(screen.getByText('Drawer Title')).toBeInTheDocument()
+    expect(screen.getByText('Drawer Description')).toBeInTheDocument()
     expect(screen.getByText('Drawer content')).toBeInTheDocument()
   })
 })

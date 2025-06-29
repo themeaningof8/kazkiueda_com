@@ -10,6 +10,17 @@ import {
   useChart,
 } from './Chart'
 
+// Mock ResponsiveContainer to disable warnings
+vi.mock('recharts', async () => {
+  const OriginalModule = await vi.importActual('recharts')
+  return {
+    ...OriginalModule,
+    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+      <div style={{ width: 500, height: 500 }}>{children}</div>
+    ),
+  }
+})
+
 const mockConfig: ChartConfig = {
   desktop: {
     label: 'Desktop',

@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
 const Command = React.memo(
   ({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) => {

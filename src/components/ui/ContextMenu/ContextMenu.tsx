@@ -5,23 +5,11 @@ import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react'
 
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils'
 
-const ContextMenu = React.memo(
-  ({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Root>) => {
-    return <ContextMenuPrimitive.Root data-slot='context-menu' {...props} />
-  }
-)
+const ContextMenu = ContextMenuPrimitive.Root
 
-ContextMenu.displayName = 'ContextMenu'
-
-const ContextMenuTrigger = React.memo(
-  ({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Trigger>) => {
-    return <ContextMenuPrimitive.Trigger data-slot='context-menu-trigger' {...props} />
-  }
-)
-
-ContextMenuTrigger.displayName = 'ContextMenuTrigger'
+const ContextMenuTrigger = ContextMenuPrimitive.Trigger
 
 const ContextMenuGroup = React.memo(
   ({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Group>) => {
@@ -217,7 +205,7 @@ const ContextMenuLabel = React.memo(
         data-slot='context-menu-label'
         data-inset={inset}
         className={cn(
-          'text-foreground px-2 py-1.5 text-sm font-medium data-[inset]:pl-8',
+          'text-foreground flex h-full w-full items-center px-2 py-1.5 text-sm font-semibold data-[inset]:pl-8',
           className
         )}
         {...props}
@@ -242,32 +230,34 @@ const ContextMenuSeparator = React.memo(
 
 ContextMenuSeparator.displayName = 'ContextMenuSeparator'
 
-const ContextMenuShortcut = React.memo(({ className, ...props }: React.ComponentProps<'span'>) => {
-  return (
-    <span
-      data-slot='context-menu-shortcut'
-      className={cn('text-muted-foreground ml-auto text-xs tracking-widest', className)}
-      {...props}
-    />
-  )
-})
+const ContextMenuShortcut = React.memo(
+  ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
+    return (
+      <span
+        data-slot='context-menu-shortcut'
+        className={cn('text-muted-foreground ml-auto text-xs tracking-widest', className)}
+        {...props}
+      />
+    )
+  }
+)
 
 ContextMenuShortcut.displayName = 'ContextMenuShortcut'
 
 export {
   ContextMenu,
-  ContextMenuTrigger,
-  ContextMenuContent,
-  ContextMenuItem,
   ContextMenuCheckboxItem,
-  ContextMenuRadioItem,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
   ContextMenuLabel,
+  ContextMenuPortal,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
   ContextMenuSeparator,
   ContextMenuShortcut,
-  ContextMenuGroup,
-  ContextMenuPortal,
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
-  ContextMenuRadioGroup,
+  ContextMenuTrigger,
 }

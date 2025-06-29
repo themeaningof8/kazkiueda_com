@@ -6,8 +6,8 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { useLoadPerformance, useMemoryMonitor } from '@/hooks/usePerformanceMonitor'
 
 // ページコンポーネントの遅延読み込み
-const HomePage = lazy(() => import('@/pages/HomePage'))
-const AboutPage = lazy(() => import('@/pages/AboutPage'))
+const HomePage = lazy(() => import('@/features/home'))
+const AboutPage = lazy(() => import('@/features/about'))
 
 // Loading コンポーネント
 const PageLoader = () => (

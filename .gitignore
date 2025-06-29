@@ -30,8 +30,19 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # IntelliJ based IDEs
 .idea
 
+# VSCode
+.vscode/
+
 # Finder (MacOS) folder config
 .DS_Store
 
 *storybook.log
 storybook-static
+
+# Playwright reports
+/playwright-report/
+/test-results/
+playwright/.cache/
+
+# Bun cache
+.bun/

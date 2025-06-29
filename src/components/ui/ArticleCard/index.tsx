@@ -1,1 +1,1 @@
-export { ArticleCard, type ArticleCardProps } from './ArticleCard' 
+export { ArticleCard, type ArticleCardProps } from './ArticleCard'
