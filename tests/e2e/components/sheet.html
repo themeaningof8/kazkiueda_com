@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sheet Test</title>
+    <link rel="stylesheet" href="/src/styles/globals.css" />
+    <script type="module">
+      import React from 'react'
+      import ReactDOM from 'react-dom/client'
+      import {
+        Sheet,
+        SheetContent,
+        SheetDescription,
+        SheetHeader,
+        SheetTitle,
+        SheetTrigger,
+        SheetFooter,
+        SheetClose,
+      } from '/src/components/ui/Sheet/Sheet.tsx'
+      import { Button } from '/src/components/ui/Button/Button.tsx'
+
+      const App = () => (
+        <div className="p-4 bg-background">
+          <Sheet open={true}>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Edit profile</SheetTitle>
+                <SheetDescription>
+                  Make changes to your profile here. Click save when you're done.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="grid gap-4 py-4">{/* Content */}</div>
+              <SheetFooter>
+                <SheetClose asChild>
+                  <Button type="submit">Save changes</Button>
+                </SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+        </div>
+      )
+
+      const root = ReactDOM.createRoot(document.getElementById('root'))
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+      )
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html> 

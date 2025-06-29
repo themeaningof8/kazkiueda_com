@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ContextMenu Test</title>
+    <link rel="stylesheet" href="/src/styles/globals.css" />
+    <script type="module">
+      import React from 'react'
+      import ReactDOM from 'react-dom/client'
+      import {
+        ContextMenu,
+        ContextMenuContent,
+        ContextMenuItem,
+        ContextMenuTrigger,
+        ContextMenuSeparator,
+        ContextMenuSub,
+        ContextMenuSubTrigger,
+        ContextMenuSubContent,
+      } from '/src/components/ui/ContextMenu/ContextMenu.tsx'
+
+      const App = () => (
+        <div className="p-4 bg-background h-[300px] flex items-center justify-center">
+          <ContextMenu>
+            <ContextMenuTrigger className="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+              Right-click here
+            </ContextMenuTrigger>
+            {/* The content is rendered outside the trigger, so we can't easily screenshot it.
+                This VRT will just test the trigger's appearance.
+                Testing the content would require triggering the menu and screenshotting the portal.
+             */}
+          </ContextMenu>
+        </div>
+      )
+
+      const root = ReactDOM.createRoot(document.getElementById('root'))
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+      )
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html> 

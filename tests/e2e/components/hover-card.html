@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HoverCard Test</title>
+    <link rel="stylesheet" href="/src/styles/globals.css" />
+    <script type="module">
+      import React from 'react'
+      import ReactDOM from 'react-dom/client'
+      import {
+        HoverCard,
+        HoverCardContent,
+        HoverCardTrigger,
+      } from '/src/components/ui/HoverCard/HoverCard.tsx'
+      import { Button } from '/src/components/ui/Button/Button.tsx'
+
+      const App = () => (
+        <div className="p-4 bg-background">
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <Button variant="link">@nextjs</Button>
+            </HoverCardTrigger>
+            {/* Content not tested in VRT */}
+          </HoverCard>
+        </div>
+      )
+
+      const root = ReactDOM.createRoot(document.getElementById('root'))
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+      )
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html> 

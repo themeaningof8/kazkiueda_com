@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Textarea Test</title>
+    <link rel="stylesheet" href="/src/styles/globals.css" />
+    <script type="module">
+      import React from 'react'
+      import ReactDOM from 'react-dom/client'
+      import { Textarea } from '/src/components/ui/Textarea/Textarea.tsx'
+      import { Label } from '/src/components/ui/Label/Label.tsx'
+      import { Button } from '/src/components/ui/Button/Button.tsx'
+
+      const App = () => (
+        <div className="p-4 bg-background grid w-full gap-2">
+          <Textarea placeholder="Type your message here." />
+          <Textarea placeholder="Disabled" disabled />
+          <div className="grid w-full gap-1.5">
+            <Label htmlFor="message">Your message</Label>
+            <Textarea placeholder="Type your message here." id="message" />
+          </div>
+          <div className="grid w-full gap-2">
+            <Textarea placeholder="Type your message here." id="message-2" />
+            <Button>Send message</Button>
+          </div>
+        </div>
+      )
+
+      const root = ReactDOM.createRoot(document.getElementById('root'))
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+      )
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html> 

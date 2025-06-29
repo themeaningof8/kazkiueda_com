@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Card Variants Test</title>
+    <link rel="stylesheet" href="/src/styles/globals.css" />
+    <script type="module">
+      import React from 'react'
+      import ReactDOM from 'react-dom/client'
+      import {
+        Card,
+        CardContent,
+        CardDescription,
+        CardFooter,
+        CardHeader,
+        CardTitle,
+      } from '/src/components/ui/Card/Card.tsx'
+      import { Button } from '/src/components/ui/Button/Button.tsx'
+
+      const App = () => (
+        <div className="p-4 grid grid-cols-2 gap-4 bg-background">
+          <Card>
+            <CardHeader>
+              <CardTitle>Card Title</CardTitle>
+              <CardDescription>Card Description</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Card Content</p>
+            </CardContent>
+            <CardFooter>
+              <Button>Footer Button</Button>
+            </CardFooter>
+          </Card>
+
+          <Card className="w-[350px]">
+            <CardHeader>
+              <CardTitle>Create project</CardTitle>
+              <CardDescription>Deploy your new project in one-click.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>This is a more detailed card content area with more text to see how it wraps.</p>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline">Cancel</Button>
+              <Button>Deploy</Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )
+
+      const root = ReactDOM.createRoot(document.getElementById('root'))
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+      )
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html> 

@@ -1,6 +1,6 @@
 ---
 description: 
-globs: *.test.ts,*.test.tsx
+globs: *.test.ts,*.test.tsx,*.spec.ts,tests/**/*
 alwaysApply: false
 ---
 # Test File Development Rules
@@ -46,3 +46,8 @@ alwaysApply: false
 - Brittle selectors that break on styling changes
 - Testing library internals instead of user-facing behavior
 - Writing tests that only pass due to implementation coupling
+
+## Snapshot Testing and Alternatives
+- **Prioritize Visual Regression Testing**: For testing the visual appearance of components, prefer visual regression testing (e.g., with Playwright or Chromatic) over snapshot tests. This ensures tests are robust against markup refactoring and verify what the user actually sees.
+- **Use Specific Assertions**: Instead of broad snapshot tests, use specific assertions to check for critical attributes or styles (e.g., `expect(el).toHaveClass('...')`, `expect(el).toBeDisabled()`). This makes the test's intent clearer and less brittle.
+- **Limit Snapshot Usage**: Use snapshot tests sparingly, primarily for complex, static output where manual assertion is impractical, such as CLI tool outputs or generated code.

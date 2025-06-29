@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sonner Test</title>
+    <link rel="stylesheet" href="/src/styles/globals.css" />
+    <script type="module">
+      import React from 'react'
+      import ReactDOM from 'react-dom/client'
+      import { Toaster, toast } from '/src/components/ui/Sonner/Sonner.tsx'
+
+      const App = () => {
+        React.useEffect(() => {
+          // Trigger toasts on mount for the screenshot
+          toast('Event has been created', {
+            description: 'Sunday, December 03, 2023 at 9:00 AM',
+            action: {
+              label: 'Undo',
+              onClick: () => console.log('Undo'),
+            },
+          })
+          toast.success('Success Toast')
+          toast.error('Error Toast')
+          toast.info('Info Toast')
+          toast.warning('Warning Toast')
+        }, [])
+
+        return (
+          <div className="p-4 bg-background h-[400px]">
+            <Toaster />
+          </div>
+        )
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'))
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+      )
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html> 

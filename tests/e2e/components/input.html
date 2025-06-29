@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Input Test</title>
+    <link rel="stylesheet" href="/src/styles/globals.css" />
+    <script type="module">
+      import React from 'react'
+      import ReactDOM from 'react-dom/client'
+      import { Input } from '/src/components/ui/Input/Input.tsx'
+      import { Label } from '/src/components/ui/Label/Label.tsx'
+      import { Button } from '/src/components/ui/Button/Button.tsx'
+
+      const App = () => (
+        <div className="p-4 grid w-full max-w-sm items-center gap-2 bg-background">
+          <Input type="email" placeholder="Email" />
+          <Input type="text" placeholder="With value" defaultValue="some value" />
+          <Input type="file" />
+          <div className="flex w-full max-w-sm items-center space-x-2">
+            <Input type="email" placeholder="Email" />
+            <Button type="submit">Subscribe</Button>
+          </div>
+           <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input type="email" id="email" placeholder="Email" />
+          </div>
+          <Input type="text" placeholder="Disabled" disabled />
+        </div>
+      )
+
+      const root = ReactDOM.createRoot(document.getElementById('root'))
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+      )
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html> 

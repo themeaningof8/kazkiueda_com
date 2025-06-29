@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor, act } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
@@ -81,22 +81,27 @@ describe('useArticles', () => {
     await waitFor(() => {
       expect(result.current.loading).toBe(false)
     })
+    expect(result.current.articles).toHaveLength(2)
 
     // 空の配列を返すハンドラーに置き換え
     server.use(
       http.get('https://api.example.com/articles', () => {
         return HttpResponse.json([])
-      })
+      }),
     )
 
     // refetch実行
-    await result.current.refetch()
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
+    act(() => {
+      result.current.refetch()
     })
 
-    expect(result.current.articles).toEqual([])
+    // データが更新されるのを待つ
+    await waitFor(() => {
+      expect(result.current.articles).toEqual([])
+    })
+
+    // 最終的な状態を確認
+    expect(result.current.loading).toBe(false)
     expect(result.current.error).toBe(null)
   })
 
@@ -112,23 +117,24 @@ describe('useArticles', () => {
     server.use(
       http.get('https://api.example.com/articles', async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
-        return HttpResponse.json([])
-      })
+        return HttpResponse.json(['new data'])
+      }),
     )
 
     // refetch実行（awaitしない）
-    const refetchPromise = result.current.refetch()
+    act(() => {
+      result.current.refetch()
+    })
 
     // ローディング状態の確認
     await waitFor(() => {
       expect(result.current.loading).toBe(true)
     })
 
-    // refetch完了まで待機
-    await refetchPromise
-
+    // refetch完了とデータ更新を待機
     await waitFor(() => {
       expect(result.current.loading).toBe(false)
+      expect(result.current.articles).toEqual(['new data'])
     })
   })
 })

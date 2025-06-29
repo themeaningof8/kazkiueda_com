@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NavigationMenu Test</title>
+    <link rel="stylesheet" href="/src/styles/globals.css" />
+    <script type="module">
+      import React from 'react'
+      import ReactDOM from 'react-dom/client'
+      import {
+        NavigationMenu,
+        NavigationMenuContent,
+        NavigationMenuItem,
+        NavigationMenuLink,
+        NavigationMenuList,
+        NavigationMenuTrigger,
+        navigationMenuTriggerStyle,
+      } from '/src/components/ui/NavigationMenu/NavigationMenu.tsx'
+      import { cn } from '/src/utils/index.ts'
+
+      const ListItem = React.forwardRef(
+        ({ className, title, children, ...props }, ref) => {
+          return (
+            <li>
+              <NavigationMenuLink asChild>
+                <a
+                  ref={ref}
+                  className={cn(
+                    'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+                    className,
+                  )}
+                  {...props}
+                >
+                  <div className="text-sm font-medium leading-none">{title}</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    {children}
+                  </p>
+                </a>
+              </NavigationMenuLink>
+            </li>
+          )
+        },
+      )
+      ListItem.displayName = 'ListItem'
+
+      const App = () => (
+        <div className="p-4 bg-background">
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Components</NavigationMenuTrigger>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Documentation
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+      )
+
+      const root = ReactDOM.createRoot(document.getElementById('root'))
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>,
+      )
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html> 
