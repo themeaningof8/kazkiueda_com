@@ -61,6 +61,10 @@ jobs:
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps
 
+      - name: Verify Playwright installation
+        if: always()
+        run: ls -laR ~/.cache/ms-playwright
+
       - name: Build Storybook
         run: bun run build-storybook
 
