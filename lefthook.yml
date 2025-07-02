@@ -1,0 +1,11 @@
+pre-commit:
+  parallel: true
+  commands:
+    oxlint:
+      glob: "*.{ts,tsx,js,jsx}"
+      run: bunx oxlint --fix {staged_files}
+    prettier:
+      glob: "*.{ts,tsx,js,jsx,json,css,md}"
+      run: prettier --write {staged_files}
+    type-check:
+      run: bun run type-check

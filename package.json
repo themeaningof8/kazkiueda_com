@@ -11,7 +11,6 @@
     "lint": "bunx oxlint src/",
     "lint:fix": "bunx oxlint src/ --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "prepare": "husky",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -51,9 +50,8 @@
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "happy-dom": "^18.0.1",
-    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
-    "lint-staged": "^15.3.0",
+    "lefthook": "^1.11.14",
     "lost-pixel": "^3.22.0",
     "msw": "^2.10.2",
     "oxlint": "^1.2.0",
@@ -118,15 +116,6 @@
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",
     "zod": "^3.25.67"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "bunx oxlint --fix",
-      "prettier --write"
-    ],
-    "*.{json,css,md}": [
-      "prettier --write"
-    ]
   },
   "msw": {
     "workerDirectory": [
