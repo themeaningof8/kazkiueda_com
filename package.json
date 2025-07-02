@@ -28,6 +28,9 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
+  "overrides": {
+    "@playwright/test": "^1.53.1"
+  },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
     "@chromatic-com/storybook": "^4.0.1",
