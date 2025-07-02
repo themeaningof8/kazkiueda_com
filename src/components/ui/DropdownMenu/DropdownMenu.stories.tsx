@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from '@storybook/test'
 import {
   Cloud,
   CreditCard,
@@ -366,7 +365,7 @@ export const Interactive: Story = {
     const [urlsChecked, setUrlsChecked] = React.useState(false)
     const [person, setPerson] = React.useState('pedro')
 
-    const handleSelect = fn()
+    const handleSelect = () => {}
 
     return (
       <DropdownMenu>
