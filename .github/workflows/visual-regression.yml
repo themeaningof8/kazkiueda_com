@@ -59,7 +59,7 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium
+        run: bunx playwright install --with-deps
 
       - name: Build Storybook
         run: bun run build-storybook
@@ -90,18 +90,18 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: lost-pixel-diff-${{ github.sha }}
+          name: lost-pixel/diff-${{ github.sha }}
           path: |
-            lost-pixel-current/
-            lost-pixel-difference/
+            lost-pixel/current/
+            lost-pixel/difference/
           retention-days: 7
 
       - name: Upload updated baseline (if update mode)
         if: github.event.inputs.update_baseline == 'true' && success()
         uses: actions/upload-artifact@v4
         with:
-          name: lost-pixel-baseline-${{ github.sha }}
-          path: lost-pixel-baseline/
+          name: lost-pixel/baseline-${{ github.sha }}
+          path: lost-pixel/baseline/
           retention-days: 30
 
       - name: Comment PR with visual diff results
@@ -118,7 +118,7 @@ jobs:
             }
 
             try {
-              const diffDir = 'lost-pixel-difference';
+              const diffDir = 'lost-pixel/difference';
               if (fs.existsSync(diffDir)) {
                 const diffFiles = fs.readdirSync(diffDir);
                 
