@@ -92,7 +92,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: lost-pixel/diff-${{ github.sha }}
+          name: lost-pixel-diff-${{ github.sha }}
           path: |
             lost-pixel/current/
             lost-pixel/difference/
@@ -102,7 +102,7 @@ jobs:
         if: github.event.inputs.update_baseline == 'true' && success()
         uses: actions/upload-artifact@v4
         with:
-          name: lost-pixel/baseline-${{ github.sha }}
+          name: lost-pixel-baseline-${{ github.sha }}
           path: lost-pixel/baseline/
           retention-days: 30
 
