@@ -15,6 +15,9 @@ on:
         description: 'ベースライン画像を更新する'
         type: boolean
         default: false
+      pull_request_number:
+        description: 'コメントを投稿するPull Request番号 (任意)'
+        required: false
 
 jobs:
   visual-regression:
@@ -39,8 +42,16 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install Playwright browsers
-        run: bunx playwright install chromium
+        run: bunx playwright install --with-deps chromium
 
       - name: Build Storybook
         run: bun run build-storybook
@@ -91,7 +102,13 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            
+            const issue_number = context.issue.number || '${{ github.event.inputs.pull_request_number }}';
+
+            if (!issue_number) {
+              console.log('Could not determine the issue number. Skipping comment.');
+              return;
+            }
+
             try {
               const diffDir = 'lost-pixel-difference';
               if (fs.existsSync(diffDir)) {
@@ -123,7 +140,7 @@ jobs:
                   ].join('\n');
 
                   await github.rest.issues.createComment({
-                    issue_number: context.issue.number,
+                    issue_number: issue_number,
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     body: comment
@@ -139,6 +156,13 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const issue_number = context.issue.number || '${{ github.event.inputs.pull_request_number }}';
+
+            if (!issue_number) {
+              console.log('Could not determine the issue number. Skipping comment.');
+              return;
+            }
+
             const comment = [
               '## ✅ Visual Baseline Updated',
               '',
@@ -150,7 +174,7 @@ jobs:
             ].join('\n');
 
             await github.rest.issues.createComment({
-              issue_number: context.issue.number,
+              issue_number: issue_number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: comment

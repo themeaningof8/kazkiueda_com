@@ -67,5 +67,10 @@ export default defineConfig({
       '@radix-ui/react-dialog',
       'lucide-react',
     ],
+    esbuildOptions: {
+      loader: {
+        '.js': 'jsx',
+      },
+    },
   },
 }) 
