@@ -1,0 +1,157 @@
+name: Visual Regression Testing
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - '**.stories.**'
+      - 'package.json'
+      - 'lostpixel.config.js'
+  workflow_dispatch:
+    inputs:
+      update_baseline:
+        description: 'ベースライン画像を更新する'
+        type: boolean
+        default: false
+
+jobs:
+  visual-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install chromium
+
+      - name: Build Storybook
+        run: bun run build-storybook
+
+      - name: Run Visual Regression Tests (Update Mode)
+        if: github.event.inputs.update_baseline == 'true'
+        run: bun run test:vrt:baseline
+        env:
+          CI: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_PR_NUMBER: ${{ github.event.number }}
+
+      - name: Run Visual Regression Tests (Compare Mode)
+        if: github.event.inputs.update_baseline != 'true'
+        run: bun run test:vrt:ci
+        env:
+          CI: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_PR_NUMBER: ${{ github.event.number }}
+
+      - name: Upload Lost Pixel artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lost-pixel-diff-${{ github.sha }}
+          path: |
+            lost-pixel-current/
+            lost-pixel-difference/
+          retention-days: 7
+
+      - name: Upload updated baseline (if update mode)
+        if: github.event.inputs.update_baseline == 'true' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lost-pixel-baseline-${{ github.sha }}
+          path: lost-pixel-baseline/
+          retention-days: 30
+
+      - name: Comment PR with visual diff results
+        if: failure() && github.event.inputs.update_baseline != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            try {
+              const diffDir = 'lost-pixel-difference';
+              if (fs.existsSync(diffDir)) {
+                const diffFiles = fs.readdirSync(diffDir);
+                
+                if (diffFiles.length > 0) {
+                  const fileList = diffFiles.map(file => `- ${file}`).join('\n');
+                  const comment = [
+                    '## 🎨 Visual Regression Detection',
+                    '',
+                    '視覚的な変更が検出されました。以下のコンポーネントで差分があります：',
+                    '',
+                    fileList,
+                    '',
+                    `詳細な差分画像は [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) からダウンロードできます。`,
+                    '',
+                    '変更が意図的なものである場合は、以下のいずれかの方法でベースラインを更新してください：',
+                    '',
+                    '**方法1: GitHub Actions UI から**',
+                    '1. [Actions タブ](https://github.com/${{ github.repository }}/actions/workflows/visual-regression.yml)に移動',
+                    '2. "Run workflow" をクリック',
+                    '3. "ベースライン画像を更新する" をチェック',
+                    '4. "Run workflow" を実行',
+                    '',
+                    '**方法2: ローカルで実行**',
+                    '```bash',
+                    'bun run test:vrt:update',
+                    '```'
+                  ].join('\n');
+
+                  await github.rest.issues.createComment({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: comment
+                  });
+                }
+              }
+            } catch (error) {
+              console.log('Error posting comment:', error.message);
+            }
+
+      - name: Comment PR with baseline update success
+        if: success() && github.event.inputs.update_baseline == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = [
+              '## ✅ Visual Baseline Updated',
+              '',
+              'ベースライン画像が正常に更新されました。',
+              '',
+              `更新されたベースライン画像は [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) からダウンロードできます。`,
+              '',
+              '次回のVRTではこの新しいベースラインが使用されます。'
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            }); 

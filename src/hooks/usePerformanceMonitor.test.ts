@@ -1,9 +1,10 @@
-import { renderHook, act } from '@testing-library/react'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
-  usePerformanceMonitor,
   useLoadPerformance,
   useMemoryMonitor,
+  usePerformanceMonitor,
 } from './usePerformanceMonitor'
 
 // performance APIのモック
@@ -96,11 +97,13 @@ describe('useLoadPerformance', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     // PerformanceObserverのインスタンスをキャプチャ
-    vi.spyOn(window, 'PerformanceObserver').mockImplementation((cb: PerformanceObserverCallback) => {
+    vi.spyOn(window, 'PerformanceObserver').mockImplementation(
+      (cb: PerformanceObserverCallback) => {
         const instance = new MockPerformanceObserver(cb)
         observerInstance = instance
         return instance
-    });
+      }
+    )
   })
 
   afterEach(() => {
@@ -115,21 +118,24 @@ describe('useLoadPerformance', () => {
     })
 
     const navEntry: Partial<PerformanceNavigationTiming> = {
-        entryType: 'navigation',
-        domContentLoadedEventStart: 100,
-        domContentLoadedEventEnd: 200,
-        loadEventStart: 250,
-        loadEventEnd: 300,
-        fetchStart: 50
+      entryType: 'navigation',
+      domContentLoadedEventStart: 100,
+      domContentLoadedEventEnd: 200,
+      loadEventStart: 250,
+      loadEventEnd: 300,
+      fetchStart: 50,
     }
     const resourceEntry: Partial<PerformanceResourceTiming> = {
-        entryType: 'resource',
-        name: 'large-bundle.js',
-        transferSize: 200000
+      entryType: 'resource',
+      name: 'large-bundle.js',
+      transferSize: 200000,
     }
-    
+
     act(() => {
-        observerInstance?.trigger([navEntry as PerformanceNavigationTiming, resourceEntry as PerformanceResourceTiming])
+      observerInstance?.trigger([
+        navEntry as PerformanceNavigationTiming,
+        resourceEntry as PerformanceResourceTiming,
+      ])
     })
 
     expect(console.log).toHaveBeenCalledWith('🚀 Page Load Performance:', expect.any(Object))
@@ -142,7 +148,6 @@ describe('useLoadPerformance', () => {
     expect(observerInstance?.disconnect).toHaveBeenCalled()
   })
 })
-
 
 describe('useMemoryMonitor', () => {
   beforeEach(() => {
@@ -177,7 +182,7 @@ describe('useMemoryMonitor', () => {
     renderHook(() => useMemoryMonitor(true))
     expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('High memory usage detected'))
   })
-  
+
   it.skip('30秒ごとにメモリをチェックする', () => {
     renderHook(() => useMemoryMonitor(true))
     // The initial call
@@ -185,18 +190,18 @@ describe('useMemoryMonitor', () => {
 
     // Advance timers
     act(() => {
-        vi.advanceTimersByTime(30000)
+      vi.advanceTimersByTime(30000)
     })
     expect(console.debug).toHaveBeenCalledTimes(2)
     act(() => {
-        vi.advanceTimersByTime(30000)
+      vi.advanceTimersByTime(30000)
     })
     expect(console.debug).toHaveBeenCalledTimes(3)
   })
 
   it.skip('アンマウント時に interval を clear する', () => {
-      const { unmount } = renderHook(() => useMemoryMonitor(true))
-      unmount()
-      expect(clearInterval).toHaveBeenCalled()
+    const { unmount } = renderHook(() => useMemoryMonitor(true))
+    unmount()
+    expect(clearInterval).toHaveBeenCalled()
   })
-}) 
+})

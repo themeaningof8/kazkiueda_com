@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { cn } from '@/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { cn } from '@/utils'
 
 export const BentoCard = ({
   children,
@@ -9,19 +9,14 @@ export const BentoCard = ({
   header,
   icon,
 }: {
-  children?: React.ReactNode;
-  className?: string;
-  title?: string;
-  description?: string;
-  header?: React.ReactNode;
-  icon?: React.ReactNode;
+  children?: React.ReactNode
+  className?: string
+  title?: string
+  description?: string
+  header?: React.ReactNode
+  icon?: React.ReactNode
 }) => (
-  <Card
-    className={cn(
-      'flex h-full flex-col justify-between overflow-hidden',
-      className,
-    )}
-  >
+  <Card className={cn('flex h-full flex-col justify-between overflow-hidden', className)}>
     {header ? (
       header
     ) : (
@@ -30,13 +25,11 @@ export const BentoCard = ({
           <CardHeader>
             {icon}
             {title && <CardTitle>{title}</CardTitle>}
-            {description && (
-              <p className="text-sm text-gray-500">{description}</p>
-            )}
+            {description && <p className='text-sm text-gray-500'>{description}</p>}
           </CardHeader>
         )}
         <CardContent>{children}</CardContent>
       </>
     )}
   </Card>
-); 
+)

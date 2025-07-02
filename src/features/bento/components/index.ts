@@ -1,2 +1,2 @@
-export * from './BentoCard';
-export * from './BentoGrid'; 
+export * from './BentoCard'
+export * from './BentoGrid'
