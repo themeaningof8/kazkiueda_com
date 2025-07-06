@@ -1,0 +1,230 @@
+---
+description: React Component Design Rules reflecting React 19 changes and innovations
+globs: **/*.tsx,**/components/**/*.tsx
+alwaysApply: false
+lastUpdated: July 2025
+---
+
+# React Component Design Rules (React 19 Edition)
+
+_Practical guidelines reflecting React 19 new features and paradigm shifts_
+
+## Component Structure Design (Kent C. Dodds, Dan Abramov)
+
+- Adhere to the single responsibility principle and do one thing well
+- Group related components using the Compound Components pattern
+- Prioritise composition over inheritance
+- Component names should clearly express their purpose
+- **🆕 Extract complex logic into custom hooks (simplified with React 19's use
+  hook)**
+
+### React 19 Changes
+
+- Data fetching custom hooks significantly simplified
+- Traditional useEffect + useState patterns no longer necessary with `use` hook
+
+## State Management Design (Kent C. Dodds, Tanner Linsley, Mark Erikson)
+
+- State Colocation: Manage state close to where it is used
+- **🆕 Clearly separate server state and client state (leverage React 19's use
+  hook and Server Components)**
+- Use Redux Toolkit only when necessary (many cases can be replaced with React
+  19 features)
+- Avoid unnecessary global state
+- Maintain immutability when updating state
+
+### React 19 Changes
+
+- Reduced need for external libraries like TanStack Query
+- Declarative data fetching with use hook becomes standard
+
+## Performance Optimisation (Brian Vaughn, React Core Team)
+
+- **⚠️ Minimize manual use of React.memo, useMemo, and useCallback**
+- **🆕 Design with React Compiler's automatic optimization in mind (future
+  release)**
+- Avoid creating objects and functions within renders (Compiler handles
+  automatically)
+- Apply virtualisation for large datasets
+- Do not execute side effects during rendering
+
+### React 19 Changes
+
+- Manual memoization complexity significantly reduced (though not completely
+  eliminated)
+- Performance optimization responsibility shifts to framework level
+- **Note**: React Compiler is separate from React 19 core release
+
+## Data Fetching Design (Tanner Linsley, Dan Abramov)
+
+- **🆕 Declarative data fetching with use hook**
+- **🆕 Automatic integration with Suspense and Error Boundaries**
+- Improve UX with Optimistic Updates (using useOptimistic hook)
+- **🆕 Server-side data fetching with Server Components**
+- Utilise parallel data fetching
+
+### React 19 Changes
+
+```tsx
+// Traditional complex approach
+const [data, setData] = useState(null);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
+
+// React 19 simplified approach
+const data = use(fetchUserData(userId));
+```
+
+## Form Handling Design (React 19 New Addition)
+
+- **🆕 Declarative form processing with Server Actions**
+- **🆕 JavaScript-free form functionality with action attribute**
+- **🆕 Loading state management with useTransition and isPending**
+- Prefer action attribute over traditional onSubmit handlers
+
+### React 19 New Features
+
+```tsx
+function ContactForm() {
+  async function submitForm(formData) {
+    await sendMessage(formData);
+  }
+
+  return (
+    <form action={submitForm}>
+      <input name="email" />
+      <button>Submit</button>
+    </form>
+  );
+}
+```
+
+## Component Extension (Kent C. Dodds, Michael Jackson, React Core Team)
+
+- **🆕 Leverage use hook in custom hooks**
+- Prioritise Hooks over Higher-Order Components
+- Maintain a balance between flexibility and complexity
+- Keep coupling between components low
+- **🆕 Clearly define boundaries between Server Components and Client
+  Components**
+
+## Error Handling (Dan Abramov, React Core Team)
+
+- Set appropriate error boundaries with Error Boundaries
+- **🆕 Local error handling with try-catch in use hook**
+- Provide user-friendly error messages
+- Maintain a usable UI even in error conditions
+- Integrate with error reporting systems
+
+### React 19 Changes
+
+```tsx
+function DataComponent() {
+  try {
+    const data = use(fetchData());
+    return <DisplayData data={data} />;
+  } catch (error) {
+    return <ErrorMessage error={error} />;
+  }
+}
+```
+
+## Test Design (Kent C. Dodds)
+
+- Test user behaviour rather than implementation details
+- Follow Testing Library principles
+- Use tests as specifications
+- **⚠️ Establish new testing strategies for Server Components**
+- Properly mock external dependencies
+
+### React 19 Impact
+
+- Different testing approaches needed for Server Components vs Client Components
+- Reconsider testing methods for components using use hook
+
+## Accessibility (Ryan Florence, React Community)
+
+- Prioritise the use of semantic HTML elements
+- **🆕 Enhanced Progressive Enhancement with Server Components**
+- Set appropriate ARIA attributes
+- Ensure keyboard navigation
+- Provide meaningful alt text for images
+
+## Type Safety (React Community, Kent C. Dodds)
+
+- Strictly define props using TypeScript interfaces
+- Express state constraints using union types
+- Enhance reusability using generic types
+- **🆕 Ensure type safety for use hook and Server Components**
+- Keep code concise by leveraging type inference
+
+## Server Components (Dan Abramov, React Core Team) - Increased Importance
+
+- **🆕 Leverage server-side data retrieval**
+- **🆕 Clearly define boundaries with Client Components**
+- **🆕 Optimise hydration strategies**
+- **🆕 Balance SEO and performance**
+- **🆕 Improve UX with streaming**
+
+## Migration Strategy (React 19 New Addition)
+
+- **Gradual Migration**: Don't rush to remove existing performance optimizations
+- **Continuous Learning**: Maintain understanding of traditional optimization
+  techniques until React Compiler release
+- **Experimental Adoption**: Start with use hook and gradually introduce new
+  patterns
+- **Team Education**: Learn to distinguish between new and traditional patterns
+
+## Code Quality
+
+- Strictly enforce linting rules
+- Use Prettier for consistent formatting
+- Verify pattern compliance through code reviews
+- **🆕 Manage technical debt including React 19 migration planning**
+- Share team knowledge through documentation
+
+---
+
+## Important Considerations
+
+**🚨 Migration Period Cautions**:
+
+1. **React Compiler**: Separate release from React 19 core. Complete automatic
+   optimization not yet achieved
+2. **Gradual Adoption**: Don't change all optimization techniques at once;
+   migrate incrementally
+3. **Compatibility**: Verify compatibility with existing libraries during
+   adoption
+4. **Continuous Learning**: Understand both new features and traditional
+   approaches for appropriate usage
+
+**🎯 Priority Changes**:
+
+- **High**: Server Components, use hook, form handling
+- **Medium**: Performance optimization (becoming automated)
+- **Ongoing**: Accessibility, type safety, testing strategies
+
+---
+
+## Removed/Changed Items from Original Rules
+
+### 🗑️ Removed Items
+
+- **"Clearly define cache strategies"** - Reduced necessity with React 19's use
+  hook
+- **"Effectively utilise useMemo and useCallback"** - Automated by React
+  Compiler
+- **"Separate logic and UI with Render Props patterns"** - Hooks pattern now
+  dominant
+
+### 🔄 Modified Items
+
+- **"Extract complex logic into custom hooks"** → Enhanced with React 19
+  simplification
+- **"Apply modern Redux patterns using Redux Toolkit"** → Conditional usage
+  recommendation
+- **"Use React.memo appropriately"** → Minimize manual usage
+
+**Key Insight**: These changes reflect the paradigm shift toward framework-level
+optimization and declarative patterns, while maintaining the need for gradual,
+thoughtful migration during the transition period.

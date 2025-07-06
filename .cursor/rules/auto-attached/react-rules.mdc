@@ -1,8 +1,9 @@
 ---
-description: 
-globs: **/*.tsx,**/components/**/*.tsx
+description:
+globs:
 alwaysApply: false
 ---
+
 # React Component Design Rules
 
 _Practical guidelines based on the design concepts of React community leaders_
