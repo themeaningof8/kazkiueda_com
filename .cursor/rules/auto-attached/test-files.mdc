@@ -1,17 +1,21 @@
 ---
-description: 
+description: Test File Development Rules
 globs: *.test.ts,*.test.tsx,*.spec.ts,tests/**/*
 alwaysApply: false
 ---
+
 # Test File Development Rules
 
 ## Core Methodologies
+
 - Establish a testing strategy based on Kent C. Dodds' 'Testing Trophy'
-- Adopt a user-centric testing philosophy: 'tests should resemble how software is used'
+- Adopt a user-centric testing philosophy: 'tests should resemble how software
+  is used'
 - Refer to Josh Goldberg's TypeScript testing patterns
 - Follow Artem Zakharchenko's modern mocking techniques
 
 ## Testing Approach
+
 - Test user behaviour rather than implementation details
 - Use accessibility-first selectors (getByRole, getByLabelText)
 - Prohibit mock tests that directly reference DOM files
@@ -19,6 +23,7 @@ alwaysApply: false
 - Write tests that give you confidence the app works for users
 
 ## Modern Tools & Practices
+
 - Use Jest/Vitest as test runners
 - Use React Testing Library for component testing
 - Use Mock Service Worker (MSW) for API mocking
@@ -27,12 +32,14 @@ alwaysApply: false
 - Use screen object for querying instead of destructuring from render
 
 ## Test Distribution (Testing Trophy)
+
 - Static Tests: ESLint, TypeScript type checking (broad base)
 - Unit Tests: Pure functions, utilities (fewer than integration)
 - Integration Tests: Component integration, API contracts (emphasis)
 - E2E Tests: Critical user journeys (few but essential)
 
 ## Specific Guidelines
+
 - Use meaningful test descriptions that explain business value
 - Avoid testing implementation details like component state
 - Mock external dependencies, not internal modules
@@ -41,6 +48,7 @@ alwaysApply: false
 - Focus on testing what the user can see and do
 
 ## Anti-Patterns to Avoid
+
 - Testing component methods directly
 - Excessive mocking that disconnects tests from reality
 - Brittle selectors that break on styling changes
@@ -48,6 +56,26 @@ alwaysApply: false
 - Writing tests that only pass due to implementation coupling
 
 ## Snapshot Testing and Alternatives
-- **Prioritize Visual Regression Testing**: For testing the visual appearance of components, prefer visual regression testing (e.g., with Playwright or Chromatic) over snapshot tests. This ensures tests are robust against markup refactoring and verify what the user actually sees.
-- **Use Specific Assertions**: Instead of broad snapshot tests, use specific assertions to check for critical attributes or styles (e.g., `expect(el).toHaveClass('...')`, `expect(el).toBeDisabled()`). This makes the test's intent clearer and less brittle.
-- **Limit Snapshot Usage**: Use snapshot tests sparingly, primarily for complex, static output where manual assertion is impractical, such as CLI tool outputs or generated code.
+
+- **Prioritize Visual Regression Testing**: For testing the visual appearance of
+  components, prefer visual regression testing (e.g., with Playwright or
+  Chromatic) over snapshot tests. This ensures tests are robust against markup
+  refactoring and verify what the user actually sees.
+- **Use Specific Assertions**: Instead of broad snapshot tests, use specific
+  assertions to check for critical attributes or styles (e.g.,
+  `expect(el).toHaveClass('...')`, `expect(el).toBeDisabled()`). This makes the
+  test's intent clearer and less brittle.
+- **Limit Snapshot Usage**: Use snapshot tests sparingly, primarily for complex,
+  static output where manual assertion is impractical, such as CLI tool outputs
+  or generated code.
+
+## Notes on React 19/Suspense compatibility
+
+- When using Suspense/use hooks, tests may not proceed with the loading UI when
+  using “fetch-on-render.”
+- We recommend the **Render-as-You-Fetch pattern** (side effects start before
+  rendering, and Promises are resolved and cached in test setup).
+- Immediately resolve API mock Promises in test setup or beforeEach and utilize
+  caching
+- Extending timeouts for findByText/waitFor or using await act(async () => ...)
+  to wait for Suspense resolution can also be effective

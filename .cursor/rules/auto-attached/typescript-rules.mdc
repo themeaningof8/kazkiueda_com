@@ -1,15 +1,18 @@
 ---
-description: 
+description: TypeScript Best Practices
 globs: *.ts,*.tsx
 alwaysApply: false
 ---
+
 # TypeScript Best Practices
 
 ## Core Methodologies
+
 - Implement Kent C. Dodds' 'Fully Typed Web Apps' approach
 - Follow Matt Pocock's type design patterns
 
 ## Framework-Specific
+
 - Use the Result type for functional error handling
 - Implement React error boundaries
 - Leverage dependency injection (Angular/NestJS)
