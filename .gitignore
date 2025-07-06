@@ -45,9 +45,7 @@ storybook-static
 playwright/.cache/
 
 # Lost Pixel Visual Regression Testing
-lost-pixel-baseline/
-lost-pixel-current/
-lost-pixel-difference/
+lost-pixel/
 
 # Bun cache
 .bun/
