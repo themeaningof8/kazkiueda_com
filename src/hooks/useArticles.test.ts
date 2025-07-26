@@ -23,22 +23,6 @@ author:
 
 React Testing Libraryは、Reactコンポーネントをユーザーの視点でテストするためのライブラリです...`
 
-const mockMarkdownPublished2 = `---
-title: "TypeScriptの型安全性"
-description: "TypeScriptを使った型安全なコードの書き方とベストプラクティス。"
-category: "プログラミング"
-publishedAt: "2024-01-10T14:30:00Z"
-published: true
-imageUrl: "https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80"
-author:
-  name: "佐藤花子"
-  avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
----
-
-# TypeScriptの型安全性
-
-TypeScriptは、JavaScriptに静的型付けを追加したプログラミング言語です...`
-
 const mockMarkdownDraft = `---
 title: "Next.js 14の新機能（ドラフト）"
 description: "Next.js 14で追加された新機能について詳しく解説します。"
@@ -66,10 +50,6 @@ describe('useArticles', () => {
       }),
       http.get('/articles/2024-01-20-nextjs-draft.md', () => {
         return HttpResponse.text(mockMarkdownDraft)
-      }),
-      // 追加の公開記事（テスト用）
-      http.get('/articles/typescript-safety.md', () => {
-        return HttpResponse.text(mockMarkdownPublished2)
       })
     )
   })

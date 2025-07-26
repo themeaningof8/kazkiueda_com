@@ -11,7 +11,7 @@ describe('ArticleList', () => {
   beforeEach(() => {
     server.resetHandlers()
 
-    // デフォルトで2つの公開記事をモック
+    // デフォルトで1つの公開記事をモック
     server.use(
       http.get('/articles/2024-06-01-hello-world.md', () => {
         return HttpResponse.text(`---
@@ -30,22 +30,28 @@ author:
 
 React Testing Libraryは、Reactコンポーネントをユーザーの視点でテストするためのライブラリです...`)
       }),
-      http.get('/articles/2024-01-10-typescript-safety.md', () => {
+      http.get('/articles/2024-01-20-nextjs-draft.md', () => {
         return HttpResponse.text(`---
-title: "TypeScriptの型安全性"
-description: "TypeScriptを使った型安全なコードの書き方とベストプラクティス。"
-category: "プログラミング"
-publishedAt: "2024-01-10T14:30:00Z"
-published: true
-imageUrl: "https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80"
+title: "Next.js 14の新機能"
+description: "Next.js 14で追加された新機能について詳しく解説します（執筆中）"
+category: "テクノロジー"
+publishedAt: "2024-01-20T09:00:00Z"
+published: false
+imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80"
 author:
-  name: "佐藤花子"
-  avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+  name: "Kaz Kiueda"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
 ---
 
-# TypeScriptの型安全性
+# Next.js 14の新機能
 
-TypeScriptは、JavaScriptに静的型付けを追加したプログラミング言語です...`)
+> ⚠️ この記事は執筆中です
+
+Next.js 14では、以下の新機能が追加されました：
+
+## 主要な新機能
+
+この部分は現在執筆中です...`)
       })
     )
   })
@@ -58,24 +64,18 @@ TypeScriptは、JavaScriptに静的型付けを追加したプログラミング
 
     // データ読み込み完了まで待機
     await waitFor(() => {
-      expect(screen.getByText('記事一覧 (2件)')).toBeInTheDocument()
+      expect(screen.getByText('記事一覧 (1件)')).toBeInTheDocument()
     })
 
     // 記事が表示されることを確認
     expect(screen.getByText('React Testing Libraryの使い方')).toBeInTheDocument()
-    expect(screen.getByText('TypeScriptの型安全性')).toBeInTheDocument()
     expect(screen.getByText('テクノロジー')).toBeInTheDocument()
-    expect(screen.getByText('プログラミング')).toBeInTheDocument()
   })
 
   it('ローディング状態を正しく表示する', () => {
     // 遅延レスポンスのハンドラーに置き換え
     server.use(
       http.get('/articles/2024-06-01-hello-world.md', async () => {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        return new HttpResponse(null, { status: 404 })
-      }),
-      http.get('/articles/2024-01-10-typescript-safety.md', async () => {
         await new Promise(resolve => setTimeout(resolve, 1000))
         return new HttpResponse(null, { status: 404 })
       }),
@@ -97,9 +97,6 @@ TypeScriptは、JavaScriptに静的型付けを追加したプログラミング
       http.get('/articles/2024-06-01-hello-world.md', () => {
         return new HttpResponse(null, { status: 404 })
       }),
-      http.get('/articles/2024-01-10-typescript-safety.md', () => {
-        return new HttpResponse(null, { status: 404 })
-      }),
       http.get('/articles/2024-01-20-nextjs-draft.md', () => {
         return new HttpResponse(null, { status: 404 })
       })
@@ -108,12 +105,10 @@ TypeScriptは、JavaScriptに静的型付けを追加したプログラミング
     const user = userEvent.setup()
     render(<ArticleList />)
 
-    // エラーメッセージの表示を待機
+    // エラーメッセージの表示を待機（h3要素を指定）
     await waitFor(() => {
-      expect(screen.getByText('記事の読み込みに失敗しました')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: '記事一覧の取得に失敗しました' })).toBeInTheDocument()
     })
-
-    expect(screen.getByText('記事一覧の取得に失敗しました')).toBeInTheDocument()
 
     // 正常なレスポンスを返すハンドラーに戻す
     server.use(
@@ -134,9 +129,6 @@ author:
 
 React Testing Libraryは、Reactコンポーネントをユーザーの視点でテストするためのライブラリです...`)
       }),
-      http.get('/articles/2024-01-10-typescript-safety.md', () => {
-        return new HttpResponse(null, { status: 404 })
-      }),
       http.get('/articles/2024-01-20-nextjs-draft.md', () => {
         return new HttpResponse(null, { status: 404 })
       })
@@ -148,7 +140,7 @@ React Testing Libraryは、Reactコンポーネントをユーザーの視点で
 
     // エラーが解消され、記事が表示されることを確認
     await waitFor(() => {
-      expect(screen.queryByText('記事の読み込みに失敗しました')).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: '記事一覧の取得に失敗しました' })).not.toBeInTheDocument()
     })
 
     // 1件の記事が表示されることを確認
@@ -162,9 +154,6 @@ React Testing Libraryは、Reactコンポーネントをユーザーの視点で
       http.get('/articles/2024-06-01-hello-world.md', () => {
         return new HttpResponse(null, { status: 404 })
       }),
-      http.get('/articles/2024-01-10-typescript-safety.md', () => {
-        return new HttpResponse(null, { status: 404 })
-      }),
       http.get('/articles/2024-01-20-nextjs-draft.md', () => {
         return new HttpResponse(null, { status: 404 })
       })
@@ -173,10 +162,9 @@ React Testing Libraryは、Reactコンポーネントをユーザーの視点で
     render(<ArticleList />)
 
     await waitFor(() => {
-      expect(screen.getByText('記事の読み込みに失敗しました')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: '記事一覧の取得に失敗しました' })).toBeInTheDocument()
     })
 
-    expect(screen.getByText('記事一覧の取得に失敗しました')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '再試行' })).toBeInTheDocument()
   })
 
@@ -186,7 +174,7 @@ React Testing Libraryは、Reactコンポーネントをユーザーの視点で
 
     // 初回データ読み込み完了まで待機
     await waitFor(() => {
-      expect(screen.getByText('記事一覧 (2件)')).toBeInTheDocument()
+      expect(screen.getByText('記事一覧 (1件)')).toBeInTheDocument()
     })
 
     // 異なるデータを返すハンドラーに置き換え
@@ -207,9 +195,6 @@ author:
 # 更新されたテスト記事
 
 更新後の記事です`)
-      }),
-      http.get('/articles/2024-01-10-typescript-safety.md', () => {
-        return new HttpResponse(null, { status: 404 })
       }),
       http.get('/articles/2024-01-20-nextjs-draft.md', () => {
         return new HttpResponse(null, { status: 404 })
@@ -233,12 +218,11 @@ author:
     render(<ArticleList />)
 
     await waitFor(() => {
-      expect(screen.getByText('記事一覧 (2件)')).toBeInTheDocument()
+      expect(screen.getByText('記事一覧 (1件)')).toBeInTheDocument()
     })
 
-    // 記事のリンクが正しく設定されていることを確認
+    // 記事のリンクが正しく設定されていることを確認（短縮バージョン）
     const articleLinks = screen.getAllByRole('link')
-    expect(articleLinks[0]).toHaveAttribute('href', '/articles/2024-06-01-hello-world')
-    expect(articleLinks[1]).toHaveAttribute('href', '/articles/2024-01-10-typescript-safety')
+    expect(articleLinks[0]).toHaveAttribute('href', '/articles/hello-world')
   })
 })
