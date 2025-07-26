@@ -1,5 +1,5 @@
-name: "Setup Bun with Cache and Madge"
-description: "Setup Bun, cache dependencies, and run Madge dependency analysis for faster CI/CD builds"
+name: "Setup Bun with Cache"
+description: "Setup Bun and cache dependencies for faster CI/CD builds"
 
 runs:
   using: "composite"
@@ -20,35 +20,3 @@ runs:
     - name: Install dependencies
       run: bun install --frozen-lockfile
       shell: bash
-
-    - name: Install Graphviz for Madge
-      run: |
-        if [ "$RUNNER_OS" = "macOS" ]; then
-          brew install graphviz
-        elif [ "$RUNNER_OS" = "Linux" ]; then
-          sudo apt-get update
-          sudo apt-get install -y graphviz
-        elif [ "$RUNNER_OS" = "Windows" ]; then
-          choco install graphviz
-        fi
-      shell: bash
-
-    - name: Run Madge circular dependency check
-      run: |
-        echo "Checking for circular dependencies..."
-        bun run madge:circular
-        echo "Checking for orphan modules..."
-        bun run madge:orphans
-        echo "Checking for leaf modules..."
-        bun run madge:leaves
-      shell: bash
-
-    - name: Upload Madge dependency graphs as artifacts
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: dependency-graphs
-        path: |
-          *.svg
-          dependency-graph.gv
-        retention-days: 30
