@@ -30,7 +30,7 @@ export function ArticleList() {
       <Alert variant='destructive'>
         <div className='flex items-center justify-between'>
           <div>
-            <h3 className='font-semibold'>記事の読み込みに失敗しました</h3>
+            <h3 className='font-semibold'>記事一覧の取得に失敗しました</h3>
             <p className='text-sm'>{error}</p>
           </div>
           <Button onClick={refetch} variant='outline' size='sm'>

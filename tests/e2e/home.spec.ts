@@ -59,14 +59,6 @@ Next.js 14では、以下の新機能が追加されました：
       })
     })
 
-    await page.route('/articles/2024-01-10-typescript-safety.md', async route => {
-      await route.fulfill({
-        status: 404,
-        contentType: 'text/plain',
-        body: 'Not Found',
-      })
-    })
-
     await page.goto('/')
   })
 

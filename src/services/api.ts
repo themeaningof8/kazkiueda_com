@@ -25,9 +25,28 @@ export async function getAllArticles(): Promise<Result<Article[], ApiErrorClass>
   return getMarkdownArticles({ includeDrafts: true })
 }
 
+// 短縮されたslugからフルslugを見つける関数
+function findFullSlugFromShortSlug(shortSlug: string): string | null {
+  return (
+    availableArticleSlugs.find(slug => slug.replace(/^\d{4}-\d{2}-\d{2}-/, '') === shortSlug) ||
+    null
+  )
+}
+
 // 個別記事をスラッグで取得
 export async function getMarkdownArticle(slug: string): Promise<Result<Article, ApiErrorClass>> {
-  const result = await fetchMarkdownFile(slug)
+  // 短縮slugの場合は、フルslugを取得
+  const fullSlug =
+    slug.includes('-') && slug.match(/^\d{4}-\d{2}-\d{2}-/) ? slug : findFullSlugFromShortSlug(slug)
+
+  if (!fullSlug) {
+    return {
+      success: false,
+      error: new ApiErrorClass('記事が見つかりません', 404, 'NOT_FOUND'),
+    }
+  }
+
+  const result = await fetchMarkdownFile(fullSlug)
 
   if (result.success) {
     const article = markdownToArticle(result.data)
@@ -74,6 +93,9 @@ async function fetchMarkdownFile(slug: string): Promise<Result<MarkdownArticle, 
 function markdownToArticle(markdown: MarkdownArticle): Article {
   const { slug, frontMatter, content } = markdown
 
+  // スラッグを短縮（日付プレフィックスを除去）
+  const shortSlug = slug.replace(/^\d{4}-\d{2}-\d{2}-/, '')
+
   return {
     id: slug,
     title: frontMatter.title,
@@ -83,7 +105,7 @@ function markdownToArticle(markdown: MarkdownArticle): Article {
     imageUrl:
       frontMatter.imageUrl ||
       'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80',
-    href: `/articles/${slug}`,
+    href: `/articles/${shortSlug}`,
     publishedAt: frontMatter.publishedAt,
     published: frontMatter.published,
     author: frontMatter.author || {
@@ -95,11 +117,7 @@ function markdownToArticle(markdown: MarkdownArticle): Article {
 }
 
 // 利用可能な記事スラッグ一覧（実際の実装では動的に取得）
-const availableArticleSlugs = [
-  '2024-06-01-hello-world',
-  '2024-01-20-nextjs-draft',
-  '2024-01-10-typescript-safety',
-]
+const availableArticleSlugs = ['2024-06-01-hello-world', '2024-01-20-nextjs-draft']
 
 // Markdownベースの記事一覧取得
 export async function getMarkdownArticles(options?: {
