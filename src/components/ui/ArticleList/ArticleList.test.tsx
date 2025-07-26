@@ -107,7 +107,9 @@ Next.js 14では、以下の新機能が追加されました：
 
     // エラーメッセージの表示を待機（h3要素を指定）
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: '記事一覧の取得に失敗しました' })).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { name: '記事一覧の取得に失敗しました' })
+      ).toBeInTheDocument()
     })
 
     // 正常なレスポンスを返すハンドラーに戻す
@@ -140,7 +142,9 @@ React Testing Libraryは、Reactコンポーネントをユーザーの視点で
 
     // エラーが解消され、記事が表示されることを確認
     await waitFor(() => {
-      expect(screen.queryByRole('heading', { name: '記事一覧の取得に失敗しました' })).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('heading', { name: '記事一覧の取得に失敗しました' })
+      ).not.toBeInTheDocument()
     })
 
     // 1件の記事が表示されることを確認
@@ -162,7 +166,9 @@ React Testing Libraryは、Reactコンポーネントをユーザーの視点で
     render(<ArticleList />)
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: '記事一覧の取得に失敗しました' })).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { name: '記事一覧の取得に失敗しました' })
+      ).toBeInTheDocument()
     })
 
     expect(screen.getByRole('button', { name: '再試行' })).toBeInTheDocument()
