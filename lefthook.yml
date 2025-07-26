@@ -5,9 +5,9 @@ pre-commit:
   commands:
     oxlint:
       glob: "*.{ts,tsx,js,jsx}"
-      run: /opt/homebrew/bin/bun run lint --fix {staged_files}
+      run: /opt/homebrew/bin/bunx oxlint {staged_files} --fix
     prettier:
       glob: "*.{ts,tsx,js,jsx,json,css,md}"
-      run: /opt/homebrew/bin/bun run format --write {staged_files}
+      run: /opt/homebrew/bin/bun run format
     type-check:
       run: /opt/homebrew/bin/bun run type-check
