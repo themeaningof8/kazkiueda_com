@@ -1,11 +1,13 @@
 pre-commit:
   parallel: true
+  env:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
   commands:
     oxlint:
       glob: "*.{ts,tsx,js,jsx}"
       run: bunx oxlint --fix {staged_files}
     prettier:
       glob: "*.{ts,tsx,js,jsx,json,css,md}"
-      run: prettier --write {staged_files}
+      run: bunx prettier --write {staged_files}
     type-check:
       run: bun run type-check

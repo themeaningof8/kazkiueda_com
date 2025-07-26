@@ -49,3 +49,7 @@ lost-pixel/
 
 # Bun cache
 .bun/
+
+# Madge dependency graphs
+*.svg
+dependency-graph.gv

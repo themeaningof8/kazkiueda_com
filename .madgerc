@@ -1,0 +1,24 @@
+{
+  "fontSize": "12px",
+  "graphVizOptions": {
+    "G": {
+      "rankdir": "TB",
+      "splines": "ortho"
+    }
+  },
+  "detectiveOptions": {
+    "ts": {
+      "skipTypeImports": true,
+      "skipAsyncImports": true
+    },
+    "tsx": {
+      "skipTypeImports": true,
+      "skipAsyncImports": true
+    }
+  },
+  "excludeRegExp": [
+    "\\.(test|spec|stories)\\.(ts|tsx|js|jsx)$",
+    "node_modules",
+    "\\.d\\.ts$"
+  ]
+} 

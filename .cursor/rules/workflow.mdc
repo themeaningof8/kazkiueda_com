@@ -1,25 +1,51 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
+
 # Development Workflow
 
 ## Quality Assurance Checklist
+
 Before marking any task as complete:
+
 1. Run `bun run check` - Ensure linting passes
 2. Run `bun run build` - Verify build succeeds
 3. Run `bun run test` - Confirm all tests pass
 4. Run `bun run test:coverage` - Ensure test coverage meets the threshold
 5. Run `bun run test:e2e` - Verify E2E tests pass
+6. Run `bun run madge:circular` - Check for circular dependencies
+7. Run `bun audit` - Check for security vulnerabilities
 
 ## E2E Testing Guidelines
+
 - E2E tests run in isolated browser environment with MSW disabled
 - API responses are mocked using Playwright's route interception
 - Focus on critical user journeys and accessibility compliance
 - Run E2E tests before major releases and deployments
 
 ## Technical Debt Management
+
 - Refactor continuously during development
 - Fix technical debt early before it accumulates
 - Track technical debt items in project backlog
+
+## Dependency Analysis with Madge
+
+### Available Scripts
+
+- `bun run madge` - Generate dependency graph as SVG image
+- `bun run madge:circular` - Find and visualize circular dependencies
+- `bun run madge:orphans` - Find modules that no one depends on
+- `bun run madge:leaves` - Find modules with no dependencies
+- `bun run madge:json` - Export dependency tree as JSON
+- `bun run madge:dot` - Export dependency tree as DOT format
+
+### Usage Guidelines
+
+- Run circular dependency check before major refactoring
+- Use dependency graph to identify architectural issues
+- Monitor orphan modules for potential dead code
+- Analyze dependency depth to optimize bundle size
+- Generate visual graphs for documentation and presentations
