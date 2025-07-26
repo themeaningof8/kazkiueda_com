@@ -14,8 +14,13 @@ jobs:
     timeout-minutes: 3
 
     steps:
-      - name: Checkout and Setup
-        uses: ./.github/actions/checkout-and-setup
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun with Cache
+        uses: ./.github/actions/setup-bun
 
       - name: Run linting and formatting checks
         run: bun run check
@@ -28,8 +33,13 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Checkout and Setup
-        uses: ./.github/actions/checkout-and-setup
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun with Cache
+        uses: ./.github/actions/setup-bun
 
       - name: Build application
         run: bun run build
@@ -49,8 +59,13 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Checkout and Setup
-        uses: ./.github/actions/checkout-and-setup
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun with Cache
+        uses: ./.github/actions/setup-bun
 
       - name: Run unit tests
         run: bun run test
@@ -63,8 +78,13 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Checkout and Setup
-        uses: ./.github/actions/checkout-and-setup
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun with Cache
+        uses: ./.github/actions/setup-bun
 
       - name: Run test coverage
         run: bun run test:coverage
@@ -85,8 +105,13 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout and Setup
-        uses: ./.github/actions/checkout-and-setup
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun with Cache
+        uses: ./.github/actions/setup-bun
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
