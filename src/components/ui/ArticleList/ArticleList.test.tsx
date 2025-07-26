@@ -122,6 +122,7 @@ describe('ArticleList', () => {
             imageUrl: 'https://example.com/image.jpg',
             href: '/articles/updated',
             publishedAt: '2024-01-20T10:00:00Z',
+            published: true,
             author: {
               name: '更新者',
               avatar: 'https://example.com/avatar.jpg',

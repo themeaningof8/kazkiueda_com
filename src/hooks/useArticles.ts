@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 
-import { getArticles } from '@/services/api'
+import { getMarkdownArticles } from '@/services/api'
 import type { Article } from '@/types/api'
+
+interface UseArticlesOptions {
+  includeDrafts?: boolean
+}
 
 interface UseArticlesReturn {
   articles: Article[]
@@ -10,7 +14,7 @@ interface UseArticlesReturn {
   refetch: () => Promise<void>
 }
 
-export function useArticles(): UseArticlesReturn {
+export function useArticles(options?: UseArticlesOptions): UseArticlesReturn {
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -18,19 +22,30 @@ export function useArticles(): UseArticlesReturn {
   const fetchArticles = async () => {
     setLoading(true)
     setError(null)
-    const result = await getArticles()
+    
+    try {
+      const result = await getMarkdownArticles({
+        includeDrafts: options?.includeDrafts ?? false,
+      })
 
-    if (result.success) {
-      setArticles(result.data)
-    } else {
-      setError(result.error.message)
+      if (result.success) {
+        setArticles(result.data)
+        setError(null)
+      } else {
+        setError(result.error.message)
+        setArticles([])
+      }
+    } catch (err) {
+      setError('記事一覧の取得に失敗しました')
+      setArticles([])
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
     fetchArticles()
-  }, [])
+  }, [options?.includeDrafts])
 
   return {
     articles,

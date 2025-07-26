@@ -13,6 +13,13 @@ export default defineConfig({
   },
   define: {
     'process.env.E2E_TEST': JSON.stringify(process.env.E2E_TEST),
+    global: 'globalThis',
+  },
+  // Node.js polyfills for browser environment
+  esbuild: {
+    define: {
+      global: 'globalThis',
+    },
   },
   server: {
     port: 3000,
@@ -66,10 +73,15 @@ export default defineConfig({
       '@radix-ui/react-accordion',
       '@radix-ui/react-dialog',
       'lucide-react',
+      'buffer',
+      'gray-matter',
     ],
     esbuildOptions: {
       loader: {
         '.js': 'jsx',
+      },
+      define: {
+        global: 'globalThis',
       },
     },
   },

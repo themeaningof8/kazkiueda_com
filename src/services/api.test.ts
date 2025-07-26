@@ -3,7 +3,14 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { server } from '@/mocks/server'
 
-import { ApiErrorClass, getArticle, getArticles, getUserProfile } from './api'
+import {
+  ApiErrorClass,
+  getAllArticles,
+  getArticle,
+  getArticles,
+  getPublishedArticles,
+  getUserProfile,
+} from './api'
 
 describe('API Service', () => {
   beforeEach(() => {
@@ -16,17 +23,52 @@ describe('API Service', () => {
 
       expect(result.success).toBe(true)
       if (result.success) {
+        // デフォルトで公開記事のみを取得
         expect(result.data).toHaveLength(2)
+        expect(result.data.every(article => article.published)).toBe(true)
         expect(result.data[0]).toMatchObject({
           id: '1',
           title: 'React Testing Libraryの使い方',
           category: 'テクノロジー',
+          published: true,
         })
         expect(result.data[1]).toMatchObject({
           id: '2',
           title: 'TypeScriptの型安全性',
           category: 'プログラミング',
+          published: true,
         })
+      }
+    })
+
+    it('ドラフト記事も含めて取得できる', async () => {
+      const result = await getArticles({ includeDrafts: true })
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        // 全記事（ドラフト含む）を取得
+        expect(result.data).toHaveLength(3)
+        const publishedCount = result.data.filter(article => article.published).length
+        const draftCount = result.data.filter(article => !article.published).length
+        expect(publishedCount).toBe(2)
+        expect(draftCount).toBe(1)
+
+        const draftArticle = result.data.find(article => !article.published)
+        expect(draftArticle).toMatchObject({
+          id: '3',
+          title: 'Next.js 14の新機能（ドラフト）',
+          published: false,
+        })
+      }
+    })
+
+    it('includeDrafts: falseで公開記事のみを取得', async () => {
+      const result = await getArticles({ includeDrafts: false })
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toHaveLength(2)
+        expect(result.data.every(article => article.published)).toBe(true)
       }
     })
 
@@ -64,6 +106,33 @@ describe('API Service', () => {
         expect(result.error.message).toBe('Network error occurred')
         expect(result.error.status).toBe(0)
         expect(result.error.code).toBe('NETWORK_ERROR')
+      }
+    })
+  })
+
+  describe('getPublishedArticles', () => {
+    it('公開記事のみを取得する', async () => {
+      const result = await getPublishedArticles()
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toHaveLength(2)
+        expect(result.data.every(article => article.published)).toBe(true)
+      }
+    })
+  })
+
+  describe('getAllArticles', () => {
+    it('ドラフト記事も含めて全記事を取得する', async () => {
+      const result = await getAllArticles()
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toHaveLength(3)
+        const publishedCount = result.data.filter(article => article.published).length
+        const draftCount = result.data.filter(article => !article.published).length
+        expect(publishedCount).toBe(2)
+        expect(draftCount).toBe(1)
       }
     })
   })

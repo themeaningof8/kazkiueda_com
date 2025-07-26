@@ -1,6 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
+// Buffer polyfill for gray-matter
+import { Buffer } from 'buffer'
+// @ts-ignore
+window.Buffer = Buffer
+// @ts-ignore
+globalThis.Buffer = Buffer
+
 import App from './App'
 import './styles/globals.css'
 

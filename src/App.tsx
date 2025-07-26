@@ -8,6 +8,7 @@ import { useLoadPerformance, useMemoryMonitor } from '@/hooks/usePerformanceMoni
 // ページコンポーネントの遅延読み込み
 const HomePage = lazy(() => import('@/features/home'))
 const AboutPage = lazy(() => import('@/features/about'))
+const ArticlePage = lazy(() => import('@/features/articles'))
 
 // Loading コンポーネント
 const PageLoader = () => (
@@ -38,6 +39,7 @@ function App() {
               <Routes>
                 <Route path='/' element={<HomePage />} />
                 <Route path='/about' element={<AboutPage />} />
+                <Route path='/articles/:slug' element={<ArticlePage />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

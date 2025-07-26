@@ -71,6 +71,7 @@ export function ArticleList() {
             description={article.description}
             imageUrl={article.imageUrl}
             href={article.href}
+            published={article.published}
           />
         ))}
       </div>

@@ -17,6 +17,7 @@ const mockArticles: Article[] = [
       'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80',
     href: '/articles/react-testing-library',
     publishedAt: '2024-01-15T10:00:00Z',
+    published: true,
     author: {
       name: '田中太郎',
       avatar:
@@ -33,10 +34,28 @@ const mockArticles: Article[] = [
       'https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80',
     href: '/articles/typescript-type-safety',
     publishedAt: '2024-01-10T14:30:00Z',
+    published: true,
     author: {
       name: '佐藤花子',
       avatar:
         'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    },
+  },
+  {
+    id: '3',
+    title: 'Next.js 14の新機能（ドラフト）',
+    category: 'テクノロジー',
+    description: 'Next.js 14で追加された新機能について詳しく解説します。',
+    content: 'Next.js 14では、Server ActionsやTurbopackなどの新機能が追加されました...',
+    imageUrl:
+      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80',
+    href: '/articles/nextjs-14-features',
+    publishedAt: '2024-01-20T09:00:00Z',
+    published: false,
+    author: {
+      name: '田中太郎',
+      avatar:
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
     },
   },
 ]

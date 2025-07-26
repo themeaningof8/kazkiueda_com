@@ -24,6 +24,9 @@ const meta: Meta<typeof ArticleCard> = {
     aspectRatio: {
       control: { type: 'number', min: 0.1, max: 5, step: 0.1 },
     },
+    published: {
+      control: 'boolean',
+    },
   },
 }
 
@@ -116,13 +119,102 @@ export const HorizontalLayout: Story = {
   },
 }
 
+// 公開状態のバリエーション
+export const DraftArticle: Story = {
+  args: {
+    title: 'ドラフト記事の例',
+    category: 'ドラフト',
+    imageUrl:
+      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80',
+    href: '/articles/draft-example',
+    description: 'まだ公開されていないドラフト記事です。ドラフトバッジが表示されます。',
+    published: false,
+    categoryVariant: 'secondary',
+  },
+}
+
+export const PublishedArticle: Story = {
+  args: {
+    title: '公開済み記事の例',
+    category: '公開',
+    imageUrl:
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80',
+    href: '/articles/published-example',
+    description: '公開済みの記事です。ドラフトバッジは表示されません。',
+    published: true,
+    categoryVariant: 'default',
+  },
+}
+
+// 公開状態の比較
+export const PublishStateComparison: Story = {
+  render: () => (
+    <div className='space-y-8 p-6 max-w-4xl'>
+      <div>
+        <h3 className='text-lg font-semibold mb-4'>公開状態の比較</h3>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <ArticleCard
+            title='公開済みの記事'
+            category={'テクノロジー'}
+            imageUrl='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
+            href='/articles/published-article'
+            description='この記事は既に公開されており、読者に表示されます。'
+            published={true}
+            categoryVariant='default'
+          />
+          <ArticleCard
+            title='ドラフト記事（未公開）'
+            category='プログラミング'
+            imageUrl='https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
+            href='/articles/draft-article'
+            description='この記事はまだドラフト状態で、管理者のみが確認できます。'
+            published={false}
+            categoryVariant='secondary'
+          />
+        </div>
+      </div>
+
+      <div>
+        <h3 className='text-lg font-semibold mb-4'>横レイアウトでの公開状態</h3>
+        <div className='space-y-4'>
+          <ArticleCard
+            title='公開済み記事（横レイアウト）'
+            category={'デザイン'}
+            imageUrl='https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
+            href='/articles/published-horizontal'
+            description='横レイアウトで表示される公開済み記事の例です。'
+            published={true}
+            layout='horizontal'
+            aspectRatio={1}
+            categoryVariant='outline'
+          />
+          <ArticleCard
+            title='ドラフト記事（横レイアウト）'
+            category={'エンジニアリング'}
+            imageUrl='https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
+            href='/articles/draft-horizontal'
+            description='横レイアウトで表示されるドラフト記事の例です。ドラフトバッジが適切に配置されます。'
+            published={false}
+            layout='horizontal'
+            aspectRatio={4 / 3}
+            categoryVariant='default'
+          />
+        </div>
+      </div>
+    </div>
+  ),
+  parameters: {
+    layout: 'fullscreen',
+  },
+}
+
 // アスペクト比のバリエーション
 export const AspectRatioVariations: Story = {
   render: () => (
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 max-w-6xl'>
       <ArticleCard
         title='正方形カード (1:1)'
-        category='デザイン'
+        category={'デザイン'}
         imageUrl='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=400&q=80'
         href='/articles/square-design'
         description='正方形のアスペクト比で表示される記事カードです。'
@@ -130,7 +222,7 @@ export const AspectRatioVariations: Story = {
       />
       <ArticleCard
         title='ポートレート (3:4)'
-        category='写真'
+        category={'写真'}
         imageUrl='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=400&q=80'
         href='/articles/portrait-photography'
         description='ポートレート比率で縦長に表示される記事カードです。'
@@ -139,7 +231,7 @@ export const AspectRatioVariations: Story = {
       />
       <ArticleCard
         title='ウルトラワイド (21:9)'
-        category='映像'
+        category={'映像'}
         imageUrl='https://images.unsplash.com/photo-1440404653325-ab127d49abc1?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&h=300&q=80'
         href='/articles/ultra-wide-video'
         description='ウルトラワイド比率で横長に表示される記事カードです。'
@@ -162,7 +254,7 @@ export const LayoutComparison: Story = {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <ArticleCard
             title='縦レイアウトの記事カード例'
-            category='デザイン'
+            category={'デザイン'}
             imageUrl='https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
             href='/articles/vertical-example'
             description='縦方向のレイアウトで、画像が上部に配置される従来のカードスタイルです。'
@@ -170,7 +262,7 @@ export const LayoutComparison: Story = {
           />
           <ArticleCard
             title='もう一つの縦レイアウト例'
-            category='開発'
+            category={'開発'}
             imageUrl='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
             href='/articles/vertical-example-2'
             description='画像とコンテンツが縦に並ぶ、読みやすいレイアウトです。'
@@ -185,7 +277,7 @@ export const LayoutComparison: Story = {
         <div className='space-y-4'>
           <ArticleCard
             title='横並びレイアウトの記事カード'
-            category='UI/UX'
+            category={'UI/UX'}
             imageUrl='https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
             href='/articles/horizontal-example'
             description='画像とテキストが横並びになる、コンパクトで効率的なレイアウトです。リスト表示に適しています。'
@@ -194,7 +286,7 @@ export const LayoutComparison: Story = {
           />
           <ArticleCard
             title='効率的な情報表示を実現する横レイアウト'
-            category='エンジニアリング'
+            category={'エンジニアリング'}
             imageUrl='https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
             href='/articles/horizontal-example-2'
             description='限られたスペースで多くの情報を表示できる横型レイアウトの活用方法について解説します。'
@@ -217,14 +309,14 @@ export const GridLayout: Story = {
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 max-w-6xl'>
       <ArticleCard
         title='React Hooksの使い方'
-        category='React'
+        category={'React'}
         imageUrl='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
         href='/articles/react-hooks'
         description='React Hooksの基本的な使い方を解説します。'
       />
       <ArticleCard
         title='Next.js 13 App Routerの新機能'
-        category='Next.js'
+        category={'Next.js'}
         imageUrl='https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
         href='/articles/nextjs-app-router'
         description='Next.js 13のApp Routerで追加された新機能について。'
@@ -232,7 +324,7 @@ export const GridLayout: Story = {
       />
       <ArticleCard
         title='Tailwind CSSのベストプラクティス'
-        category='CSS'
+        category={'CSS'}
         imageUrl='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80'
         href='/articles/tailwind-best-practices'
         description='Tailwind CSSを効率的に使うためのベストプラクティス。'
