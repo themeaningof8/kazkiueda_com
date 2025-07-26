@@ -1,0 +1,13 @@
+name: "Checkout and Setup"
+description: "Checkout repository and setup Bun with cache"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Setup Bun with Cache
+      uses: ./.github/actions/setup-bun

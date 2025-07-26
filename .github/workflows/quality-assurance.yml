@@ -14,13 +14,8 @@ jobs:
     timeout-minutes: 3
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Setup Bun with Cache
-        uses: ./.github/actions/setup-bun
+      - name: Checkout and Setup
+        uses: ./.github/actions/checkout-and-setup
 
       - name: Run linting and formatting checks
         run: bun run check
@@ -33,13 +28,8 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Setup Bun with Cache
-        uses: ./.github/actions/setup-bun
+      - name: Checkout and Setup
+        uses: ./.github/actions/checkout-and-setup
 
       - name: Build application
         run: bun run build
@@ -59,13 +49,8 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Setup Bun with Cache
-        uses: ./.github/actions/setup-bun
+      - name: Checkout and Setup
+        uses: ./.github/actions/checkout-and-setup
 
       - name: Run unit tests
         run: bun run test
@@ -78,19 +63,15 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Setup Bun with Cache
-        uses: ./.github/actions/setup-bun
+      - name: Checkout and Setup
+        uses: ./.github/actions/checkout-and-setup
 
       - name: Run test coverage
         run: bun run test:coverage
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: coverage-report
           path: coverage/
@@ -104,13 +85,8 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Setup Bun with Cache
-        uses: ./.github/actions/setup-bun
+      - name: Checkout and Setup
+        uses: ./.github/actions/checkout-and-setup
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
