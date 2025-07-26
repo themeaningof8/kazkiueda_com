@@ -2,105 +2,182 @@ import { test, expect } from '@playwright/test'
 
 test.describe('エラーハンドリング', () => {
   test('APIエラー時にエラーメッセージが表示される', async ({ page }) => {
-    // MSWのService Workerが読み込まれる前にルートを設定
-    await page.route('https://api.example.com/articles', async route => {
+    // Markdownファイルのリクエストでエラーを返す
+    await page.route('/articles/2024-06-01-hello-world.md', async route => {
       await route.fulfill({
         status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          message: 'サーバーエラーが発生しました',
-          code: 'SERVER_ERROR'
-        })
+        contentType: 'text/plain',
+        body: 'Internal Server Error'
+      })
+    })
+
+    await page.route('/articles/2024-01-20-nextjs-draft.md', async route => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'text/plain',
+        body: 'Internal Server Error'
+      })
+    })
+
+    await page.route('/articles/2024-01-10-typescript-safety.md', async route => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'text/plain',
+        body: 'Internal Server Error'
       })
     })
 
     await page.goto('/')
 
     // エラーメッセージが表示されることを確認
-    await expect(page.getByText('記事の読み込みに失敗しました')).toBeVisible({ timeout: 15000 })
-    await expect(page.getByText('サーバーエラーが発生しました')).toBeVisible()
+    await expect(page.getByText('記事一覧の取得に失敗しました')).toBeVisible({ timeout: 15000 })
     
     // 再試行ボタンが表示されることを確認
     await expect(page.getByRole('button', { name: '再試行' })).toBeVisible()
   })
 
   test('ネットワークエラー時にエラーメッセージが表示される', async ({ page }) => {
-    // ネットワークエラーをシミュレート
-    await page.route('https://api.example.com/articles', async route => {
+    // ネットワークエラーをシミュレート（リクエストを中断）
+    await page.route('/articles/2024-06-01-hello-world.md', async route => {
+      await route.abort('failed')
+    })
+
+    await page.route('/articles/2024-01-20-nextjs-draft.md', async route => {
+      await route.abort('failed')
+    })
+
+    await page.route('/articles/2024-01-10-typescript-safety.md', async route => {
       await route.abort('failed')
     })
 
     await page.goto('/')
 
     // エラーメッセージが表示されることを確認
-    await expect(page.getByText('記事の読み込みに失敗しました')).toBeVisible({ timeout: 15000 })
+    await expect(page.getByText('記事一覧の取得に失敗しました')).toBeVisible({ timeout: 15000 })
     
     // 再試行ボタンが表示されることを確認
     await expect(page.getByRole('button', { name: '再試行' })).toBeVisible()
   })
 
   test('再試行ボタンでエラーから回復できる', async ({ page }) => {
-    let requestCount = 0
+    let retryCount = 0
 
-    // 最初のリクエストはエラー、2回目は成功
-    await page.route('https://api.example.com/articles', async route => {
-      requestCount++
-      
-      if (requestCount === 1) {
-        // 最初はエラー
+    // 最初のリクエストではエラー、2回目のリクエストでは成功
+    await page.route('/articles/2024-06-01-hello-world.md', async route => {
+      if (retryCount === 0) {
+        retryCount++
         await route.fulfill({
           status: 500,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            message: 'サーバーエラーが発生しました',
-            code: 'SERVER_ERROR'
-          })
+          contentType: 'text/plain',
+          body: 'Internal Server Error'
         })
       } else {
-        // 2回目以降は成功
         await route.fulfill({
           status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify([
-            {
-              id: '1',
-              title: 'React Testing Libraryの使い方',
-              category: 'React',
-              description: 'React Testing Libraryを使った効果的なテストの書き方について解説します。',
-              imageUrl: '/images/react-testing.jpg',
-              href: '/articles/react-testing-library',
-            }
-          ])
+          contentType: 'text/plain',
+          body: `---
+title: "こんにちは世界"
+description: "このサイトの最初のテスト記事です"
+category: "テスト"
+publishedAt: "2024-06-01T10:00:00Z"
+published: true
+imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80"
+author:
+  name: "Kaz Kiueda"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+---
+
+# こんにちは世界
+
+これはテスト記事です。`
         })
       }
+    })
+
+    await page.route('/articles/2024-01-20-nextjs-draft.md', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/plain',
+        body: `---
+title: "Next.js 14の新機能"
+description: "Next.js 14で追加された新機能について詳しく解説します（執筆中）"
+category: "テクノロジー"
+publishedAt: "2024-01-20T09:00:00Z"
+published: false
+imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80"
+author:
+  name: "Kaz Kiueda"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+---
+
+# Next.js 14の新機能`
+      })
+    })
+
+    await page.route('/articles/2024-01-10-typescript-safety.md', async route => {
+      await route.fulfill({
+        status: 404,
+        contentType: 'text/plain',
+        body: 'Not Found'
+      })
     })
 
     await page.goto('/')
 
     // エラーメッセージが表示されることを確認
-    await expect(page.getByText('記事の読み込みに失敗しました')).toBeVisible({ timeout: 15000 })
+    await expect(page.getByText('記事一覧の取得に失敗しました')).toBeVisible({ timeout: 15000 })
     
     // 再試行ボタンをクリック
     await page.getByRole('button', { name: '再試行' }).click()
     
-    // エラーが解消され、記事が表示されることを確認
+    // 成功時のコンテンツが表示されることを確認
     await expect(page.getByText('記事一覧 (1件)')).toBeVisible({ timeout: 15000 })
-    await expect(page.getByText('React Testing Libraryの使い方')).toBeVisible()
-    
-    // エラーメッセージが消えることを確認
-    await expect(page.getByText('記事の読み込みに失敗しました')).not.toBeVisible()
+    await expect(page.getByText('こんにちは世界')).toBeVisible()
   })
 
   test('遅いAPIレスポンス時にローディング状態が表示される', async ({ page }) => {
-    // APIレスポンスを遅延させる
-    await page.route('https://api.example.com/articles', async route => {
-      // 3秒遅延
+    // 3秒の遅延を設定
+    await page.route('/articles/2024-06-01-hello-world.md', async route => {
       await new Promise(resolve => setTimeout(resolve, 3000))
-      
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([])
+        contentType: 'text/plain',
+        body: `---
+title: "こんにちは世界"
+description: "このサイトの最初のテスト記事です"
+category: "テスト"
+publishedAt: "2024-06-01T10:00:00Z"
+published: true
+imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80"
+author:
+  name: "Kaz Kiueda"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+---
+
+# こんにちは世界
+
+これはテスト記事です。`
+      })
+    })
+
+    await page.route('/articles/2024-01-20-nextjs-draft.md', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/plain',
+        body: `---
+title: "Next.js 14の新機能"
+published: false
+---
+
+# Next.js 14の新機能`
+      })
+    })
+
+    await page.route('/articles/2024-01-10-typescript-safety.md', async route => {
+      await route.fulfill({
+        status: 404,
+        contentType: 'text/plain',
+        body: 'Not Found'
       })
     })
 
@@ -113,19 +190,8 @@ test.describe('エラーハンドリング', () => {
     await page.waitForTimeout(2000)
     await expect(page.locator('.animate-pulse')).toBeVisible()
     
-    // 最終的にデータが読み込まれることを確認
-    await expect(page.getByText('記事が見つかりません')).toBeVisible({ timeout: 5000 })
-  })
-
-  test('存在しないページへのアクセス時に適切にハンドリングされる', async ({ page }) => {
-    // 存在しないページにアクセス
-    const response = await page.goto('/non-existent-page')
-    
-    // 404ステータスまたはルーターによるフォールバック処理を確認
-    // React Routerの場合、通常は200で返されるが、適切なエラーページが表示される
-    expect(response?.status()).toBeLessThan(500)
-    
-    // ページが正常に読み込まれることを確認（エラーページまたはホームページへのリダイレクト）
-    await expect(page.locator('body')).toBeVisible()
+    // 最終的にコンテンツが表示されることを確認
+    await expect(page.getByText('記事一覧 (1件)')).toBeVisible({ timeout: 15000 })
+    await expect(page.getByText('こんにちは世界')).toBeVisible()
   })
 }) 

@@ -1,4 +1,4 @@
-import { renderHook, waitFor, act } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { HttpResponse, http } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
@@ -58,7 +58,7 @@ Next.js 14では、Server ActionsやTurbopackなどの新機能が追加され�
 describe('useArticles', () => {
   beforeEach(() => {
     server.resetHandlers()
-    
+
     // Markdownファイルの取得をモック
     server.use(
       http.get('/articles/2024-06-01-hello-world.md', () => {
@@ -243,7 +243,7 @@ author:
 # Updated Article
 
 This article has been updated.`
-    
+
     server.use(
       http.get('/articles/2024-06-01-hello-world.md', () => {
         return HttpResponse.text(updatedArticle)

@@ -3,217 +3,163 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { server } from '@/mocks/server'
 
-import {
-  ApiErrorClass,
-  getAllArticles,
-  getArticle,
-  getArticles,
-  getPublishedArticles,
-  getUserProfile,
-} from './api'
+import { ApiErrorClass, getAllArticles, getMarkdownArticle, getPublishedArticles } from './api'
 
 describe('API Service', () => {
   beforeEach(() => {
     server.resetHandlers()
-  })
 
-  describe('getArticles', () => {
-    it('記事一覧を正常に取得できる', async () => {
-      const result = await getArticles()
+    // Markdownファイルのモックハンドラーを追加
+    server.use(
+      http.get('/articles/2024-06-01-hello-world.md', () => {
+        return HttpResponse.text(`---
+title: "React Testing Libraryの使い方"
+description: "React Testing Libraryを使った効果的なテストの書き方について解説します。"
+category: "テクノロジー"
+publishedAt: "2024-01-15T10:00:00Z"
+published: true
+imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80"
+author:
+  name: "田中太郎"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+---
 
-      expect(result.success).toBe(true)
-      if (result.success) {
-        // デフォルトで公開記事のみを取得
-        expect(result.data).toHaveLength(2)
-        expect(result.data.every(article => article.published)).toBe(true)
-        expect(result.data[0]).toMatchObject({
-          id: '1',
-          title: 'React Testing Libraryの使い方',
-          category: 'テクノロジー',
-          published: true,
-        })
-        expect(result.data[1]).toMatchObject({
-          id: '2',
-          title: 'TypeScriptの型安全性',
-          category: 'プログラミング',
-          published: true,
-        })
-      }
-    })
+# React Testing Libraryの使い方
 
-    it('ドラフト記事も含めて取得できる', async () => {
-      const result = await getArticles({ includeDrafts: true })
+React Testing Libraryは、Reactコンポーネントをユーザーの視点でテストするためのライブラリです...`)
+      }),
+      http.get('/articles/2024-01-10-typescript-safety.md', () => {
+        return HttpResponse.text(`---
+title: "TypeScriptの型安全性"
+description: "TypeScriptを使った型安全なコードの書き方とベストプラクティス。"
+category: "プログラミング"
+publishedAt: "2024-01-10T14:30:00Z"
+published: true
+imageUrl: "https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80"
+author:
+  name: "佐藤花子"
+  avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+---
 
-      expect(result.success).toBe(true)
-      if (result.success) {
-        // 全記事（ドラフト含む）を取得
-        expect(result.data).toHaveLength(3)
-        const publishedCount = result.data.filter(article => article.published).length
-        const draftCount = result.data.filter(article => !article.published).length
-        expect(publishedCount).toBe(2)
-        expect(draftCount).toBe(1)
+# TypeScriptの型安全性
 
-        const draftArticle = result.data.find(article => !article.published)
-        expect(draftArticle).toMatchObject({
-          id: '3',
-          title: 'Next.js 14の新機能（ドラフト）',
-          published: false,
-        })
-      }
-    })
+TypeScriptを使った型安全なコードの書き方について...`)
+      }),
+      http.get('/articles/2024-01-20-nextjs-draft.md', () => {
+        return HttpResponse.text(`---
+title: "Next.js 14の新機能（ドラフト）"
+description: "Next.js 14で追加された新機能について詳しく解説します。"
+category: "テクノロジー"
+publishedAt: "2024-01-20T09:00:00Z"
+published: false
+imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200&q=80"
+author:
+  name: "田中太郎"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+---
 
-    it('includeDrafts: falseで公開記事のみを取得', async () => {
-      const result = await getArticles({ includeDrafts: false })
+# Next.js 14の新機能（ドラフト）
 
-      expect(result.success).toBe(true)
-      if (result.success) {
-        expect(result.data).toHaveLength(2)
-        expect(result.data.every(article => article.published)).toBe(true)
-      }
-    })
-
-    it('サーバーエラー時に適切なエラーを返す', async () => {
-      server.use(
-        http.get('https://api.example.com/articles', () => {
-          return HttpResponse.json(
-            { message: 'Internal Server Error', code: 'INTERNAL_ERROR' },
-            { status: 500 }
-          )
-        })
-      )
-
-      const result = await getArticles()
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error).toBeInstanceOf(ApiErrorClass)
-        expect(result.error.message).toBe('Internal Server Error')
-        expect(result.error.status).toBe(500)
-        expect(result.error.code).toBe('INTERNAL_ERROR')
-      }
-    })
-
-    it('ネットワークエラー時に適切なエラーを返す', async () => {
-      server.use(
-        http.get('https://api.example.com/articles', () => {
-          return HttpResponse.error()
-        })
-      )
-
-      const result = await getArticles()
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error).toBeInstanceOf(ApiErrorClass)
-        expect(result.error.message).toBe('Network error occurred')
-        expect(result.error.status).toBe(0)
-        expect(result.error.code).toBe('NETWORK_ERROR')
-      }
-    })
+Next.js 14では、Server ActionsやTurbopackなどの新機能が追加されました...`)
+      })
+    )
   })
 
   describe('getPublishedArticles', () => {
-    it('公開記事のみを取得する', async () => {
+    it('公開済みの記事のみを取得できる', async () => {
       const result = await getPublishedArticles()
 
       expect(result.success).toBe(true)
       if (result.success) {
         expect(result.data).toHaveLength(2)
         expect(result.data.every(article => article.published)).toBe(true)
+        expect(result.data[0]?.title).toBe('React Testing Libraryの使い方')
+        expect(result.data[1]?.title).toBe('TypeScriptの型安全性')
+      }
+    })
+
+    it('記事の取得に失敗した場合、エラーを返す', async () => {
+      server.use(
+        http.get('/articles/2024-06-01-hello-world.md', () => {
+          return new HttpResponse(null, { status: 500 })
+        }),
+        http.get('/articles/2024-01-10-typescript-safety.md', () => {
+          return new HttpResponse(null, { status: 500 })
+        }),
+        http.get('/articles/2024-01-20-nextjs-draft.md', () => {
+          return new HttpResponse(null, { status: 500 })
+        })
+      )
+
+      const result = await getPublishedArticles()
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error).toBeInstanceOf(ApiErrorClass)
+        expect(result.error.message).toBe('記事一覧の取得に失敗しました')
       }
     })
   })
 
   describe('getAllArticles', () => {
-    it('ドラフト記事も含めて全記事を取得する', async () => {
+    it('公開済みとドラフト記事を含む全ての記事を取得できる', async () => {
       const result = await getAllArticles()
 
       expect(result.success).toBe(true)
       if (result.success) {
         expect(result.data).toHaveLength(3)
-        const publishedCount = result.data.filter(article => article.published).length
-        const draftCount = result.data.filter(article => !article.published).length
-        expect(publishedCount).toBe(2)
-        expect(draftCount).toBe(1)
+        expect(result.data.some(article => article.published)).toBe(true)
+        expect(result.data.some(article => !article.published)).toBe(true)
+        const draftArticle = result.data.find(
+          article => article.title === 'Next.js 14の新機能（ドラフト）'
+        )
+        expect(draftArticle).toBeDefined()
       }
     })
   })
 
-  describe('getArticle', () => {
-    it('特定の記事を正常に取得できる', async () => {
-      const result = await getArticle('1')
+  describe('getMarkdownArticle', () => {
+    it('指定されたスラッグの記事を取得できる', async () => {
+      const result = await getMarkdownArticle('2024-06-01-hello-world')
 
       expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data).toMatchObject({
-          id: '1',
-          title: 'React Testing Libraryの使い方',
-          category: 'テクノロジー',
-          content: expect.stringContaining('React Testing Library'),
-        })
+        expect(result.data.title).toBe('React Testing Libraryの使い方')
+        expect(result.data.category).toBe('テクノロジー')
+        expect(result.data.published).toBe(true)
+        expect(result.data.content).toContain(
+          'React Testing Libraryは、Reactコンポーネントをユーザーの視点でテストするためのライブラリです'
+        )
       }
     })
 
-    it('存在しない記事IDでは404エラーを返す', async () => {
-      const result = await getArticle('999')
+    it('存在しない記事を取得しようとした場合、NOT_FOUNDエラーを返す', async () => {
+      server.use(
+        http.get('/articles/non-existent.md', () => {
+          return new HttpResponse(null, { status: 404 })
+        })
+      )
+
+      const result = await getMarkdownArticle('non-existent')
 
       expect(result.success).toBe(false)
       if (!result.success) {
         expect(result.error).toBeInstanceOf(ApiErrorClass)
-        expect(result.error.status).toBe(404)
+        expect(result.error.code).toBe('NOT_FOUND')
+        expect(result.error.message).toBe('記事が見つかりません')
       }
     })
   })
 
-  describe('getUserProfile', () => {
-    it('ユーザー情報を正常に取得できる', async () => {
-      const result = await getUserProfile()
+  describe('ApiErrorClass', () => {
+    it('APIエラーの詳細情報を保持する', () => {
+      const error = new ApiErrorClass('テストエラー', 404, 'NOT_FOUND')
 
-      expect(result.success).toBe(true)
-      if (result.success) {
-        expect(result.data).toMatchObject({
-          id: 'user-1',
-          name: 'Kaz Kiueda',
-          email: 'kaz@example.com',
-          bio: expect.stringContaining('フロントエンド開発者'),
-        })
-      }
-    })
-
-    it('認証エラー時に適切なエラーを返す', async () => {
-      server.use(
-        http.get('https://api.example.com/user/profile', () => {
-          return HttpResponse.json({ message: 'Unauthorized', code: 'AUTH_ERROR' }, { status: 401 })
-        })
-      )
-
-      const result = await getUserProfile()
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error).toBeInstanceOf(ApiErrorClass)
-        expect(result.error.status).toBe(401)
-        expect(result.error.code).toBe('AUTH_ERROR')
-      }
-    })
-  })
-
-  describe('エラーハンドリング', () => {
-    it('不正なJSONレスポンスでもエラーを適切に処理する', async () => {
-      server.use(
-        http.get('https://api.example.com/articles', () => {
-          return new HttpResponse('Invalid JSON', {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        })
-      )
-
-      const result = await getArticles()
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error).toBeInstanceOf(ApiErrorClass)
-        expect(result.error.message).toBe('Unknown error occurred')
-        expect(result.error.status).toBe(500)
-        expect(result.error.code).toBe('UNKNOWN_ERROR')
-      }
+      expect(error.message).toBe('テストエラー')
+      expect(error.status).toBe(404)
+      expect(error.code).toBe('NOT_FOUND')
+      expect(error.name).toBe('ApiError')
+      expect(error).toBeInstanceOf(Error)
     })
   })
 })

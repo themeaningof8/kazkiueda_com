@@ -22,7 +22,7 @@ export function useArticles(options?: UseArticlesOptions): UseArticlesReturn {
   const fetchArticles = async () => {
     setLoading(true)
     setError(null)
-    
+
     try {
       const result = await getMarkdownArticles({
         includeDrafts: options?.includeDrafts ?? false,
@@ -36,6 +36,7 @@ export function useArticles(options?: UseArticlesOptions): UseArticlesReturn {
         setArticles([])
       }
     } catch (err) {
+      console.error('記事一覧の取得でエラーが発生しました:', err)
       setError('記事一覧の取得に失敗しました')
       setArticles([])
     } finally {

@@ -1,15 +1,16 @@
+// Buffer polyfill for gray-matter
+import { Buffer } from 'buffer'
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-// Buffer polyfill for gray-matter
-import { Buffer } from 'buffer'
+import App from './App'
+import './styles/globals.css'
+
 // @ts-ignore
 window.Buffer = Buffer
 // @ts-ignore
 globalThis.Buffer = Buffer
-
-import App from './App'
-import './styles/globals.css'
 
 // 開発環境でMSWを有効にする（E2Eテスト時は除く）
 async function enableMocking() {
