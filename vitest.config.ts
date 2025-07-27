@@ -10,6 +10,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // @ts-expect-error: vitestの設定をviteのconfigに含めるため
   test: {
     globals: true,
     environment: 'jsdom',
