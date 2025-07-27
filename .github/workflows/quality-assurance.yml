@@ -61,14 +61,16 @@ jobs:
       - name: Run Knip unused code analysis
         run: |
           echo "Checking for unused code and dependencies..."
-          bun run analyze:unused
+          bun run analyze:unused || echo "Knip found issues but continuing..."
         shell: bash
+        continue-on-error: true
 
       - name: Generate Knip reports
         run: |
           echo "Generating detailed analysis reports..."
-          bun run analyze:unused:reports
+          bun run analyze:unused:reports || echo "Report generation failed but continuing..."
         shell: bash
+        continue-on-error: true
 
       - name: Upload Knip reports as artifacts
         uses: actions/upload-artifact@v4

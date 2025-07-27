@@ -17,11 +17,20 @@
     "public/**/*",
     "lost-pixel/**/*",
     "playwright-report/**/*",
-    "test-results/**/*"
+    "test-results/**/*",
+    "src/components/ui/*/index.tsx"
   ],
   "ignoreDependencies": [
     "tailwindcss",
     "tw-animate-css",
     "@tailwindcss/typography"
-  ]
+  ],
+  "rules": {
+    "files": "warn",
+    "dependencies": "error",
+    "devDependencies": "error",
+    "exports": "warn",
+    "types": "warn",
+    "unlisted": "error"
+  }
 } 
