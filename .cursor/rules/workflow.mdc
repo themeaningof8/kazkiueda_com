@@ -15,8 +15,9 @@ Before marking any task as complete:
 3. Run `bun run test` - Confirm all tests pass
 4. Run `bun run test:coverage` - Ensure test coverage meets the threshold
 5. Run `bun run test:e2e` - Verify E2E tests pass
-6. Run `bun run madge:circular` - Check for circular dependencies
-7. Run `bun audit` - Check for security vulnerabilities
+6. Run `bun run analyze:unused` - Check for unused code and dependencies
+7. Run `bun run analyze:circular` - Check for circular dependencies
+8. Run `bun audit` - Check for security vulnerabilities
 
 ## E2E Testing Guidelines
 
@@ -30,6 +31,27 @@ Before marking any task as complete:
 - Refactor continuously during development
 - Fix technical debt early before it accumulates
 - Track technical debt items in project backlog
+- Use `bun run analyze:unused` to identify unused code and dependencies
+- Remove unused dependencies to reduce bundle size and security risks
+- Clean up unused exports to maintain clean public APIs
+
+## Code Analysis with Knip
+
+### Available Scripts
+
+- `bun run analyze:unused` - Check for unused code and dependencies
+- `bun run analyze:unused:production` - Check for unused code in production mode
+- `bun run analyze:unused:reports` - Generate detailed reports (JSON + text)
+- `bun run analyze` - Comprehensive analysis (dependencies + unused code +
+  circular dependencies)
+
+### Usage Guidelines
+
+- Run unused code analysis before major refactoring
+- Use production mode to exclude test and development files
+- Monitor unused dependencies to reduce bundle size
+- Check for unused exports to clean up public APIs
+- Generate reports for documentation and team reviews
 
 ## Dependency Analysis with Madge
 

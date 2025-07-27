@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["src/main.tsx", "src/styles/globals.css"],
+  "project": ["src/**/*.{ts,tsx,css}"],
+  "ignore": [
+    "**/*.stories.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "tests/**/*",
+    "**/__snapshots__/**",
+    "**/__mocks__/**",
+    "src/mocks/**/*",
+    "src/test/**/*",
+    "docs/**/*",
+    "public/**/*",
+    "lost-pixel/**/*",
+    "playwright-report/**/*",
+    "test-results/**/*"
+  ],
+  "ignoreDependencies": [
+    "tailwindcss",
+    "tw-animate-css",
+    "@tailwindcss/typography"
+  ]
+} 
