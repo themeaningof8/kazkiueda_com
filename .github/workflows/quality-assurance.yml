@@ -11,7 +11,7 @@ jobs:
   lint:
     name: Lint & Format Check
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 2
 
     steps:
       - name: Checkout repository
@@ -29,7 +29,7 @@ jobs:
   security:
     name: Security & Dependency Check
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
 
     steps:
       - name: Checkout repository
@@ -47,7 +47,13 @@ jobs:
   code-analysis:
     name: Comprehensive Code Analysis
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 6
+    if: |
+      github.event_name == 'pull_request' ||
+      contains(github.event.head_commit.modified, 'src/') ||
+      contains(github.event.head_commit.added, 'src/') ||
+      contains(github.event.head_commit.modified, 'package.json') ||
+      contains(github.event.head_commit.modified, 'bun.lockb')
 
     steps:
       - name: Checkout repository
@@ -58,7 +64,19 @@ jobs:
       - name: Setup Bun with Cache
         uses: ./.github/actions/setup-bun
 
+      - name: Cache Graphviz
+        id: cache-graphviz
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/bin/dot
+            /usr/bin/dot
+          key: ${{ runner.os }}-graphviz-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-graphviz-
+
       - name: Install Graphviz for Madge
+        if: steps.cache-graphviz.outputs.cache-hit != 'true'
         run: |
           if [ "$RUNNER_OS" = "macOS" ]; then
             brew install graphviz
@@ -70,11 +88,16 @@ jobs:
           fi
         shell: bash
 
-      - name: Run comprehensive code analysis
+      - name: Run critical code analysis
         run: |
-          echo "Running comprehensive code analysis..."
+          echo "Running critical code analysis..."
           echo "1. Checking for unused code and dependencies..."
-          bun run analyze:unused || echo "Knip found issues but continuing..."
+          bun run analyze:unused
+        shell: bash
+
+      - name: Run optional code analysis
+        run: |
+          echo "Running optional code analysis..."
           echo "2. Checking for circular dependencies..."
           bun run analyze:circular || echo "Circular dependency check completed..."
           echo "3. Checking for orphan modules..."
@@ -93,16 +116,19 @@ jobs:
 
       - name: Upload analysis reports as artifacts
         uses: actions/upload-artifact@v4
-        if: always()
+        if: |
+          always() && 
+          (github.event_name == 'pull_request' || 
+           contains(github.event.head_commit.modified, 'src/'))
         with:
           name: code-analysis-reports-${{ github.job }}-${{ github.run_id }}
           path: |
             knip.json
-            *.svg
+            circular-dependencies.svg
             dependency-graph.gv
-          retention-days: 30
+          retention-days: 7
 
-  # 4. ビルド（リント成功後）
+  # 4. ビルド（lintと並列実行可能）
   build:
     name: Build Application
     runs-on: ubuntu-latest
@@ -128,7 +154,7 @@ jobs:
           path: dist/
           retention-days: 1
 
-  # 5. ユニットテスト（ビルドと並列実行可能）
+  # 5. ユニットテスト（lintと並列実行可能）
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -147,7 +173,7 @@ jobs:
       - name: Run unit tests
         run: bun run test
 
-  # 6. カバレッジテスト（ユニットテストと並列実行可能）
+  # 6. カバレッジテスト（lintと並列実行可能）
   coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
