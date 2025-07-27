@@ -57,10 +57,10 @@ Before marking any task as complete:
 
 ### Available Scripts
 
-- `bun run madge` - Generate dependency graph as SVG image
-- `bun run madge:circular` - Find and visualize circular dependencies
-- `bun run madge:orphans` - Find modules that no one depends on
-- `bun run madge:leaves` - Find modules with no dependencies
+- `bun run analyze:deps` - Generate dependency graph as SVG image
+- `bun run analyze:circular` - Find and visualize circular dependencies
+- `bun run analyze:orphans` - Find modules that no one depends on
+- `bun run analyze:leaves` - Find modules with no dependencies
 - `bun run madge:json` - Export dependency tree as JSON
 - `bun run madge:dot` - Export dependency tree as DOT format
 

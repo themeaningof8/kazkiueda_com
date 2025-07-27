@@ -111,11 +111,11 @@ jobs:
       - name: Run Madge circular dependency check
         run: |
           echo "Checking for circular dependencies..."
-          bun run madge:circular
+          bun run analyze:circular
           echo "Checking for orphan modules..."
-          bun run madge:orphans
+          bun run analyze:orphans
           echo "Checking for leaf modules..."
-          bun run madge:leaves
+          bun run analyze:leaves
         shell: bash
 
       - name: Upload Madge dependency graphs as artifacts
