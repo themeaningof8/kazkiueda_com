@@ -1,11 +1,26 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import reactScan from '@react-scan/vite-plugin-react-scan'
 import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    reactScan({
+      enable: process.env.NODE_ENV === 'development',
+      autoDisplayNames: true,
+      scanOptions: {
+        enabled: process.env.NODE_ENV === 'development',
+        showToolbar: true,
+        animationSpeed: 'fast',
+        trackUnnecessaryRenders: true,
+        log: false,
+      }
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

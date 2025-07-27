@@ -50,6 +50,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
     "@playwright/test": "^1.54.1",
+    "@react-scan/vite-plugin-react-scan": "^0.1.8",
     "@storybook/addon-docs": "^9.0.18",
     "@storybook/addon-links": "^9.0.18",
     "@storybook/react-vite": "^9.0.18",
@@ -76,6 +77,7 @@
     "msw": "^2.10.4",
     "oxlint": "^1.8.0",
     "prettier": "^3.6.2",
+    "react-scan": "^0.4.3",
     "storybook": "^9.0.18",
     "tailwindcss": "^4.1.11",
     "terser": "^5.43.1",
