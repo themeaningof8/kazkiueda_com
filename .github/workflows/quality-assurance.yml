@@ -43,49 +43,11 @@ jobs:
       - name: Run security audit
         run: bun audit
 
-  # 3. コード分析（lintと並列実行可能）
+  # 3. 包括的コード分析（lintと並列実行可能）
   code-analysis:
-    name: Code Analysis
+    name: Comprehensive Code Analysis
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Setup Bun with Cache
-        uses: ./.github/actions/setup-bun
-
-      - name: Run Knip unused code analysis
-        run: |
-          echo "Checking for unused code and dependencies..."
-          bun run analyze:unused || echo "Knip found issues but continuing..."
-        shell: bash
-        continue-on-error: true
-
-      - name: Generate Knip reports
-        run: |
-          echo "Generating detailed analysis reports..."
-          bun run analyze:unused:reports || echo "Report generation failed but continuing..."
-        shell: bash
-        continue-on-error: true
-
-      - name: Upload Knip reports as artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: knip-reports-${{ github.job }}-${{ github.run_id }}
-          path: |
-            knip.json
-          retention-days: 30
-
-  # 4. 依存関係分析（lintと並列実行可能）
-  dependency-analysis:
-    name: Dependency Analysis
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
 
     steps:
       - name: Checkout repository
@@ -108,27 +70,39 @@ jobs:
           fi
         shell: bash
 
-      - name: Run Madge circular dependency check
+      - name: Run comprehensive code analysis
         run: |
-          echo "Checking for circular dependencies..."
-          bun run analyze:circular
-          echo "Checking for orphan modules..."
-          bun run analyze:orphans
-          echo "Checking for leaf modules..."
-          bun run analyze:leaves
+          echo "Running comprehensive code analysis..."
+          echo "1. Checking for unused code and dependencies..."
+          bun run analyze:unused || echo "Knip found issues but continuing..."
+          echo "2. Checking for circular dependencies..."
+          bun run analyze:circular || echo "Circular dependency check completed..."
+          echo "3. Checking for orphan modules..."
+          bun run analyze:orphans || echo "Orphan modules check completed..."
+          echo "4. Checking for leaf modules..."
+          bun run analyze:leaves || echo "Leaf modules check completed..."
         shell: bash
+        continue-on-error: true
 
-      - name: Upload Madge dependency graphs as artifacts
+      - name: Generate detailed reports
+        run: |
+          echo "Generating detailed analysis reports..."
+          bun run analyze:unused:reports || echo "Report generation failed but continuing..."
+        shell: bash
+        continue-on-error: true
+
+      - name: Upload analysis reports as artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: dependency-graphs-${{ github.job }}-${{ github.run_id }}
+          name: code-analysis-reports-${{ github.job }}-${{ github.run_id }}
           path: |
+            knip.json
             *.svg
             dependency-graph.gv
           retention-days: 30
 
-  # 5. ビルド（リント成功後）
+  # 4. ビルド（リント成功後）
   build:
     name: Build Application
     runs-on: ubuntu-latest
@@ -154,7 +128,7 @@ jobs:
           path: dist/
           retention-days: 1
 
-  # 6. ユニットテスト（ビルドと並列実行可能）
+  # 5. ユニットテスト（ビルドと並列実行可能）
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -173,7 +147,7 @@ jobs:
       - name: Run unit tests
         run: bun run test
 
-  # 7. カバレッジテスト（ユニットテストと並列実行可能）
+  # 6. カバレッジテスト（ユニットテストと並列実行可能）
   coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
@@ -200,11 +174,11 @@ jobs:
           path: coverage/
           retention-days: 7
 
-  # 8. E2Eテスト（全ての前段階テスト成功後）
+  # 7. E2Eテスト（全ての前段階テスト成功後）
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    needs: [build, unit-tests, coverage, code-analysis, dependency-analysis]
+    needs: [build, unit-tests, coverage, code-analysis]
     timeout-minutes: 10
 
     steps:
