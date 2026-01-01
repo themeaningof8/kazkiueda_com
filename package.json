@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "dotenvx run -f projects/.env -f projects/.env.development -- bun next dev",
     "build": "NODE_ENV=production dotenvx run -f projects/.env -f projects/.env.production -- bun next build",
+    "prepare": "husky",
     "start": "NODE_ENV=production dotenvx run -f projects/.env -f projects/.env.production -- bun next start",
     "test": "npm run test:run",
     "test:run": "dotenvx run -f projects/.env.test -- vitest run src/__tests__/integration/posts.test.ts && dotenvx run -f projects/.env.test -- vitest run src/__tests__/integration/server-actions.test.ts --no-coverage",
@@ -57,6 +58,20 @@
     "generate:importmap": "dotenvx run -f projects/.env -f projects/.env.development -- cross-env NODE_ENV=development NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:importmap",
     "ci": "payload migrate && build"
   },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "biome check --write --no-errors-on-unmatched",
+      "biome format --write --no-errors-on-unmatched",
+      "bunx tsc --noEmit --skipLibCheck"
+    ],
+    "*.{js,jsx}": [
+      "biome check --write --no-errors-on-unmatched",
+      "biome format --write --no-errors-on-unmatched"
+    ],
+    "*.{json,md}": [
+      "biome format --write --no-errors-on-unmatched"
+    ]
+  },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.69.0",
     "@payloadcms/next": "^3.69.0",
@@ -98,8 +113,10 @@
     "@vitest/coverage-v8": "^4.0.16",
     "cross-env": "^10.1.0",
     "happy-dom": "^20.0.11",
+    "husky": "^9.1.7",
     "jscpd": "^4.0.5",
     "knip": "^5.78.0",
+    "lint-staged": "^16.2.7",
     "madge": "^8.0.0",
     "pg": "^8.16.3",
     "pino-pretty": "^13.0.0",
