@@ -53,8 +53,10 @@ yarn-error.log*
 .env
 .env.*
 !.env.example
-projects/.env
-projects/.env.*
+# Allow encrypted .env files to be committed (dotenvx)
+!projects/.env
+!projects/.env.development
+!projects/.env.production
 !projects/.env.example
 # dotenvx keys (never commit these!)
 .env.keys
