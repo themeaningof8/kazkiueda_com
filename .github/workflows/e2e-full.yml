@@ -1,0 +1,139 @@
+name: E2E Full Tests (Nightly)
+
+on:
+  schedule:
+    # 毎日深夜2:00 JST (17:00 UTC前日)
+    - cron: '0 17 * * *'
+  workflow_dispatch: # 手動実行も可能
+
+env:
+  NODE_ENV: test
+
+jobs:
+  # ==========================================
+  # Full E2E Test Suite (全5スイート)
+  # ==========================================
+  e2e-full:
+    name: E2E Full Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - name: blog
+            file: tests/e2e/blog-list.spec.ts
+          - name: post-detail
+            file: tests/e2e/post-detail.spec.ts
+          - name: accessibility
+            file: tests/e2e/accessibility.spec.ts
+          - name: preview
+            file: tests/e2e/preview.spec.ts
+          - name: error-handling
+            file: tests/e2e/error-handling.spec.ts
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.3.5
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browsers
+        run: bun run test:e2e:install
+
+      - name: Start test database
+        run: bun run test:db:up
+
+      - name: Run migrations
+        run: bun run test:migrate
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          PAYLOAD_SECRET: ${{ secrets.TEST_PAYLOAD_SECRET }}
+          NODE_ENV: test
+
+      - name: Start Next.js server
+        run: |
+          bunx next dev --port 3001 > /tmp/next-dev.log 2>&1 &
+          sleep 10
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          PAYLOAD_SECRET: ${{ secrets.TEST_PAYLOAD_SECRET }}
+          PAYLOAD_PREVIEW_SECRET: ${{ secrets.TEST_PAYLOAD_PREVIEW_SECRET }}
+          NODE_ENV: test
+
+      - name: Run E2E Tests - ${{ matrix.suite.name }}
+        run: bunx playwright test ${{ matrix.suite.file }} --reporter=github
+        env:
+          CI: true
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          PAYLOAD_SECRET: ${{ secrets.TEST_PAYLOAD_SECRET }}
+          PAYLOAD_PREVIEW_SECRET: ${{ secrets.TEST_PAYLOAD_PREVIEW_SECRET }}
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.suite.name }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload server logs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: server-logs-${{ matrix.suite.name }}
+          path: /tmp/next-dev.log
+          retention-days: 7
+
+      - name: Cleanup
+        if: always()
+        run: |
+          pkill -f 'next dev' || true
+          bun run test:db:down
+
+  # ==========================================
+  # Notify Results
+  # ==========================================
+  notify:
+    name: Notify E2E Results
+    runs-on: ubuntu-latest
+    needs: e2e-full
+    if: always()
+
+    steps:
+      - name: E2E test results
+        run: |
+          echo "# Nightly E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Status: ${{ needs.e2e-full.result }}" >> $GITHUB_STEP_SUMMARY
+
+      # Slack通知（オプション）
+      # - name: Slack notification
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ needs.e2e-full.result }}
+      #     text: 'Nightly E2E tests ${{ needs.e2e-full.result }}'
+      #     webhook_url: ${{ secrets.SLACK_WEBHOOK }}

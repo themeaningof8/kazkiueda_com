@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Client-side bundle",
+    "path": ".next/static/**/*.js",
+    "limit": "500 KB",
+    "webpack": false,
+    "gzip": true
+  },
+  {
+    "name": "First Load JS",
+    "path": ".next/static/chunks/*.js",
+    "limit": "300 KB",
+    "webpack": false,
+    "gzip": true
+  }
+]

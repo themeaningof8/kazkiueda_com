@@ -1,0 +1,78 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# package manager lock files (using bun)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# testing
+/coverage
+*.lcov
+.vitest
+
+# Playwright
+/playwright-report/
+/test-results/
+/playwright/.cache/
+
+# E2E test data
+/tests/e2e/.test-data.json
+/tests/e2e/.auth/
+
+# analysis reports
+/reports
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env
+.env.*
+!.env.example
+projects/.env
+projects/.env.*
+!projects/.env.example
+# dotenvx keys (never commit these!)
+.env.keys
+.env.keys.*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# database
+# *.db (SQLite - commented out for PostgreSQL)
+# *.db-*
+
+# payload
+payload-types.ts
+
+# media uploads
+/media
