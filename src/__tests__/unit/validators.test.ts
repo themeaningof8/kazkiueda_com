@@ -1,12 +1,12 @@
-import { describe, expect, test } from "vitest";
-import { validateSlug, generateSlugFromTitle } from "@/lib/validators/slug";
-import { VALIDATION_LIMITS } from "@/lib/constants";
 import * as v from "valibot";
+import { describe, expect, test } from "vitest";
+import { VALIDATION_LIMITS } from "@/lib/constants";
 import {
   getPostBySlugSchema,
   getPostsSchema,
   getPublishedPostSlugsSchema,
 } from "@/lib/validators/posts";
+import { generateSlugFromTitle, validateSlug } from "@/lib/validators/slug";
 
 describe("validateSlug", () => {
   test("should validate valid slug", () => {
@@ -17,15 +17,25 @@ describe("validateSlug", () => {
   });
 
   test("should reject invalid characters", () => {
-    expect(validateSlug("invalid slug")).toBe("スラッグは英数字、ハイフン、アンダースコアのみ使用できます");
-    expect(validateSlug("invalid@slug")).toBe("スラッグは英数字、ハイフン、アンダースコアのみ使用できます");
-    expect(validateSlug("invalid.slug")).toBe("スラッグは英数字、ハイフン、アンダースコアのみ使用できます");
-    expect(validateSlug("invalid/slug")).toBe("スラッグは英数字、ハイフン、アンダースコアのみ使用できます");
+    expect(validateSlug("invalid slug")).toBe(
+      "スラッグは英数字、ハイフン、アンダースコアのみ使用できます",
+    );
+    expect(validateSlug("invalid@slug")).toBe(
+      "スラッグは英数字、ハイフン、アンダースコアのみ使用できます",
+    );
+    expect(validateSlug("invalid.slug")).toBe(
+      "スラッグは英数字、ハイフン、アンダースコアのみ使用できます",
+    );
+    expect(validateSlug("invalid/slug")).toBe(
+      "スラッグは英数字、ハイフン、アンダースコアのみ使用できます",
+    );
   });
 
   test("should reject too long slug", () => {
     const longSlug = "a".repeat(VALIDATION_LIMITS.SLUG_MAX_LENGTH + 1);
-    expect(validateSlug(longSlug)).toBe(`スラッグは${VALIDATION_LIMITS.SLUG_MAX_LENGTH}文字以内で入力してください`);
+    expect(validateSlug(longSlug)).toBe(
+      `スラッグは${VALIDATION_LIMITS.SLUG_MAX_LENGTH}文字以内で入力してください`,
+    );
   });
 
   test("should accept empty or undefined slug", () => {
@@ -59,7 +69,9 @@ describe("generateSlugFromTitle", () => {
 
   test("should handle multiple spaces", () => {
     expect(generateSlugFromTitle("Hello   World")).toBe("hello-world");
-    expect(generateSlugFromTitle("  Leading and trailing spaces  ")).toBe("leading-and-trailing-spaces");
+    expect(generateSlugFromTitle("  Leading and trailing spaces  ")).toBe(
+      "leading-and-trailing-spaces",
+    );
   });
 
   test("should handle empty or invalid titles", () => {

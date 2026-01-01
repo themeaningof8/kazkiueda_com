@@ -18,16 +18,9 @@ export const getPostBySlugSchema = v.object({
  * 記事一覧取得のスキーマ
  */
 export const getPostsSchema = v.object({
-  page: v.optional(
-    v.pipe(v.number(), v.minValue(1, "ページは1以上である必要があります")),
-    1,
-  ),
+  page: v.optional(v.pipe(v.number(), v.minValue(1, "ページは1以上である必要があります")), 1),
   limit: v.optional(
-    v.pipe(
-      v.number(),
-      v.minValue(1),
-      v.maxValue(100, "1回の取得は100件までです"),
-    ),
+    v.pipe(v.number(), v.minValue(1), v.maxValue(100, "1回の取得は100件までです")),
     12,
   ),
   draft: v.optional(v.boolean(), false),

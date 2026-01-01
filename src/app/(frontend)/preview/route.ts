@@ -46,7 +46,6 @@ export async function GET(request: NextRequest) {
   const collection = searchParams.get("collection");
   const path = searchParams.get("path");
 
-
   if (!previewSecret || previewSecret !== process.env.PAYLOAD_PREVIEW_SECRET) {
     return new Response("Invalid preview secret", { status: 403 });
   }

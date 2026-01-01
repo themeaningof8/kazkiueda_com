@@ -1,18 +1,17 @@
 "use server";
 
-import { actionClient } from "@/lib/safe-action";
-import {
-  getPostBySlugSchema,
-  getPostsSchema,
-  getPublishedPostSlugsSchema,
-} from "@/lib/validators/posts";
 import {
   findPostBySlug as findPostBySlugPayload,
   findPosts as findPostsPayload,
   findPublishedPostSlugs as findPublishedPostSlugsPayload,
 } from "@/lib/api/payload-client";
 import { NotFoundError } from "@/lib/errors";
-import type { Post } from "@/payload-types";
+import { actionClient } from "@/lib/safe-action";
+import {
+  getPostBySlugSchema,
+  getPostsSchema,
+  getPublishedPostSlugsSchema,
+} from "@/lib/validators/posts";
 
 /**
  * スラッグから記事を取得するAction

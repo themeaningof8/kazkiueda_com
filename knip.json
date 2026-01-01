@@ -1,28 +1,11 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "entry": [
-    "src/app/**/*.{ts,tsx}",
-    "src/payload.config.ts",
-    "src/lib/actions/**/*.ts"
-  ],
-  "project": [
-    "src/**/*.{ts,tsx}"
-  ],
-  "ignore": [
-    "src/payload-types.ts",
-    "src/migrations/**/*.ts",
-    "**/*.d.ts"
-  ],
-  "ignoreDependencies": [
-    "pino-pretty",
-    "sharp",
-    "tailwindcss"
-  ],
+  "entry": ["src/app/**/*.{ts,tsx}", "src/payload.config.ts", "src/lib/actions/**/*.ts"],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": ["src/payload-types.ts", "src/migrations/**/*.ts", "**/*.d.ts"],
+  "ignoreDependencies": ["pino-pretty", "sharp", "tailwindcss"],
   "ignoreExportsUsedInFile": true,
   "next": {
-    "entry": [
-      "src/app/**/*.{ts,tsx}",
-      "next.config.ts"
-    ]
+    "entry": ["src/app/**/*.{ts,tsx}", "next.config.ts"]
   }
 }

@@ -85,7 +85,8 @@ function validateEnv() {
   } catch (error) {
     if (error instanceof v.ValiError) {
       const issues = error.issues.map((issue) => {
-        const path = issue.path?.map((p: { key: string | number | symbol }) => p.key).join(".") || "root";
+        const path =
+          issue.path?.map((p: { key: string | number | symbol }) => p.key).join(".") || "root";
         return `  - ${path}: ${issue.message}`;
       });
       envLogger.error({ issues }, "環境変数の検証に失敗しました");

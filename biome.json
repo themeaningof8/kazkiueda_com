@@ -36,6 +36,7 @@
       "!**/.next",
       "!**/dist",
       "!**/build",
+      "!**/reports",
       "!**/payload-types.ts",
       "!**/src/payload-types.ts",
       "!**/src/app/(payload)/admin/importMap.js",

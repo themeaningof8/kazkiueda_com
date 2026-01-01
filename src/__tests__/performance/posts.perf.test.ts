@@ -1,10 +1,9 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
-import { getPosts } from "@/lib/posts";
 import { findPublishedPostSlugs } from "@/lib/api/payload-client";
+import { getPosts } from "@/lib/posts";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
+import { createBulkTestPosts, createTestUser } from "@/test/helpers/factories";
 import { destroyTestPayload, getTestPayload } from "@/test/payload";
-import { createTestUser } from "@/test/helpers/factories";
-import { createBulkTestPosts } from "@/test/helpers/factories";
 
 describe("Performance Tests", () => {
   const pool = createTestDbPool();

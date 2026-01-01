@@ -1,18 +1,16 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, expect, test, vi } from "vitest";
 import { ArticleContent } from "@/components/article-content";
 import type { Post } from "@/payload-types";
 
 // formatDate関数のモック（厳密な型定義）
 vi.mock("@/lib/format-date", () => ({
-  formatDate: vi.fn<(date: string | Date) => string>(
-    (date: string | Date) => "2024年1月15日"
-  ),
+  formatDate: vi.fn<(date: string | Date) => string>((_date: string | Date) => "2024年1月15日"),
 }));
 
 // RichTextRendererコンポーネントのモック
 vi.mock("@/components/rich-text", () => ({
-  RichTextRenderer: ({ data }: { data: any }) => (
+  RichTextRenderer: ({ data }: { data: unknown }) => (
     <div data-testid="rich-text">{data ? "Rich Text Content" : null}</div>
   ),
 }));
@@ -115,7 +113,7 @@ describe("ArticleContent", () => {
   });
 
   test("contentがnullの場合、RichTextRendererが表示されない", () => {
-    const post = createMockPost({ content: null as any });
+    const post = createMockPost({ content: null });
     render(<ArticleContent post={post} />);
     expect(screen.queryByTestId("rich-text")).not.toBeInTheDocument();
   });

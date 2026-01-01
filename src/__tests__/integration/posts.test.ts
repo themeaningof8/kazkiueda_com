@@ -1,9 +1,9 @@
-import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { randomUUID } from "node:crypto";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { getPostBySlug, getPosts, getPublishedPostSlugs } from "@/lib/posts";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
+import { createBulkTestPosts, createTestPost, createTestUser } from "@/test/helpers/factories";
 import { destroyTestPayload, getTestPayload } from "@/test/payload";
-import { createTestPost, createTestUser, createBulkTestPosts } from "@/test/helpers/factories";
 
 describe("Posts integration (Payload Local API + Postgres)", () => {
   const pool = createTestDbPool();
@@ -40,7 +40,7 @@ describe("Posts integration (Payload Local API + Postgres)", () => {
     });
 
     // When: slugで記事を取得
-    const fetched = await getPostBySlug(post.slug!);
+    const fetched = await getPostBySlug(post.slug || "");
 
     // Then: 正しい記事データが返る
     expect(fetched.success).toBe(true);
@@ -200,7 +200,7 @@ describe("Posts integration (Payload Local API + Postgres)", () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toHaveLength(2);
-        expect(result.data.map(s => s.slug)).toEqual(expect.arrayContaining(slugs));
+        expect(result.data.map((s) => s.slug)).toEqual(expect.arrayContaining(slugs));
       }
     });
 
@@ -253,4 +253,3 @@ describe("Posts integration (Payload Local API + Postgres)", () => {
     });
   });
 });
-

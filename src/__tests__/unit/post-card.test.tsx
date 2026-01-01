@@ -1,13 +1,11 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, expect, test, vi } from "vitest";
 import { PostCard } from "@/components/post-card";
 import type { Post } from "@/payload-types";
 
 // formatDate関数のモック（厳密な型定義）
 vi.mock("@/lib/format-date", () => ({
-  formatDate: vi.fn<(date: string | Date) => string>(
-    (date: string | Date) => "2024年1月15日"
-  ),
+  formatDate: vi.fn<(date: string | Date) => string>((_date: string | Date) => "2024年1月15日"),
 }));
 
 describe("PostCard", () => {

@@ -32,9 +32,7 @@ export function LoadingTimeout({ onRetry }: { onRetry?: () => void }) {
     <div className="flex min-h-[300px] flex-col items-center justify-center text-center px-4">
       <Loader2 className="h-8 w-8 animate-spin text-yellow-500 mb-4" />
       <h3 className="text-lg font-semibold mb-2">読み込みに時間がかかっています</h3>
-      <p className="text-sm text-muted-foreground mb-4">
-        ネットワーク接続を確認してください
-      </p>
+      <p className="text-sm text-muted-foreground mb-4">ネットワーク接続を確認してください</p>
       {onRetry && (
         <button
           onClick={onRetry}

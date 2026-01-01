@@ -11,34 +11,46 @@ import { buildPublishStatusFilter, buildSlugFilter } from "./payload-filters";
 function classifyError(error: unknown): ErrorType {
   if (error instanceof Error) {
     // ネットワーク関連のエラー
-    if (error.message.includes('fetch') || error.message.includes('network') || error.message.includes('ECONNREFUSED')) {
-      return 'NETWORK_ERROR';
+    if (
+      error.message.includes("fetch") ||
+      error.message.includes("network") ||
+      error.message.includes("ECONNREFUSED")
+    ) {
+      return "NETWORK_ERROR";
     }
 
     // タイムアウトエラー
-    if (error.message.includes('timeout') || error.message.includes('TIMEOUT')) {
-      return 'TIMEOUT';
+    if (error.message.includes("timeout") || error.message.includes("TIMEOUT")) {
+      return "TIMEOUT";
     }
 
     // CORSエラー
-    if (error.message.includes('CORS') || error.message.includes('Access-Control') ||
-        error.message.includes('cross-origin') || error.message.includes('preflight')) {
-      return 'CORS_ERROR';
+    if (
+      error.message.includes("CORS") ||
+      error.message.includes("Access-Control") ||
+      error.message.includes("cross-origin") ||
+      error.message.includes("preflight")
+    ) {
+      return "CORS_ERROR";
     }
 
     // データベース関連のエラー
-    if (error.message.includes('database') || error.message.includes('connection') || error.message.includes('SQLITE_')) {
-      return 'DB_ERROR';
+    if (
+      error.message.includes("database") ||
+      error.message.includes("connection") ||
+      error.message.includes("SQLITE_")
+    ) {
+      return "DB_ERROR";
     }
 
     // Payload固有のエラー
-    if (error.message.includes('Payload') || error.message.includes('collection')) {
-      return 'DB_ERROR';
+    if (error.message.includes("Payload") || error.message.includes("collection")) {
+      return "DB_ERROR";
     }
   }
 
   // 不明なエラー
-  return 'UNKNOWN';
+  return "UNKNOWN";
 }
 
 type PayloadFindOptions<T extends "posts" | "media" | "users"> = {
@@ -97,16 +109,16 @@ async function findPayload<T extends "posts" | "media" | "users">(
 
       // リトライ可能なエラーの場合のみリトライ
       const errorType = classifyError(error);
-      const isRetryableError = ['NETWORK_ERROR', 'TIMEOUT'].includes(errorType);
+      const isRetryableError = ["NETWORK_ERROR", "TIMEOUT"].includes(errorType);
 
       if (!isRetryableError || attempt === maxRetries) {
         // リトライ不可または最大リトライ回数に達した場合はエラーをthrow
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
         throw new Error(`${errorType}:${errorMessage}`);
       }
 
       // リトライ前に少し待機（指数バックオフ）
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 100));
+      await new Promise((resolve) => setTimeout(resolve, 2 ** attempt * 100));
     }
   }
 
@@ -131,7 +143,7 @@ export async function findPostBySlug(
       draft: options.draft,
       overrideAccess: options.overrideAccess,
     });
-  } catch (error) {
+  } catch (_error) {
     // エラーが発生したら空の結果を返す
     // 上位の関数で適切なFetchResultに変換される
     return {
@@ -159,7 +171,7 @@ export async function findPosts(
       draft: options.draft,
       overrideAccess: options.overrideAccess,
     });
-  } catch (error) {
+  } catch (_error) {
     // エラーが発生したら空の結果を返す
     // 上位の関数で適切なFetchResultに変換される
     return {
@@ -199,7 +211,7 @@ export async function findPublishedPostSlugs(): Promise<Array<{ slug: string }>>
     }
 
     return allSlugs;
-  } catch (error) {
+  } catch (_error) {
     // エラーが発生したら空の配列を返す
     return [];
   }

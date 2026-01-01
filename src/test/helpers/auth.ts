@@ -1,7 +1,7 @@
 import type { Payload } from "payload";
+import { expect } from "vitest";
 import type { User } from "@/payload-types";
 import { createTestUser } from "./factories";
-import { expect } from "vitest";
 
 /**
  * 管理者ユーザーを作成
@@ -32,10 +32,10 @@ export async function createRegularUser(payload: Payload): Promise<User> {
  * @example
  * const posts = await findAsUnauthenticated(payload, 'posts', {});
  */
-export async function findAsUnauthenticated<T>(
+export async function findAsUnauthenticated<_T>(
   payload: Payload,
   collection: string,
-  options: any = {}
+  options: any = {},
 ) {
   return await payload.find({
     collection,
@@ -48,11 +48,11 @@ export async function findAsUnauthenticated<T>(
 /**
  * 認証ユーザーとしてPayload操作を実行するヘルパー
  */
-export async function findAsUser<T>(
+export async function findAsUser<_T>(
   payload: Payload,
   user: User,
   collection: string,
-  options: any = {}
+  options: any = {},
 ) {
   return await payload.find({
     collection,

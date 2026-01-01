@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // 共通の環境変数設定ヘルパー関数
 function setupMinimalEnv() {
@@ -11,7 +11,7 @@ describe("getSiteUrl", () => {
   const originalExit = process.exit;
 
   beforeEach(() => {
-    process.exit = vi.fn() as any;
+    process.exit = vi.fn() as (code?: string | number | null | undefined) => never;
     vi.unstubAllEnvs();
     vi.resetModules(); // モジュールキャッシュをクリア
     setupMinimalEnv(); // 共通環境変数を設定
@@ -100,7 +100,7 @@ describe("getSiteUrl", () => {
       // env.tsの検証により、NEXT_PUBLIC_SITE_URLは有効なURLである必要があります。
       // そのため、site.ts:57-60のcatch節（無効なURL形式のフォールバック）は
       // 実際には到達不可能なコードパスです。
-      // 
+      //
       // このコードパスをテストするには、env.tsの検証をバイパスする必要がありますが、
       // それはテスト環境の整合性を損なうため推奨されません。
       //
@@ -116,7 +116,7 @@ describe("getSiteUrl", () => {
       expect(true).toBe(true);
     });
 
-    test.skip("NEXT_PUBLIC_SITE_URL=\"\"の空文字列ケース（env.tsの検証により到達不可能）", async () => {
+    test.skip('NEXT_PUBLIC_SITE_URL=""の空文字列ケース（env.tsの検証により到達不可能）', async () => {
       // NOTE: このテストは実装不可能です。
       // env.tsの検証により、NEXT_PUBLIC_SITE_URLは有効なURLである必要があります。
       // 空文字列は有効なURLではないため、env.tsの検証で弾かれます。
@@ -164,7 +164,7 @@ describe("getSiteUrl", () => {
       }
     });
 
-    test("VERCEL_URL=\"\"の空文字列ケース", async () => {
+    test('VERCEL_URL=""の空文字列ケース', async () => {
       vi.stubEnv("NODE_ENV", "development");
       vi.stubEnv("VERCEL_URL", "");
       delete process.env.NEXT_PUBLIC_SITE_URL;

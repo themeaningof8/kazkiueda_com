@@ -45,8 +45,9 @@ jobs:
       - name: Type check & Lint
         run: |
           bunx tsc --noEmit &
-          bun run check || echo "Lint errors found, continuing..." &
+          bun run check &
           wait
+        continue-on-error: true
 
   # ==========================================
   # Build & Deploy (並列)

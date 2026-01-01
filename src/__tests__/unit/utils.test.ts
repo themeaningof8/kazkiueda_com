@@ -1,4 +1,4 @@
-import { describe, test, expect } from "vitest";
+import { describe, expect, test } from "vitest";
 import { cn } from "@/lib/utils";
 
 describe("cn", () => {
@@ -20,9 +20,7 @@ describe("cn", () => {
   });
 
   test("clsxとtailwind-mergeの組み合わせ", () => {
-    expect(cn("bg-red-500", "text-white", "bg-blue-500", "p-4")).toBe(
-      "text-white bg-blue-500 p-4",
-    );
+    expect(cn("bg-red-500", "text-white", "bg-blue-500", "p-4")).toBe("text-white bg-blue-500 p-4");
   });
 
   test("空文字列を無視", () => {

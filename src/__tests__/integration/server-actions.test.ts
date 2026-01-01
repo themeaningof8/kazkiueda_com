@@ -5,8 +5,8 @@ import {
   getPublishedPostSlugsAction,
 } from "@/lib/actions/posts";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
-import { destroyTestPayload, getTestPayload } from "@/test/payload";
 import { createTestPost, createTestUser } from "@/test/helpers/factories";
+import { destroyTestPayload, getTestPayload } from "@/test/payload";
 
 describe("Server Actions Integration (next-safe-action + Payload + Postgres)", () => {
   const pool = createTestDbPool();
@@ -27,7 +27,6 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
   });
 
   describe("getPostBySlugAction", () => {
-
     test("should fetch published post by slug via Payload Local API", async () => {
       const payload = await getTestPayload(payloadKey);
 
@@ -171,7 +170,6 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
   });
 
   describe("getPostsAction", () => {
-
     test("should fetch paginated posts via next-safe-action", async () => {
       const payload = await getTestPayload(payloadKey);
       const user = await createTestUser(payload);
@@ -183,8 +181,8 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
             title: `Post ${i}`,
             slug: `post-${i}`,
             status: "published",
-          })
-        )
+          }),
+        ),
       );
 
       // When: Server Action経由で記事一覧を取得（デフォルトページネーション）
@@ -209,8 +207,8 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
             title: `Post Limit ${i}`,
             slug: `post-limit-${i}`,
             status: "published",
-          })
-        )
+          }),
+        ),
       );
 
       const result = await getPostsAction({ page: 1, limit: 5 });
@@ -230,8 +228,8 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
             title: `Post Paginate ${i}`,
             slug: `post-paginate-${i}`,
             status: "published",
-          })
-        )
+          }),
+        ),
       );
 
       const page1 = await getPostsAction({ page: 1, limit: 12 });
@@ -252,14 +250,14 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
             title: `Published ${i}`,
             slug: `published-${i}`,
             status: "published",
-          })
+          }),
         ),
         ...Array.from({ length: 3 }, (_, i) =>
           createTestPost(payload, user.id, {
             title: `Draft ${i}`,
             slug: `draft-${i}`,
             status: "draft",
-          })
+          }),
         ),
       ]);
 
@@ -283,14 +281,14 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
             title: `Published Only ${i}`,
             slug: `published-only-${i}`,
             status: "published",
-          })
+          }),
         ),
         ...Array.from({ length: 3 }, (_, i) =>
           createTestPost(payload, user.id, {
             title: `Draft Only ${i}`,
             slug: `draft-only-${i}`,
             status: "draft",
-          })
+          }),
         ),
       ]);
 
@@ -325,9 +323,7 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
       expect(result.serverError).toBeUndefined();
       expect(result.validationErrors).toBeDefined();
       expect(result.validationErrors?.limit).toBeDefined();
-      expect(result.validationErrors?.limit?._errors).toContain(
-        "1回の取得は100件までです",
-      );
+      expect(result.validationErrors?.limit?._errors).toContain("1回の取得は100件までです");
     });
 
     test("should return empty list when no posts exist", async () => {
@@ -349,8 +345,8 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
             title: `Performance Test Post ${i}`,
             slug: `perf-test-post-${i}`,
             status: "published",
-          })
-        )
+          }),
+        ),
       );
 
       // When: 複数回の実行で平均パフォーマンスを測定
@@ -367,7 +363,7 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
           expect(result.data?.totalDocs).toBe(100);
 
           return duration;
-        })
+        }),
       );
 
       // Then: 平均実行時間が500ms以内で、安定したパフォーマンスを発揮
@@ -376,12 +372,11 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
 
       expect(avgDuration).toBeLessThan(500);
       expect(maxDuration).toBeLessThan(1000); // 最大でも1秒以内
-      expect(durations.every(d => d > 0)).toBe(true); // 全ての実行時間が正の値
+      expect(durations.every((d) => d > 0)).toBe(true); // 全ての実行時間が正の値
     });
   });
 
   describe("getPublishedPostSlugsAction", () => {
-
     test("should fetch published post slugs", async () => {
       const payload = await getTestPayload(payloadKey);
       const user = await createTestUser(payload);
@@ -393,8 +388,8 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
             title: `Post ${slug}`,
             slug,
             status: "published",
-          })
-        )
+          }),
+        ),
       );
 
       const result = await getPublishedPostSlugsAction({});
@@ -403,9 +398,7 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
       expect(result.serverError).toBeUndefined();
       expect(result.validationErrors).toBeUndefined();
       expect(result.data).toHaveLength(3);
-      expect(result.data?.map((s) => s.slug).sort()).toEqual(
-        slugs.sort(),
-      );
+      expect(result.data?.map((s) => s.slug).sort()).toEqual(slugs.sort());
     });
 
     test("should fetch all slugs even with many posts (30 posts)", async () => {
@@ -423,7 +416,7 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
             slug,
             status: "published",
           });
-        })
+        }),
       );
 
       const result = await getPublishedPostSlugsAction({});
@@ -452,14 +445,14 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
             title: `Published Slug ${i}`,
             slug: `published-slug-${i}`,
             status: "published",
-          })
+          }),
         ),
         ...Array.from({ length: 2 }, (_, i) =>
           createTestPost(payload, user.id, {
             title: `Draft Slug ${i}`,
             slug: `draft-slug-${i}`,
             status: "draft",
-          })
+          }),
         ),
       ]);
 
@@ -467,9 +460,7 @@ describe("Server Actions Integration (next-safe-action + Payload + Postgres)", (
 
       expect(result.data).toBeDefined();
       expect(result.data).toHaveLength(3); // 公開記事のみ
-      expect(result.data?.every((s) => s.slug.startsWith("published-slug"))).toBe(
-        true,
-      );
+      expect(result.data?.every((s) => s.slug.startsWith("published-slug"))).toBe(true);
     });
   });
 });

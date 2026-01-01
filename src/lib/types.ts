@@ -2,22 +2,20 @@
  * エラータイプの定義
  */
 export type ErrorType =
-  | "NOT_FOUND"        // リソースが見つからない
-  | "DB_ERROR"         // データベース接続/操作エラー
-  | "NETWORK_ERROR"    // ネットワーク接続エラー
-  | "TIMEOUT"          // リクエストタイムアウト
-  | "CORS_ERROR"       // CORSポリシー違反
+  | "NOT_FOUND" // リソースが見つからない
+  | "DB_ERROR" // データベース接続/操作エラー
+  | "NETWORK_ERROR" // ネットワーク接続エラー
+  | "TIMEOUT" // リクエストタイムアウト
+  | "CORS_ERROR" // CORSポリシー違反
   | "INVALID_RESPONSE" // レスポンス形式が無効
-  | "SERVER_ERROR"     // サーバー内部エラー (5xx)
-  | "UNKNOWN";         // その他の予期しないエラー
+  | "SERVER_ERROR" // サーバー内部エラー (5xx)
+  | "UNKNOWN"; // その他の予期しないエラー
 
 /**
  * データ取得結果の型
  * 成功時とエラー時を明確に区別する
  */
-export type FetchResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: ErrorType };
+export type FetchResult<T> = { success: true; data: T } | { success: false; error: ErrorType };
 
 /**
  * Payload APIの検索結果型

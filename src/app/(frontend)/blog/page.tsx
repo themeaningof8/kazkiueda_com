@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import Link from "next/link";
 import { Suspense } from "react";
-import { PostCard } from "@/components/post-card";
 import { ErrorPage } from "@/components/error-page";
 import { PageLoading } from "@/components/loading";
+import { PostCard } from "@/components/post-card";
 import {
   Pagination,
   PaginationContent,
@@ -56,11 +56,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
   return (
     <Suspense fallback={<PageLoading message="記事を読み込み中..." />}>
-      <BlogContent
-        page={currentPage}
-        draft={isEnabled}
-        overrideAccess={isEnabled}
-      />
+      <BlogContent page={currentPage} draft={isEnabled} overrideAccess={isEnabled} />
     </Suspense>
   );
 }
@@ -68,7 +64,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 async function BlogContent({
   page,
   draft,
-  overrideAccess
+  overrideAccess,
 }: {
   page: number;
   draft: boolean;
@@ -81,9 +77,14 @@ async function BlogContent({
 
   if (!result.success) {
     // エラーの種類に応じて適切なエラーページを表示
-    const errorType = result.error === "DB_ERROR" ? "server" :
-                     result.error === "NETWORK_ERROR" ? "network" :
-                     result.error === "TIMEOUT" ? "timeout" : "unknown";
+    const errorType =
+      result.error === "DB_ERROR"
+        ? "server"
+        : result.error === "NETWORK_ERROR"
+          ? "network"
+          : result.error === "TIMEOUT"
+            ? "timeout"
+            : "unknown";
 
     return <ErrorPage error={{ type: errorType }} />;
   }
@@ -95,7 +96,9 @@ async function BlogContent({
     <div className="mx-auto max-w-6xl px-4 py-16">
       <header className="mb-12">
         <h1 className="mb-4 text-4xl font-bold">ブログ</h1>
-        <p className="text-lg text-muted-foreground" id="blog-description">記事一覧</p>
+        <p className="text-lg text-muted-foreground" id="blog-description">
+          記事一覧
+        </p>
       </header>
 
       {draft && (

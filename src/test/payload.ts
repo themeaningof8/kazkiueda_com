@@ -21,4 +21,3 @@ export async function destroyTestPayload(testKey = "default") {
   await payload.destroy();
   payloadInstances.delete(testKey);
 }
-

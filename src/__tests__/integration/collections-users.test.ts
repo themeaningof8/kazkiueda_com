@@ -1,8 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
-import { destroyTestPayload, getTestPayload } from "@/test/payload";
-import { createTestUser } from "@/test/helpers/factories";
 import { createAdminUser, createRegularUser, findAsUser } from "@/test/helpers/auth";
+import { destroyTestPayload, getTestPayload } from "@/test/payload";
 
 describe("collections/Users.ts Integration Tests", () => {
   const pool = createTestDbPool();
@@ -26,7 +25,7 @@ describe("collections/Users.ts Integration Tests", () => {
     test("1. ユーザーは自分のデータのみ読める", async () => {
       const payload = await getTestPayload(payloadKey);
       const userA = await createRegularUser(payload);
-      const userB = await createRegularUser(payload);
+      const _userB = await createRegularUser(payload);
 
       // When: ユーザーAが自分のデータを取得
       const result = await findAsUser(payload, userA, "users", {
@@ -41,8 +40,8 @@ describe("collections/Users.ts Integration Tests", () => {
     test("2. 管理者は全ユーザーを読める", async () => {
       const payload = await getTestPayload(payloadKey);
       const admin = await createAdminUser(payload);
-      const user1 = await createRegularUser(payload);
-      const user2 = await createRegularUser(payload);
+      const _user1 = await createRegularUser(payload);
+      const _user2 = await createRegularUser(payload);
 
       // When: 管理者が全ユーザーを取得
       const result = await findAsUser(payload, admin, "users");
@@ -62,7 +61,7 @@ describe("collections/Users.ts Integration Tests", () => {
           collection: "users",
           overrideAccess: false,
           // userなし = 未認証
-        })
+        }),
       ).rejects.toThrow(/forbidden|not allowed/i);
     });
   });
@@ -118,7 +117,7 @@ describe("collections/Users.ts Integration Tests", () => {
           },
           draft: true,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow();
 
       // When: 管理者でユーザー作成
@@ -190,7 +189,7 @@ describe("collections/Users.ts Integration Tests", () => {
           id: user.id,
           user,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow(/forbidden|not allowed/i);
 
       // When: 管理者が削除
@@ -225,7 +224,7 @@ describe("collections/Users.ts Integration Tests", () => {
 
       // Then: メールは取得できない（アクセス制御により隠される）
       if (result.docs.length > 0) {
-        expect((result.docs[0] as any).email).toBeUndefined();
+        expect((result.docs[0] as unknown as Record<string, unknown>).email).toBeUndefined();
       }
     });
 
@@ -242,7 +241,7 @@ describe("collections/Users.ts Integration Tests", () => {
 
       // Then: メールを取得できる
       expect(result.docs).toHaveLength(1);
-      expect((result.docs[0] as any).email).toBe(user.email);
+      expect((result.docs[0] as unknown as Record<string, unknown>).email).toBe(user.email);
     });
   });
 
@@ -260,7 +259,7 @@ describe("collections/Users.ts Integration Tests", () => {
           data: { role: "admin" },
           user,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow();
 
       // When: 管理者がrole変更
@@ -325,7 +324,7 @@ describe("collections/Users.ts Integration Tests", () => {
         payload.login({
           collection: "users",
           data: { email, password: "wrong-password" },
-        })
+        }),
       ).rejects.toThrow();
     });
   });
@@ -356,7 +355,7 @@ describe("collections/Users.ts Integration Tests", () => {
           },
           draft: true,
           overrideAccess: true,
-        })
+        }),
       ).rejects.toThrow(/invalid|email|duplicate|unique/i);
     });
 
@@ -373,7 +372,7 @@ describe("collections/Users.ts Integration Tests", () => {
           },
           draft: true,
           overrideAccess: true,
-        })
+        }),
       ).rejects.toThrow();
     });
   });

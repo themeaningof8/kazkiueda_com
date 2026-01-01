@@ -81,9 +81,14 @@ export default async function PostPage({ params }: PageProps) {
     }
 
     // エラーの種類に応じて適切なエラーページを表示
-    const errorType = result.error === "DB_ERROR" ? "server" :
-                     result.error === "NETWORK_ERROR" ? "network" :
-                     result.error === "TIMEOUT" ? "timeout" : "unknown";
+    const errorType =
+      result.error === "DB_ERROR"
+        ? "server"
+        : result.error === "NETWORK_ERROR"
+          ? "network"
+          : result.error === "TIMEOUT"
+            ? "timeout"
+            : "unknown";
 
     return <ErrorPage error={{ type: errorType }} />;
   }

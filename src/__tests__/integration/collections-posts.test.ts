@@ -1,10 +1,8 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
-import { randomUUID } from "node:crypto";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
-import { destroyTestPayload, getTestPayload } from "@/test/payload";
 import { createTestPost, createTestUser } from "@/test/helpers/factories";
-import { findAsUnauthenticated, findAsUser, createAdminUser } from "@/test/helpers/auth";
 import { makeLexicalContent } from "@/test/helpers/lexical";
+import { destroyTestPayload, getTestPayload } from "@/test/payload";
 
 describe("collections/Posts.ts Integration Tests", () => {
   const pool = createTestDbPool();
@@ -30,22 +28,21 @@ describe("collections/Posts.ts Integration Tests", () => {
       const user = await createTestUser(payload);
 
       // Given: 公開記事1件、下書き記事1件
-      const publishedPost = await createTestPost(payload, user.id, {
+      const _publishedPost = await createTestPost(payload, user.id, {
         title: "Published Post",
         status: "published",
       });
-      const draftPost = await createTestPost(payload, user.id, {
+      const _draftPost = await createTestPost(payload, user.id, {
         title: "Draft Post",
         status: "draft",
       });
-
 
       // When: 未認証でfindを実行
       const result = await findAsUnauthenticated(payload, "posts");
 
       // Then: 公開記事のみ返される
       expect(result.docs).toHaveLength(1);
-      expect((result.docs[0] as any)._status).toBe("published");
+      expect((result.docs[0] as Record<string, unknown>)._status).toBe("published");
     });
 
     test("2. ログインユーザーは全記事を読める（drafts含む）", async () => {
@@ -67,7 +64,7 @@ describe("collections/Posts.ts Integration Tests", () => {
 
       // Then: 全記事が返される
       expect(result.docs).toHaveLength(2);
-      const statuses = result.docs.map((doc: any) => doc.status);
+      const statuses = result.docs.map((doc: Record<string, unknown>) => doc.status);
       expect(statuses).toContain("published");
       expect(statuses).toContain("draft");
     });
@@ -132,7 +129,7 @@ describe("collections/Posts.ts Integration Tests", () => {
           },
           draft: true,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -171,7 +168,7 @@ describe("collections/Posts.ts Integration Tests", () => {
           id: post.id,
           data: { title: "Updated" },
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -225,7 +222,7 @@ describe("collections/Posts.ts Integration Tests", () => {
           collection: "posts",
           id: post.id,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -329,10 +326,10 @@ describe("collections/Posts.ts Integration Tests", () => {
           data: {
             content: makeLexicalContent("Test content"),
             author: user.id,
-          } as any,
+          } as Record<string, unknown>,
           user,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow(/タイトル/i);
     });
 
@@ -378,10 +375,12 @@ describe("collections/Posts.ts Integration Tests", () => {
 
       // Then: publishedDateが自動設定される
       expect(post.publishedDate).toBeDefined();
-      expect(new Date(post.publishedDate!).getTime()).toBeCloseTo(
-        Date.now(),
-        -3 // 3桁の誤差（ミリ秒）を許容
-      );
+      if (post.publishedDate) {
+        expect(new Date(post.publishedDate).getTime()).toBeCloseTo(
+          Date.now(),
+          -3, // 3桁の誤差（ミリ秒）を許容
+        );
+      }
     });
 
     test("18. publishedDateが既に設定されている場合、上書きしない", async () => {
@@ -441,10 +440,10 @@ describe("collections/Posts.ts Integration Tests", () => {
           data: {
             content: makeLexicalContent("Test content"),
             author: user.id,
-          } as any,
+          } as Record<string, unknown>,
           user,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow(/タイトル/i);
     });
 
@@ -459,10 +458,10 @@ describe("collections/Posts.ts Integration Tests", () => {
           data: {
             title: "Test Post",
             author: user.id,
-          } as any,
+          } as Record<string, unknown>,
           user,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow(/本文/i);
     });
 
@@ -476,13 +475,13 @@ describe("collections/Posts.ts Integration Tests", () => {
           collection: "posts",
           data: {
             title: "Test Post",
-            slug: "Invalid-Slug",  // 大文字はNG
+            slug: "Invalid-Slug", // 大文字はNG
             content: makeLexicalContent("Test content"),
             author: user.id,
           },
           user,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow();
     });
   });

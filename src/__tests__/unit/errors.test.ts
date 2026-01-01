@@ -1,5 +1,5 @@
-import { describe, test, expect } from "vitest";
-import { NotFoundError, DatabaseError } from "@/lib/errors";
+import { describe, expect, test } from "vitest";
+import { DatabaseError, NotFoundError } from "@/lib/errors";
 
 describe("NotFoundError", () => {
   test("デフォルトメッセージでインスタンス化", () => {

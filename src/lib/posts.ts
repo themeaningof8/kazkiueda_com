@@ -39,7 +39,7 @@ export const getPostBySlug = cache(
       }
 
       return { success: true, data: post };
-    } catch (error) {
+    } catch (_error) {
       // APIレベルでエラーハンドリングされているはずだが、
       // 万一のエラー発生時にUNKNOWNエラーを返す
       return { success: false, error: "UNKNOWN" };
@@ -83,7 +83,7 @@ export const getPosts = cache(
           totalDocs: result.totalDocs,
         },
       };
-    } catch (error) {
+    } catch (_error) {
       // APIレベルでエラーハンドリングされているはずだが、
       // 万一のエラー発生時にDB_ERRORを返す
       return { success: false, error: "DB_ERROR" };
@@ -105,7 +105,7 @@ export const getPublishedPostSlugs = cache(
     try {
       const slugs = await findPublishedPostSlugsPayload();
       return { success: true, data: slugs };
-    } catch (error) {
+    } catch (_error) {
       // APIレベルでエラーハンドリングされているはずだが、
       // 万一のエラー発生時にUNKNOWNエラーを返す
       return { success: false, error: "UNKNOWN" };

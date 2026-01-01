@@ -85,9 +85,7 @@ export async function truncateAllTables(pool: Pool) {
       }
 
       const qualified = tables.map((t) => `"public"."${t}"`).join(", ");
-      await client.query(
-        `TRUNCATE TABLE ${qualified} RESTART IDENTITY CASCADE;`,
-      );
+      await client.query(`TRUNCATE TABLE ${qualified} RESTART IDENTITY CASCADE;`);
 
       await client.query("COMMIT");
       return;
@@ -115,4 +113,3 @@ export async function truncateAllTables(pool: Pool) {
     }
   }
 }
-

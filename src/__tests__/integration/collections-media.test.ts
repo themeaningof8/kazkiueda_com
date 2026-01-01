@@ -1,8 +1,8 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
-import { destroyTestPayload, getTestPayload } from "@/test/payload";
+import { findAsUnauthenticated } from "@/test/helpers/auth";
 import { createTestUser } from "@/test/helpers/factories";
-import { findAsUnauthenticated, findAsUser } from "@/test/helpers/auth";
+import { destroyTestPayload, getTestPayload } from "@/test/payload";
 
 describe("collections/Media.ts Integration Tests", () => {
   const pool = createTestDbPool();
@@ -25,7 +25,7 @@ describe("collections/Media.ts Integration Tests", () => {
   // テスト用の1x1ピクセル画像（Base64） - describeの外で定義
   const TINY_PNG = Buffer.from(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-    "base64"
+    "base64",
   );
 
   /**
@@ -78,7 +78,7 @@ describe("collections/Media.ts Integration Tests", () => {
           },
           file: createTestFile(TINY_PNG, "test.png", "image/png"),
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -169,7 +169,6 @@ describe("collections/Media.ts Integration Tests", () => {
   });
 
   describe("ファイルアップロード", () => {
-
     test("6. 認証ユーザーは画像をアップロードできる（ダミーファイル使用）", async () => {
       const payload = await getTestPayload(payloadKey);
       const user = await createTestUser(payload);
@@ -198,7 +197,11 @@ describe("collections/Media.ts Integration Tests", () => {
       const testCases = [
         { name: "PDF file", content: Buffer.from("PDF content"), mimeType: "application/pdf" },
         { name: "Text file", content: Buffer.from("plain text content"), mimeType: "text/plain" },
-        { name: "JSON file", content: Buffer.from('{"test": "data"}'), mimeType: "application/json" },
+        {
+          name: "JSON file",
+          content: Buffer.from('{"test": "data"}'),
+          mimeType: "application/json",
+        },
       ];
 
       for (const testCase of testCases) {
@@ -208,10 +211,14 @@ describe("collections/Media.ts Integration Tests", () => {
             data: {
               alt: `${testCase.name}`,
             },
-            file: createTestFile(testCase.content, `test.${testCase.mimeType.split("/")[1]}`, testCase.mimeType),
+            file: createTestFile(
+              testCase.content,
+              `test.${testCase.mimeType.split("/")[1]}`,
+              testCase.mimeType,
+            ),
             user,
             overrideAccess: false,
-          })
+          }),
         ).rejects.toThrow(/MIME type|file|invalid/i);
       }
     });
@@ -234,10 +241,9 @@ describe("collections/Media.ts Integration Tests", () => {
           file: createTestFile(largeFile, "large.png", "image/png"),
           user,
           overrideAccess: false,
-        })
+        }),
       ).rejects.toThrow(/size|limit/i);
     });
-
 
     test("9. 画像サイズの自動生成（thumbnail, card）", async () => {
       const payload = await getTestPayload(payloadKey);

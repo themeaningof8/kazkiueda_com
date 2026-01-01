@@ -1,8 +1,8 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import * as v from "valibot";
-import { actionClient, authActionClient } from "@/lib/safe-action";
-import { NotFoundError, DatabaseError } from "@/lib/errors";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { DatabaseError, NotFoundError } from "@/lib/errors";
 import { actionLogger } from "@/lib/logger";
+import { actionClient, authActionClient } from "@/lib/safe-action";
 
 describe("safe-action.ts Integration Tests", () => {
   // actionLogger.errorをスパイ
@@ -154,7 +154,7 @@ describe("safe-action.ts Integration Tests", () => {
         .action(async ({ parsedInput }) => {
           if (parsedInput.errorType === "string") {
             // 非Error型エラーを投げる（next-safe-actionがラップする可能性がある）
-            throw "String error" as any;
+            throw "String error";
           }
           return { success: true };
         });
@@ -169,7 +169,7 @@ describe("safe-action.ts Integration Tests", () => {
 
       // ログが記録される
       expect(errorLogSpy).toHaveBeenCalledTimes(1);
-      
+
       // 開発環境では、next-safe-actionがラップした場合でもエラーメッセージが返される
       // または、handleServerErrorで"Unknown error"が返される
       // 実際の動作に合わせて検証
@@ -181,7 +181,7 @@ describe("safe-action.ts Integration Tests", () => {
 
     test("7. DatabaseErrorの処理", async () => {
       // Given: DatabaseErrorを投げるServer Action
-      const testAction = actionClient
+      const _testAction = actionClient
         .schema(v.object({ errorType: v.string() }))
         .action(async ({ parsedInput }) => {
           if (parsedInput.errorType === "database") {
@@ -232,7 +232,7 @@ describe("safe-action.ts Integration Tests", () => {
       expect(errorLogSpy).toHaveBeenCalledTimes(1);
       const callArgs = errorLogSpy.mock.calls[0];
       expect(callArgs[0]).toHaveProperty("err");
-      const err = (callArgs[0] as any).err;
+      const err = (callArgs[0] as Record<string, unknown>).err;
       expect(err).toBeInstanceOf(Error);
       expect(err.message).toBe("Generic error");
     });

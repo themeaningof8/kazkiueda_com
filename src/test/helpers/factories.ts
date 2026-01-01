@@ -54,7 +54,10 @@ export async function createTestPost(
     collection: "posts",
     data: {
       title: overrides?.title ?? faker.lorem.sentence(),
-      slug: overrides?.slug === null ? null : (overrides?.slug ?? `post-${faker.string.alphanumeric(12).toLowerCase()}`),
+      slug:
+        overrides?.slug === null
+          ? null
+          : (overrides?.slug ?? `post-${faker.string.alphanumeric(12).toLowerCase()}`),
       author: authorId,
       content: overrides?.content ?? makeLexicalContent(faker.lorem.paragraph()),
       tags: overrides?.tags ?? [{ tag: "test" }],
@@ -95,13 +98,13 @@ export async function createBulkTestPosts(
     const batch = Math.min(BATCH_SIZE, count - i);
     const promises = Array.from({ length: batch }, (_, j) =>
       createTestPost(payload, authorId, {
-        title: `${overrides?.title ?? 'Bulk Post'} ${i + j}`,
-        slug: `${overrides?.slug ?? 'bulk'}-${i + j}-${baseTimestamp}`,
+        title: `${overrides?.title ?? "Bulk Post"} ${i + j}`,
+        slug: `${overrides?.slug ?? "bulk"}-${i + j}-${baseTimestamp}`,
         status: overrides?.status ?? "published",
         publishedDate: overrides?.publishedDate,
         excerpt: overrides?.excerpt,
         tags: overrides?.tags,
-      })
+      }),
     );
 
     const batchResults = await Promise.all(promises);
@@ -109,7 +112,7 @@ export async function createBulkTestPosts(
 
     // メモリ圧を減らすため、大量データ時は少し待機
     if (count > 500 && i + BATCH_SIZE < count) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
 
@@ -128,7 +131,8 @@ export async function createTestMedia(
     alt: string;
     filename: string;
   }>,
-): Promise<any> { // Media型が未定義のためanyを使用
+): Promise<any> {
+  // Media型が未定義のためanyを使用
   // TODO: Mediaコレクションの実装後に型を定義
   // 現在は未使用のため、基本実装のみ
   const media = await payload.create({

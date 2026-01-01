@@ -1,10 +1,10 @@
-import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { randomUUID } from "node:crypto";
-import { findPublishedPostSlugs, findPostBySlug, findPosts } from "@/lib/api/payload-client";
-import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
-import { destroyTestPayload, getTestPayload } from "@/test/payload";
-import { createTestPost, createTestUser, createBulkTestPosts } from "@/test/helpers/factories";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import { findPostBySlug, findPosts, findPublishedPostSlugs } from "@/lib/api/payload-client";
 import { BLOG_CONFIG } from "@/lib/constants";
+import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
+import { createBulkTestPosts, createTestPost, createTestUser } from "@/test/helpers/factories";
+import { destroyTestPayload, getTestPayload } from "@/test/payload";
 
 describe("payload-client integration", () => {
   const pool = createTestDbPool();
@@ -33,15 +33,18 @@ describe("payload-client integration", () => {
       const totalPosts = pageSize + 10; // 110件
 
       // 大量データ作成（createBulkTestPostsを使用）
-      const posts = await createBulkTestPosts(payload, user.id, totalPosts, {
+      const _posts = await createBulkTestPosts(payload, user.id, totalPosts, {
         status: "published",
       });
-      const slugs = posts.map(p => p.slug!).sort();
+      const slugs = _posts
+        .map((p) => p.slug)
+        .filter(Boolean)
+        .sort();
 
       const result = await findPublishedPostSlugs();
 
       expect(result).toHaveLength(totalPosts);
-      expect(result.map(r => r.slug).sort()).toEqual(slugs);
+      expect(result.map((r) => r.slug).sort()).toEqual(slugs);
     }, 10000); // タイムアウトを10秒に延長
 
     test("should handle slug filtering correctly", async () => {
@@ -62,17 +65,16 @@ describe("payload-client integration", () => {
 
       // 少なくとも1件の記事が存在し、全てのslugがtruthyであることを確認
       expect(result.length).toBeGreaterThan(0);
-      expect(result.every(r => r.slug && r.slug.length > 0)).toBe(true);
+      expect(result.every((r) => r.slug && r.slug.length > 0)).toBe(true);
 
       // 作成した有効なslugが含まれていることを確認
-      expect(result.some(r => r.slug === validSlug)).toBe(true);
+      expect(result.some((r) => r.slug === validSlug)).toBe(true);
     });
 
     test("should return empty array when no published posts", async () => {
       const result = await findPublishedPostSlugs();
       expect(result).toEqual([]);
     });
-
   });
 
   describe("findPostBySlug", () => {
@@ -211,12 +213,7 @@ describe("payload-client integration", () => {
       const payload = await getTestPayload(payloadKey);
       const user = await createTestUser(payload);
 
-      const testSlugs = [
-        "simple-slug",
-        "slug-with-dashes",
-        "slug123",
-        "complex-slug-123",
-      ];
+      const testSlugs = ["simple-slug", "slug-with-dashes", "slug123", "complex-slug-123"];
 
       for (const slug of testSlugs) {
         await createTestPost(payload, user.id, {
@@ -230,7 +227,7 @@ describe("payload-client integration", () => {
       expect(result).toHaveLength(testSlugs.length);
 
       // 全てのslugが正しく取得されていることを確認
-      const resultSlugs = result.map(r => r.slug);
+      const resultSlugs = result.map((r) => r.slug);
       for (const slug of testSlugs) {
         expect(resultSlugs).toContain(slug);
       }
@@ -242,7 +239,7 @@ describe("payload-client integration", () => {
 
       // 250件作成（2ページ以上になる）
       const totalPosts = 100; // 250件から100件に削減（テスト時間短縮）
-      const posts = await createBulkTestPosts(payload, user.id, totalPosts, {
+      const _posts = await createBulkTestPosts(payload, user.id, totalPosts, {
         status: "published",
       });
 
@@ -250,7 +247,7 @@ describe("payload-client integration", () => {
       expect(result).toHaveLength(totalPosts);
 
       // 全てのslugがユニークであることを確認
-      const slugs = result.map(r => r.slug);
+      const slugs = result.map((r) => r.slug);
       const uniqueSlugs = new Set(slugs);
       expect(uniqueSlugs.size).toBe(totalPosts);
     }, 15000); // タイムアウトを15秒に延長
