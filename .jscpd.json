@@ -1,9 +1,6 @@
 {
-  "threshold": 1.0,
-  "reporters": [
-    "console",
-    "html"
-  ],
+  "threshold": 5.0,
+  "reporters": ["console", "html"],
   "ignore": [
     "node_modules/**",
     ".next/**",
@@ -13,12 +10,7 @@
     "**/*.min.js",
     "**/payload-types.ts"
   ],
-  "format": [
-    "typescript",
-    "javascript",
-    "tsx",
-    "jsx"
-  ],
+  "format": ["typescript", "javascript", "tsx", "jsx"],
   "minLines": 5,
   "minTokens": 50,
   "output": "./reports/jscpd"

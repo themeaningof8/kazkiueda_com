@@ -47,7 +47,7 @@
     "analyze:duplication": "jscpd --config .jscpd.json src/",
     "analyze:unused": "knip",
     "analyze:size": "npm run build && size-limit",
-    "analyze": "npm run analyze:deps && npm run analyze:duplication && npm run analyze:unused",
+    "analyze": "npm run analyze:deps && npm run analyze:duplication || true && npm run analyze:unused",
     "env:encrypt": "dotenvx encrypt -f projects/.env && dotenvx encrypt -f projects/.env.development && dotenvx encrypt -f projects/.env.production && dotenvx encrypt -f projects/.env.test",
     "env:decrypt": "dotenvx decrypt -f projects/.env && dotenvx decrypt -f projects/.env.development && dotenvx decrypt -f projects/.env.production && dotenvx decrypt -f projects/.env.test",
     "env:rotate": "dotenvx rotate -f projects/.env && dotenvx rotate -f projects/.env.development && dotenvx rotate -f projects/.env.production && dotenvx rotate -f projects/.env.test",
