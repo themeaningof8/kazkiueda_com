@@ -14,8 +14,15 @@ const postgresUrlSchema = v.pipe(
 );
 
 /**
+ * ビルド時かどうかを判定
+ * Vercel などのビルド環境では、実行時の環境変数が利用できないため
+ */
+const isBuildTime = process.env.VERCEL === "1" && !process.env.DATABASE_URL;
+
+/**
  * 環境変数のスキーマ定義
  * 開発環境では一部の環境変数をオプショナルにし、本番環境では必須とする
+ * ビルド時には DATABASE_URL をオプショナルにする
  */
 const baseEnvSchema = v.object({
   NODE_ENV: v.pipe(
@@ -25,15 +32,18 @@ const baseEnvSchema = v.object({
       "NODE_ENVはdevelopment、production、testのいずれかである必要があります",
     ),
   ),
-  PAYLOAD_SECRET: v.pipe(
-    v.string(),
-    v.minLength(32, "PAYLOAD_SECRETは32文字以上である必要があります"),
-    v.check(
-      (input) => input !== "your-secret-key",
-      "PAYLOAD_SECRETはデフォルト値（your-secret-key）を使用できません",
-    ),
-  ),
-  DATABASE_URL: postgresUrlSchema,
+  // ビルド時は PAYLOAD_SECRET と DATABASE_URL をオプショナルにする
+  PAYLOAD_SECRET: isBuildTime
+    ? v.optional(v.string())
+    : v.pipe(
+        v.string(),
+        v.minLength(32, "PAYLOAD_SECRETは32文字以上である必要があります"),
+        v.check(
+          (input) => input !== "your-secret-key",
+          "PAYLOAD_SECRETはデフォルト値（your-secret-key）を使用できません",
+        ),
+      ),
+  DATABASE_URL: isBuildTime ? v.optional(v.string()) : postgresUrlSchema,
   NEXT_PUBLIC_SITE_URL: v.optional(
     v.pipe(v.string(), v.url("NEXT_PUBLIC_SITE_URLは有効なURLである必要があります")),
   ),
