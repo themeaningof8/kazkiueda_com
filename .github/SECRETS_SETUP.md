@@ -4,52 +4,34 @@
 
 ---
 
-## 📋 設定が必要なSecrets一覧
+## 📋 必要なSecrets（dotenvxを入口に統一）
 
-### テスト環境（CI/E2E用）
+### テスト/CI用
+| Secret名 | 用途 |
+|----------|------|
+| `DOTENV_PRIVATE_KEY_TEST` | `projects/.env.test` を復号（static/unit/integration/e2eで使用） |
 
-| Secret名 | 説明 | 値の例 |
-|---------|------|--------|
-| `TEST_DATABASE_URL` | テスト用PostgreSQL接続文字列 | `postgresql://test:test@localhost:5433/kazkiueda_test` |
-| `TEST_PAYLOAD_SECRET` | テスト用Payload CMSシークレット | 最低32文字のランダム文字列 |
-| `TEST_PAYLOAD_PREVIEW_SECRET` | テスト用プレビューシークレット | 最低32文字のランダム文字列 |
+### ステージング
+| Secret名 | 用途 |
+|----------|------|
+| `VERCEL_TOKEN` | Vercelデプロイ（staging） |
+| `VERCEL_ORG_ID` | 同上 |
+| `VERCEL_PROJECT_ID` | 同上 |
+| `DOTENV_PRIVATE_KEY_DEVELOPMENT` | （必要に応じて）`projects/.env.development` を復号 |
 
-### プレビュー環境（PR Preview用）
+### 本番
+| Secret名 | 用途 |
+|----------|------|
+| `DOTENV_PRIVATE_KEY_PRODUCTION` | `projects/.env.production` を復号 |
+| `NEXT_PUBLIC_SERVER_URL` | Smoke用URL（例: https://kazkiueda.com） |
+| `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` | Vercel本番デプロイ |
+| `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_REGION`, `S3_ENDPOINT` | メディアアップロード |
 
-| Secret名 | 説明 | 値の例 |
-|---------|------|--------|
-| `PREVIEW_DATABASE_URL` | プレビュー用PostgreSQL接続文字列 | Supabase/Neon等のDB接続URL |
-| `PREVIEW_PAYLOAD_SECRET` | プレビュー用Payload CMSシークレット | 最低32文字のランダム文字列 |
-| `PREVIEW_PAYLOAD_PREVIEW_SECRET` | プレビュー用プレビューシークレット | 最低32文字のランダム文字列 |
-
-### 本番環境（Production Deploy用）
-
-| Secret名 | 説明 | 必須 |
-|---------|------|------|
-| `PRODUCTION_DATABASE_URL` | 本番PostgreSQL接続文字列 | ✅ |
-| `PRODUCTION_PAYLOAD_SECRET` | 本番Payload CMSシークレット | ✅ |
-| `PRODUCTION_PAYLOAD_PREVIEW_SECRET` | 本番プレビューシークレット | ✅ |
-| `NEXT_PUBLIC_SERVER_URL` | 本番サーバーURL | ✅ |
-| `S3_BUCKET` | S3バケット名 | ✅ |
-| `S3_ACCESS_KEY_ID` | S3アクセスキーID | ✅ |
-| `S3_SECRET_ACCESS_KEY` | S3シークレットアクセスキー | ✅ |
-| `S3_REGION` | S3リージョン | ✅ |
-| `S3_ENDPOINT` | S3エンドポイント | ✅ |
-
-### Vercel連携（デプロイ用）
-
-| Secret名 | 説明 | 取得方法 |
-|---------|------|---------|
-| `VERCEL_TOKEN` | Vercel APIトークン | [Vercel Dashboard](https://vercel.com/account/tokens) |
-| `VERCEL_ORG_ID` | Vercel組織ID | Project Settings → General |
-| `VERCEL_PROJECT_ID` | VercelプロジェクトID | Project Settings → General |
-
-### オプション（推奨）
-
-| Secret名 | 説明 | 取得方法 |
-|---------|------|---------|
-| `CODECOV_TOKEN` | Codecovアップロード用トークン | [Codecov Dashboard](https://codecov.io/) |
-| `SLACK_WEBHOOK` | Slack通知用Webhook URL | Slack App設定 |
+### オプション
+| Secret名 | 用途 |
+|----------|------|
+| `CODECOV_TOKEN` | Codecovアップロード |
+| `SLACK_WEBHOOK` | Nightly失敗通知など（未設定でも可） |
 
 ---
 
@@ -230,15 +212,10 @@ Secret: [S3エンドポイント]
 
 ---
 
-## ✅ 最小限の設定（E2Eテストのみ実行する場合）
-
-E2Eテストのみを実行する場合、以下の3つのSecretsだけで十分です：
-
-1. `TEST_DATABASE_URL`
-2. `TEST_PAYLOAD_SECRET`
-3. `TEST_PAYLOAD_PREVIEW_SECRET`
-
-この設定で、`.github/workflows/ci.yml`のテストパイプラインが動作します。
+## ✅ 最小限セット
+- CI/テスト: `DOTENV_PRIVATE_KEY_TEST`（.env.test にDB/シークレットを格納済み想定）
+- Stagingデプロイ: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+- 本番デプロイ: `DOTENV_PRIVATE_KEY_PRODUCTION`, `VERCEL_*`, `NEXT_PUBLIC_SERVER_URL`（+必要ならS3）
 
 ---
 

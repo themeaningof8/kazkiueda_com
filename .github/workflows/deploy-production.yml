@@ -1,0 +1,65 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+env:
+  NODE_ENV: production
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Show target commit
+        run: |
+          echo "## Deployment Target" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: $(git rev-parse HEAD)" >> $GITHUB_STEP_SUMMARY
+          echo "- Message: $(git log -1 --pretty=%B)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.3.5
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run database migrations
+        env:
+          DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
+        run: |
+          bunx dotenvx run -f projects/.env.production -f projects/.env -- \
+            bunx cross-env NODE_ENV=production NODE_OPTIONS="--no-deprecation --import tsx" \
+            PAYLOAD_CONFIG_PATH=src/payload.config.ts \
+            payload migrate
+
+      - name: Deploy to Vercel (Production)
+        id: deploy
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: "--prod"
+          github-comment: false
+
+      - name: Production smoke test (homepage)
+        run: |
+          url="${{ vars.NEXT_PUBLIC_SERVER_URL || 'https://kazkiueda.com' }}"
+          curl -f "$url" || exit 1
+      - name: Production smoke test (blog)
+        run: |
+          url="${{ vars.NEXT_PUBLIC_SERVER_URL || 'https://kazkiueda.com' }}"
+          curl -f "$url/blog" || exit 1

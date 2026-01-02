@@ -1,0 +1,30 @@
+name: E2E Full Tests (Nightly)
+
+on:
+  schedule:
+    - cron: "0 17 * * *" # 02:00 JST
+  workflow_dispatch:
+
+env:
+  NODE_ENV: test
+
+jobs:
+  e2e-full:
+    name: E2E Full
+    uses: ./.github/workflows/reusable-tests.yml
+    secrets: inherit
+    with:
+      suite: e2e-full
+      dotenv-key-name: DOTENV_PRIVATE_KEY_TEST
+
+  notify:
+    name: Nightly Result
+    needs: e2e-full
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "# Nightly E2E Result" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ needs.e2e-full.result }}" >> $GITHUB_STEP_SUMMARY

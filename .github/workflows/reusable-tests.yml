@@ -1,0 +1,131 @@
+name: Reusable Tests
+
+on:
+  workflow_call:
+    inputs:
+      suite:
+        description: "Test preset: static | unit | integration | e2e-essential | e2e-full"
+        required: true
+        type: string
+      env-file:
+        description: "Path to env file for dotenvx"
+        required: false
+        default: "projects/.env.test"
+        type: string
+      dotenv-key-name:
+        description: "Secret name for DOTENV_PRIVATE_KEY_*"
+        required: false
+        default: "DOTENV_PRIVATE_KEY_TEST"
+        type: string
+      integration-script:
+        description: "bun script for integration (e.g. test:integration:posts)"
+        required: false
+        default: ""
+        type: string
+      e2e-file:
+        description: "Playwright spec file (glob). Empty = default per suite"
+        required: false
+        default: ""
+        type: string
+    secrets:
+      DOTENV_PRIVATE_KEY_TEST:
+        required: false
+      DOTENV_PRIVATE_KEY_PRODUCTION:
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Setup (with Playwright when needed)
+        uses: ./.github/actions/setup
+        with:
+          playwright: ${{ inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full' }}
+
+      # ---------- Static ----------
+      - name: Run static checks
+        if: inputs.suite == 'static'
+        run: |
+          bunx tsc --noEmit
+          bun run lint
+          bun run check
+
+      # ---------- Unit ----------
+      - name: Run unit tests
+        if: inputs.suite == 'unit'
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets[inputs.dotenv-key-name] }}
+        run: |
+          dotenvx run -f "${{ inputs.env-file }}" -- bun run test:coverage:unit
+
+      # ---------- Integration ----------
+      - name: Start test database
+        if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
+        run: bun run test:db:up
+
+      - name: Run migrations
+        if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets[inputs.dotenv-key-name] }}
+        run: bun run test:migrate
+
+      - name: Run integration tests
+        if: inputs.suite == 'integration'
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets[inputs.dotenv-key-name] }}
+        run: |
+          if [ -n "${{ inputs.integration-script }}" ]; then
+            bun run "${{ inputs.integration-script }}"
+          else
+            bun run test:integration:posts
+            bun run test:integration:server-actions
+          fi
+
+      # ---------- E2E ----------
+      - name: Start Next.js server
+        if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets[inputs.dotenv-key-name] }}
+        run: |
+          dotenvx run -f "${{ inputs.env-file }}" -- bunx next dev --port 3001 > /tmp/next-dev.log 2>&1 &
+          bunx wait-on http://localhost:3001 -t 60000
+
+      - name: Run E2E tests
+        if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
+        env:
+          CI: true
+          DOTENV_PRIVATE_KEY: ${{ secrets[inputs.dotenv-key-name] }}
+        run: |
+          if [ "${{ inputs.e2e-file }}" != "" ]; then
+            bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
+          elif [ "${{ inputs.suite }}" = "e2e-essential" ]; then
+            bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github
+          else
+            bunx playwright test tests/e2e --reporter=github
+          fi
+
+      - name: Upload Playwright report
+        if: always() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ inputs.suite }}
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload server logs
+        if: failure() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-logs-${{ inputs.suite }}
+          path: /tmp/next-dev.log
+          retention-days: 7
+
+      # ---------- Cleanup ----------
+      - name: Stop Next.js server
+        if: always() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
+        run: pkill -f 'next dev' || true
+
+      - name: Stop test database
+        if: always() && (inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
+        run: bun run test:db:down
