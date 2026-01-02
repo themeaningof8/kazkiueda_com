@@ -27,7 +27,7 @@ jobs:
     secrets: inherit
     with:
       suite: unit
-      dotenv-key-name: DOTENV_PRIVATE_KEY_TEST
+      dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
 
   integration:
     name: Integration Tests
@@ -47,7 +47,7 @@ jobs:
     secrets: inherit
     with:
       suite: integration
-      dotenv-key-name: DOTENV_PRIVATE_KEY_TEST
+      dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
       integration-script: ${{ matrix.integration-script }}
 
   e2e-essential:
@@ -57,7 +57,7 @@ jobs:
     secrets: inherit
     with:
       suite: e2e-essential
-      dotenv-key-name: DOTENV_PRIVATE_KEY_TEST
+      dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
 
   staging-deploy:
     name: Deploy to Staging

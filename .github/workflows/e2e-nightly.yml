@@ -15,7 +15,7 @@ jobs:
     secrets: inherit
     with:
       suite: e2e-full
-      dotenv-key-name: DOTENV_PRIVATE_KEY_TEST
+      dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
 
   notify:
     name: Nightly Result

@@ -7,12 +7,12 @@ import { join } from 'path';
 const isCI = !!process.env.GITHUB_ACTIONS;
 
 // 環境変数ファイルの存在確認
-const envTestPath = join(process.cwd(), 'projects/.env.test');
-const envTestExists = existsSync(envTestPath);
+const envDevPath = join(process.cwd(), 'projects/.env.development');
+const envDevExists = existsSync(envDevPath);
 
-// Playwright(テスト側)にも .env.test を読み込ませる
-if (envTestExists) {
-  dotenvConfig({ path: envTestPath });
+// Playwright(テスト側)にも .env.development を読み込ませる
+if (envDevExists) {
+  dotenvConfig({ path: envDevPath });
 }
 
 export default defineConfig({

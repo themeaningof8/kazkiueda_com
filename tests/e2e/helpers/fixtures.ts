@@ -18,7 +18,8 @@ type TestFixtures = {
 };
 
 export const test = base.extend<TestFixtures>({
-  payload: async (_fixtures, use) => {
+  // biome-ignore lint/correctness/noEmptyPattern: Playwright requires destructuring to identify dependencies
+  payload: async ({}, use) => {
     const payload = await getTestPayload("e2e-fixture");
     await use(payload);
     await payload.destroy();
