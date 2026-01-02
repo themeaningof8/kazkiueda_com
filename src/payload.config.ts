@@ -81,7 +81,8 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: {
-      connectionString: env.DATABASE_URL,
+      // ビルド時にはダミー値を使用（実行時には実際の値が必要）
+      connectionString: env.DATABASE_URL || 'postgresql://localhost:5432/placeholder',
       // 本番環境でのパフォーマンス最適化
       ...(isProduction && {
         max: 20, // 最大プールサイズ
@@ -95,7 +96,8 @@ export default buildConfig({
   // Define your globals here - these are singletons across your application
   globals: [],
   // Your Payload secret - should be a long, random string in production
-  secret: env.PAYLOAD_SECRET,
+  // ビルド時にはダミー値を使用（実行時には実際の値が必要）
+  secret: env.PAYLOAD_SECRET || 'build-time-placeholder-secret-min-32-chars',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
