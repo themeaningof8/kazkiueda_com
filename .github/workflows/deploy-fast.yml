@@ -84,7 +84,7 @@ jobs:
       # Vercelが自動でビルドするため、ローカルビルドはスキップ可能
       # ビルドチェックのみ実行（オプション）
       - name: Verify build (optional)
-        run: bun run build
+        run: NODE_ENV=production PAYLOAD_CONFIG_PATH=src/payload.config.ts bunx next build
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
           PAYLOAD_SECRET: ${{ secrets.PRODUCTION_PAYLOAD_SECRET }}
@@ -94,16 +94,15 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           S3_REGION: ${{ secrets.S3_REGION }}
           S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          PAYLOAD_PREVIEW_SECRET: ${{ secrets.PRODUCTION_PAYLOAD_PREVIEW_SECRET }}
         continue-on-error: true
 
       # Migrationとデプロイを逐次実行（安全性優先）
       - name: Run database migrations
-        run: bun run payload:migrate
+        run: NODE_ENV=production PAYLOAD_CONFIG_PATH=src/payload.config.ts payload migrate
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
           PAYLOAD_SECRET: ${{ secrets.PRODUCTION_PAYLOAD_SECRET }}
-          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-          DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
           NODE_ENV: production
 
       - name: Deploy to Vercel
