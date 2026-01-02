@@ -20,6 +20,8 @@ jobs:
     name: Deploy Preview
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Skip deployment if VERCEL_TOKEN is not available (e.g., from forks)
+    if: ${{ secrets.VERCEL_TOKEN != '' }}
 
     outputs:
       preview-url: ${{ steps.deploy.outputs.preview-url }}
