@@ -243,9 +243,8 @@ jobs:
       - name: Build application
         run: bun run build
         env:
-          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
-          PAYLOAD_SECRET: ${{ secrets.TEST_PAYLOAD_SECRET }}
-          NODE_ENV: production
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
+          DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
 
       - name: Check bundle size
         run: bun run analyze:size
