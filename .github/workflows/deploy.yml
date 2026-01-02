@@ -138,10 +138,10 @@ jobs:
           DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
 
       - name: Run database migrations
-        run: bun run payload:migrate
+        run: NODE_ENV=production PAYLOAD_CONFIG_PATH=src/payload.config.ts payload migrate
         env:
-          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-          DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          PAYLOAD_SECRET: ${{ secrets.PRODUCTION_PAYLOAD_SECRET }}
 
   # ==========================================
   # Deploy to Vercel (or other platform)
