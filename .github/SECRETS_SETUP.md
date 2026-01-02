@@ -9,7 +9,7 @@
 ### テスト/CI用
 | Secret名 | 用途 |
 |----------|------|
-| `DOTENV_PRIVATE_KEY_TEST` | `projects/.env.test` を復号（static/unit/integration/e2eで使用） |
+| `DOTENV_PRIVATE_KEY_DEVELOPMENT` | `projects/.env.test` を復号（static/unit/integration/e2eで使用） |
 
 ### ステージング
 | Secret名 | 用途 |
@@ -213,7 +213,7 @@ Secret: [S3エンドポイント]
 ---
 
 ## ✅ 最小限セット
-- CI/テスト: `DOTENV_PRIVATE_KEY_TEST`（.env.test にDB/シークレットを格納済み想定）
+- CI/テスト: `DOTENV_PRIVATE_KEY_DEVELOPMENT`（.env.test にDB/シークレットを格納済み想定）
 - Stagingデプロイ: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
 - 本番デプロイ: `DOTENV_PRIVATE_KEY_PRODUCTION`, `VERCEL_*`, `NEXT_PUBLIC_SERVER_URL`（+必要ならS3）
 

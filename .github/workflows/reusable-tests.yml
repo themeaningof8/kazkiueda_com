@@ -28,7 +28,7 @@ on:
         default: ""
         type: string
     secrets:
-      DOTENV_PRIVATE_KEY_TEST:
+      DOTENV_PRIVATE_KEY_DEVELOPMENT:
         required: false
       DOTENV_PRIVATE_KEY_PRODUCTION:
         required: false
@@ -39,7 +39,7 @@ jobs:
     timeout-minutes: 30
     env:
       NODE_ENV: test
-      DOTENV_PRIVATE_KEY_TEST: ${{ secrets.DOTENV_PRIVATE_KEY_TEST }}
+      DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
       DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
     steps:
       - name: Checkout
@@ -48,8 +48,8 @@ jobs:
       - name: Setup environment keys
         run: |
           key_name="${{ inputs.dotenv-key-name }}"
-          if [ "$key_name" = "DOTENV_PRIVATE_KEY_TEST" ]; then
-            key_value="${{ secrets.DOTENV_PRIVATE_KEY_TEST }}"
+          if [ "$key_name" = "DOTENV_PRIVATE_KEY_DEVELOPMENT" ]; then
+            key_value="${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}"
           elif [ "$key_name" = "DOTENV_PRIVATE_KEY_PRODUCTION" ]; then
             key_value="${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}"
           fi
