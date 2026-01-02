@@ -38,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
+      NODE_ENV: test
       DOTENV_PRIVATE_KEY_TEST: ${{ secrets.DOTENV_PRIVATE_KEY_TEST }}
       DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
     steps:
@@ -105,11 +106,11 @@ jobs:
           CI: true
         run: |
           if [ "${{ inputs.e2e-file }}" != "" ]; then
-            bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
+            bunx dotenvx run -f projects/.env.test -- bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
           elif [ "${{ inputs.suite }}" = "e2e-essential" ]; then
-            bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github
+            bunx dotenvx run -f projects/.env.test -- bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github
           else
-            bunx playwright test tests/e2e --reporter=github
+            bunx dotenvx run -f projects/.env.test -- bunx playwright test tests/e2e --reporter=github
           fi
 
       - name: Upload Playwright report
