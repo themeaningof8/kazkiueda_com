@@ -53,7 +53,7 @@
     "env:rotate": "dotenvx rotate -f projects/.env && dotenvx rotate -f projects/.env.development && dotenvx rotate -f projects/.env.production && dotenvx rotate -f projects/.env.test",
     "env:genexample": "dotenvx ext genexample -f projects/.env -f projects/.env.development -f projects/.env.production -o projects/.env.example",
     "payload:migrate:create": "payload migrate:create",
-    "payload:migrate": "dotenvx run -f projects/.env -f projects/.env.production -- payload migrate",
+    "payload:migrate": "NODE_ENV=production dotenvx run -f projects/.env -f projects/.env.production -- payload migrate",
     "generate:types": "dotenvx run -f projects/.env -f projects/.env.development -- cross-env NODE_ENV=development NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:types",
     "generate:importmap": "dotenvx run -f projects/.env -f projects/.env.development -- cross-env NODE_ENV=development NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:importmap",
     "ci": "payload migrate && build"
