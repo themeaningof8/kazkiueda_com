@@ -252,15 +252,16 @@ describe("collections/Users.ts Integration Tests", () => {
       const admin = await createAdminUser(payload);
 
       // When: 一般ユーザーがrole変更を試みる
-      await expect(
-        payload.update({
-          collection: "users",
-          id: user.id,
-          data: { role: "admin" },
-          user,
-          overrideAccess: false,
-        }),
-      ).rejects.toThrow();
+      const result = await payload.update({
+        collection: "users",
+        id: user.id,
+        data: { role: "admin" },
+        user,
+        overrideAccess: false,
+      });
+
+      // Then: エラーにはならないが、roleは変更されない（silently ignored）
+      expect(result.role).toBe("user");
 
       // When: 管理者がrole変更
       const updated = await payload.update({

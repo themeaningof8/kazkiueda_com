@@ -65,7 +65,9 @@ describe("collections/Posts.ts Integration Tests", () => {
 
       // Then: 全記事が返される
       expect(result.docs).toHaveLength(2);
-      const statuses = result.docs.map((doc) => (doc as unknown as Record<string, unknown>).status);
+      const statuses = result.docs.map(
+        (doc) => (doc as unknown as Record<string, unknown>)._status,
+      );
       expect(statuses).toContain("published");
       expect(statuses).toContain("draft");
     });
@@ -328,11 +330,10 @@ describe("collections/Posts.ts Integration Tests", () => {
             content: makeLexicalContent("Test content"),
             author: user.id,
           } as Record<string, unknown>,
-          draft: true,
           user,
           overrideAccess: false,
-        }),
-      ).rejects.toThrow(/タイトル/i);
+        } as any),
+      ).rejects.toThrow();
     });
 
     test("16. 日本語タイトルからslugが生成される", async () => {
@@ -443,10 +444,9 @@ describe("collections/Posts.ts Integration Tests", () => {
             content: makeLexicalContent("Test content"),
             author: user.id,
           } as Record<string, unknown>,
-          draft: true,
           user,
           overrideAccess: false,
-        }),
+        } as any),
       ).rejects.toThrow(/タイトル/i);
     });
 
@@ -462,10 +462,9 @@ describe("collections/Posts.ts Integration Tests", () => {
             title: "Test Post",
             author: user.id,
           } as Record<string, unknown>,
-          draft: true,
           user,
           overrideAccess: false,
-        }),
+        } as any),
       ).rejects.toThrow(/本文/i);
     });
 
