@@ -44,6 +44,7 @@ Testing Trophyに沿ったCI/CDと環境ゲートの概要です。
   - `DOTENV_PRIVATE_KEY_DEVELOPMENT` で暗号化された `projects/.env.development` を復号
   - `.env` (共通) には `PAYLOAD_PREVIEW_SECRET` が含まれる（全環境で共有）
   - `.env.development` には `PAYLOAD_SECRET` などが含まれる
+  - E2Eテストでは `dotenvx run -f projects/.env -f projects/.env.development` で両方を読み込む
   - `DATABASE_URL` のみCIワークフローで直接オーバーライド（`postgresql://test:test@localhost:5433/kazkiueda_test`）
 
 ## パイプラインの流れ

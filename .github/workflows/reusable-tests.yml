@@ -99,7 +99,7 @@ jobs:
       - name: Start Next.js server
         if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
         run: |
-          bun next dev --port 3001 > /tmp/next-dev.log 2>&1 &
+          dotenvx run -f projects/.env -f projects/.env.development -- bun next dev --port 3001 > /tmp/next-dev.log 2>&1 &
           bunx wait-on http://localhost:3001 -t 60000
 
       - name: Run E2E tests
@@ -108,11 +108,11 @@ jobs:
           CI: true
         run: |
           if [ "${{ inputs.e2e-file }}" != "" ]; then
-            bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
+            dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
           elif [ "${{ inputs.suite }}" = "e2e-essential" ]; then
-            bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github
+            dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github
           else
-            bunx playwright test tests/e2e --reporter=github
+            dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e --reporter=github
           fi
 
       - name: Upload Playwright report
