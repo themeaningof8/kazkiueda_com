@@ -45,12 +45,19 @@ export default defineConfig({
   },
 
   projects: [
+    // セットアッププロジェクト (認証状態の生成)
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+    },
+
     // 1. 認証不要なテスト
     {
       name: 'unauthenticated',
       testMatch: [
         '**/error-handling.spec.ts',
         '**/accessibility.spec.ts',
+        '**/accessibility-essential.spec.ts', // Added
       ],
       use: {
         ...devices['Desktop Chrome'],
@@ -61,9 +68,12 @@ export default defineConfig({
     // 2. 認証必要なテスト（自動ログイン）
     {
       name: 'authenticated',
+      dependencies: ['setup'], // setupプロジェクトに依存
       testIgnore: [
         '**/error-handling.spec.ts',
         '**/accessibility.spec.ts',
+        '**/accessibility-essential.spec.ts', // Ignored
+        '**/auth.setup.ts', // Setupファイルを除外
       ],
       use: {
         ...devices['Desktop Chrome'],

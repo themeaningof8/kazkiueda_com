@@ -57,6 +57,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: pre-deploy
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
 
     outputs:
       deployment-url: ${{ steps.deploy.outputs.url }}
