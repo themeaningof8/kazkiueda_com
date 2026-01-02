@@ -125,6 +125,17 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Debug - Check if DOTENV_PRIVATE_KEY_TEST is available
+        run: |
+          if [ -z "$DOTENV_PRIVATE_KEY_TEST" ]; then
+            echo "❌ DOTENV_PRIVATE_KEY_TEST is not set"
+            exit 1
+          else
+            echo "✅ DOTENV_PRIVATE_KEY_TEST is set (length: ${#DOTENV_PRIVATE_KEY_TEST})"
+          fi
+        env:
+          DOTENV_PRIVATE_KEY_TEST: ${{ secrets.DOTENV_PRIVATE_KEY_TEST }}
+
       - name: Run unit tests with coverage
         run: bun run test:coverage:unit
         env:
@@ -186,6 +197,17 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Debug - Check if DOTENV_PRIVATE_KEY_TEST is available
+        run: |
+          if [ -z "$DOTENV_PRIVATE_KEY_TEST" ]; then
+            echo "❌ DOTENV_PRIVATE_KEY_TEST is not set"
+            exit 1
+          else
+            echo "✅ DOTENV_PRIVATE_KEY_TEST is set (length: ${#DOTENV_PRIVATE_KEY_TEST})"
+          fi
+        env:
+          DOTENV_PRIVATE_KEY_TEST: ${{ secrets.DOTENV_PRIVATE_KEY_TEST }}
 
       - name: Start test database
         run: bun run test:db:up
@@ -316,6 +338,17 @@ jobs:
         with:
           path: .next
           key: ${{ runner.os }}-build-${{ github.sha }}
+
+      - name: Debug - Check if DOTENV_PRIVATE_KEY_TEST is available
+        run: |
+          if [ -z "$DOTENV_PRIVATE_KEY_TEST" ]; then
+            echo "❌ DOTENV_PRIVATE_KEY_TEST is not set"
+            exit 1
+          else
+            echo "✅ DOTENV_PRIVATE_KEY_TEST is set (length: ${#DOTENV_PRIVATE_KEY_TEST})"
+          fi
+        env:
+          DOTENV_PRIVATE_KEY_TEST: ${{ secrets.DOTENV_PRIVATE_KEY_TEST }}
 
       - name: Start test database
         run: bun run test:db:up
