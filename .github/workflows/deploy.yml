@@ -138,7 +138,7 @@ jobs:
           DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
 
       - name: Run database migrations
-        run: NODE_ENV=production PAYLOAD_CONFIG_PATH=src/payload.config.ts payload migrate
+        run: cross-env NODE_ENV=production NODE_OPTIONS="--no-deprecation --import tsx" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload migrate
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
           PAYLOAD_SECRET: ${{ secrets.PRODUCTION_PAYLOAD_SECRET }}
