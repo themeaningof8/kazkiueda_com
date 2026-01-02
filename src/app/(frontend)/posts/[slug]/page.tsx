@@ -8,7 +8,7 @@ import { renderLogger } from "@/lib/logger";
 import { getPostBySlug, getPublishedPostSlugs } from "@/lib/posts";
 
 // ISR: 1時間ごとに再検証
-export const revalidate = BLOG_CONFIG.ISR_REVALIDATE_SECONDS;
+export const revalidate = 3600;
 
 // SSG: 公開記事の静的生成
 export async function generateStaticParams() {

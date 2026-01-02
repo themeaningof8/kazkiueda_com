@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 // ISR: 1時間ごとに再検証
-export const revalidate = BLOG_CONFIG.ISR_REVALIDATE_SECONDS;
+export const revalidate = 3600;
 
 interface BlogPageProps {
   searchParams: Promise<{ page?: string }>;
