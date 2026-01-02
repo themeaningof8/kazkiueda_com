@@ -329,10 +329,11 @@ describe("collections/Posts.ts Integration Tests", () => {
           data: {
             content: makeLexicalContent("Test content"),
             author: user.id,
-          } as Record<string, unknown>,
+            // biome-ignore lint/suspicious/noExplicitAny: 意図的に不完全なデータを渡してバリデーションをテスト
+          } as any,
           user,
           overrideAccess: false,
-        } as any),
+        }),
       ).rejects.toThrow();
     });
 
@@ -443,10 +444,11 @@ describe("collections/Posts.ts Integration Tests", () => {
           data: {
             content: makeLexicalContent("Test content"),
             author: user.id,
-          } as Record<string, unknown>,
+            // biome-ignore lint/suspicious/noExplicitAny: 意図的に不完全なデータを渡してバリデーションをテスト
+          } as any,
           user,
           overrideAccess: false,
-        } as any),
+        }),
       ).rejects.toThrow(/タイトル/i);
     });
 
@@ -461,10 +463,11 @@ describe("collections/Posts.ts Integration Tests", () => {
           data: {
             title: "Test Post",
             author: user.id,
-          } as Record<string, unknown>,
+            // biome-ignore lint/suspicious/noExplicitAny: 意図的に不完全なデータを渡してバリデーションをテスト
+          } as any,
           user,
           overrideAccess: false,
-        } as any),
+        }),
       ).rejects.toThrow(/本文/i);
     });
 

@@ -3,7 +3,6 @@ import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { ArticleContent } from "@/components/article-content";
 import { ErrorPage } from "@/components/error-page";
-import { BLOG_CONFIG } from "@/lib/constants";
 import { renderLogger } from "@/lib/logger";
 import { getPostBySlug, getPublishedPostSlugs } from "@/lib/posts";
 

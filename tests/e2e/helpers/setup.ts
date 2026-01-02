@@ -16,7 +16,7 @@ async function setupAuthentication() {
   const authDir = "tests/e2e/.auth";
 
   // .auth ディレクトリが存在しない場合は作成
-  const fs = await import("fs/promises");
+  const fs = await import("node:fs/promises");
   try {
     await fs.mkdir(authDir, { recursive: true });
   } catch {

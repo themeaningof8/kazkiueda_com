@@ -37,14 +37,23 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      DOTENV_PRIVATE_KEY_TEST: ${{ secrets.DOTENV_PRIVATE_KEY_TEST }}
+      DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup environment keys
         run: |
-          echo "DOTENV_PRIVATE_KEY=${{ secrets[inputs.dotenv-key-name] }}" >> $GITHUB_ENV
-          echo "${{ inputs.dotenv-key-name }}=${{ secrets[inputs.dotenv-key-name] }}" >> $GITHUB_ENV
+          key_name="${{ inputs.dotenv-key-name }}"
+          if [ "$key_name" = "DOTENV_PRIVATE_KEY_TEST" ]; then
+            key_value="${{ secrets.DOTENV_PRIVATE_KEY_TEST }}"
+          elif [ "$key_name" = "DOTENV_PRIVATE_KEY_PRODUCTION" ]; then
+            key_value="${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}"
+          fi
+          echo "DOTENV_PRIVATE_KEY=$key_value" >> $GITHUB_ENV
+          echo "$key_name=$key_value" >> $GITHUB_ENV
 
       - name: Setup (with Playwright when needed)
         uses: ./.github/actions/setup

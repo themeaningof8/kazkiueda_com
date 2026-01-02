@@ -43,7 +43,9 @@
       "!**/*.config.js",
       "!**/*.config.ts",
       "!**/*.config.mjs",
-      "!**/bun.lock"
+      "!**/bun.lock",
+      "!**/playwright-report",
+      "!**/test-results"
     ]
   }
 }
