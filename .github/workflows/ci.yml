@@ -31,7 +31,7 @@ jobs:
 
   integration:
     name: Integration Tests
-    needs: unit
+    needs: static
     strategy:
       fail-fast: false
       matrix:
@@ -52,7 +52,7 @@ jobs:
 
   e2e-essential:
     name: E2E Essential
-    needs: integration
+    needs: [unit, integration]
     uses: ./.github/workflows/reusable-tests.yml
     secrets: inherit
     with:

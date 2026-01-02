@@ -28,7 +28,7 @@ runs:
         path: |
           ~/.bun/install/cache
           node_modules
-        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
         restore-keys: |
           ${{ runner.os }}-bun-
 
@@ -41,7 +41,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lock') }}
+        key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lockb') }}
         restore-keys: |
           ${{ runner.os }}-playwright-
 
