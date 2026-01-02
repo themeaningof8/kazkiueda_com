@@ -185,7 +185,7 @@ jobs:
 
       # パフォーマンステスト実行
       - name: Run performance tests
-        run: bunx dotenvx run -f projects/.env.test -- vitest run src/__tests__/performance/
+        run: bunx dotenvx run -f projects/.env.development -- vitest run src/__tests__/performance/
         env:
           DATABASE_URL: postgresql://test:test@localhost:5433/kazkiueda_test
           PAYLOAD_SECRET: test-secret-key

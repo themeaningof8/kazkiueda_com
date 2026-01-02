@@ -9,7 +9,9 @@
 ### テスト/CI用
 | Secret名 | 用途 |
 |----------|------|
-| `DOTENV_PRIVATE_KEY_DEVELOPMENT` | `projects/.env.test` を復号（static/unit/integration/e2eで使用） |
+| `DOTENV_PRIVATE_KEY_DEVELOPMENT` | `projects/.env.development` を復号（static/unit/integration/e2eで使用） |
+
+**注意**: CI環境では`DATABASE_URL`はワークフロー内で直接設定されます（`postgresql://test:test@localhost:5433/kazkiueda_test`）。
 
 ### ステージング
 | Secret名 | 用途 |
@@ -46,57 +48,26 @@
 
 ### 2. テスト環境用Secretsの設定
 
-以下のSecretsを順番に追加します：
-
-#### `TEST_DATABASE_URL`
+#### `DOTENV_PRIVATE_KEY_DEVELOPMENT`
 
 ```
-Name: TEST_DATABASE_URL
-Secret: postgresql://test:test@localhost:5433/kazkiueda_test
+Name: DOTENV_PRIVATE_KEY_DEVELOPMENT
+Secret: [dotenvx encrypt で生成されたキー]
 ```
 
-**説明**: CI環境で起動するDocker PostgreSQLの接続文字列です。この値は固定で問題ありません。
+**説明**: `projects/.env.development`を復号するための秘密鍵です。
 
----
-
-#### `TEST_PAYLOAD_SECRET`
-
-```
-Name: TEST_PAYLOAD_SECRET
-Secret: a123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
-```
-
-**説明**: Payload CMSの暗号化キー。最低32文字必要です。
-
-**生成方法**:
+**取得方法**:
 ```bash
-# ランダムな128文字の文字列を生成
-openssl rand -base64 96 | tr -d '\n'
+# ローカルで暗号化されたenvファイルの秘密鍵を確認
+cat .env.keys
 ```
 
-または、現在の`.env.test`の値をそのまま使用:
-```
-a123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
-```
+`.env.keys`ファイルの`DOTENV_PRIVATE_KEY_DEVELOPMENT`の値をコピーしてGitHub Secretsに追加してください。
 
----
-
-#### `TEST_PAYLOAD_PREVIEW_SECRET`
-
-```
-Name: TEST_PAYLOAD_PREVIEW_SECRET
-Secret: test-preview-secret-123456789012345678901234567890
-```
-
-**説明**: プレビュー機能のシークレット。
-
-**生成方法**:
-```bash
-# ランダムな32文字の文字列を生成
-openssl rand -base64 24 | tr -d '\n'
-```
-
-または、現在の`.env.test`の値をそのまま使用:
+**注意**:
+- CI環境では`DATABASE_URL`はワークフロー内で自動的に設定されます（`postgresql://test:test@localhost:5433/kazkiueda_test`）
+- `PAYLOAD_SECRET`や`PAYLOAD_PREVIEW_SECRET`などのその他の環境変数は、暗号化された`projects/.env.development`に含まれています
 ```
 test-preview-secret-123456789012345678901234567890
 ```
@@ -213,8 +184,8 @@ Secret: [S3エンドポイント]
 ---
 
 ## ✅ 最小限セット
-- CI/テスト: `DOTENV_PRIVATE_KEY_DEVELOPMENT`（.env.test にDB/シークレットを格納済み想定）
-- Stagingデプロイ: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+- CI/テスト: `DOTENV_PRIVATE_KEY_DEVELOPMENT`（`projects/.env.development`を復号、`DATABASE_URL`はワークフローで自動設定）
+- Stagingデプロイ: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `DOTENV_PRIVATE_KEY_DEVELOPMENT`
 - 本番デプロイ: `DOTENV_PRIVATE_KEY_PRODUCTION`, `VERCEL_*`, `NEXT_PUBLIC_SERVER_URL`（+必要ならS3）
 
 ---
@@ -241,17 +212,19 @@ Secret: [S3エンドポイント]
 
 ### よくあるエラー
 
-#### エラー: `DATABASE_URL is not defined`
+#### エラー: `DATABASE_URL does not look like a test database`
 
-**原因**: `TEST_DATABASE_URL` Secretが設定されていない
+**原因**: CI環境で使用される`DATABASE_URL`が正しく設定されていない、または`.env.development`に本番用のデータベースURLが含まれている
 
-**解決策**: 上記の手順に従って`TEST_DATABASE_URL`を追加
+**解決策**:
+- ワークフロー内で`DATABASE_URL`が`postgresql://test:test@localhost:5433/kazkiueda_test`に設定されていることを確認
+- `projects/.env.development`に本番用のDATABASE_URLが含まれていないことを確認
 
 #### エラー: `PAYLOAD_SECRET must be at least 32 characters`
 
-**原因**: `TEST_PAYLOAD_SECRET`が短すぎる
+**原因**: `DOTENV_PRIVATE_KEY_DEVELOPMENT`が正しく設定されていないか、`.env.development`に`PAYLOAD_SECRET`が含まれていない
 
-**解決策**: 最低32文字（推奨128文字）の文字列を設定
+**解決策**: `projects/.env.development`に最低32文字の`PAYLOAD_SECRET`が含まれていることを確認
 
 #### エラー: `Docker Compose failed to start`
 
@@ -273,15 +246,14 @@ Secret: [S3エンドポイント]
 現在のワークフローでは、以下のように使用されています：
 
 ```yaml
-# ci.yml の例
+# reusable-tests.yml の例
 jobs:
-  unit-tests:
-    steps:
-      - name: Run unit tests
-        run: bun run test:coverage:unit
-        env:
-          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}  # ← GitHub Secretsから取得
-          PAYLOAD_SECRET: ${{ secrets.TEST_PAYLOAD_SECRET }}
+  test:
+    env:
+      NODE_ENV: test
+      DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+      # DATABASE_URLは直接設定（dotenvxの値を上書き）
+      DATABASE_URL: postgresql://test:test@localhost:5433/kazkiueda_test
 ```
 
 ---
@@ -337,17 +309,17 @@ DATABASE_URL: postgresql://test:***@localhost:5433/kazkiueda_test
 
 ## 📝 チェックリスト
 
-### E2Eテスト実行に必要な設定
+### テスト/CI実行に必要な設定
 
-- [ ] `TEST_DATABASE_URL` を追加
-- [ ] `TEST_PAYLOAD_SECRET` を追加（最低32文字）
-- [ ] `TEST_PAYLOAD_PREVIEW_SECRET` を追加
+- [ ] `DOTENV_PRIVATE_KEY_DEVELOPMENT` を追加
+- [ ] `projects/.env.development`に必要な環境変数（`PAYLOAD_SECRET`, `PAYLOAD_PREVIEW_SECRET`等）が含まれていることを確認
 - [ ] GitHub Actions タブで手動実行してテスト
 - [ ] CI Pipeline が成功することを確認
 
 ### PR Preview機能を使う場合（追加）
 
-- [ ] `PREVIEW_DATABASE_URL` を追加（Supabase/Neon等）
+- [ ] `DOTENV_PRIVATE_KEY_DEVELOPMENT` を追加（すでに追加済みの場合はスキップ）
+- [ ] `PREVIEW_DATABASE_URL` Secret を追加（Supabase/Neon等）
 - [ ] `PREVIEW_PAYLOAD_SECRET` を追加
 - [ ] `PREVIEW_PAYLOAD_PREVIEW_SECRET` を追加
 - [ ] `VERCEL_TOKEN` を追加
@@ -379,7 +351,7 @@ DATABASE_URL: postgresql://test:***@localhost:5433/kazkiueda_test
 
 最小限の設定（E2Eテストのみ）であれば、**3つのSecrets**だけで開始できます：
 
-1. `TEST_DATABASE_URL`
+1. `DOTENV_PRIVATE_KEY_DEVELOPMENT`
 2. `TEST_PAYLOAD_SECRET`
 3. `TEST_PAYLOAD_PREVIEW_SECRET`
 

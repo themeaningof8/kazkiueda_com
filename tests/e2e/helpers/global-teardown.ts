@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { config } from "dotenv";
 
 // テスト環境変数を読み込み（他のインポート前に実行）
-config({ path: join(process.cwd(), "projects/.env.test") });
+config({ path: join(process.cwd(), "projects/.env.development") });
 
 async function globalTeardown() {
   // 環境変数読み込み後にPayload関連をインポート

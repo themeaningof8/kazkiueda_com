@@ -57,7 +57,6 @@ yarn-error.log*
 !projects/.env
 !projects/.env.development
 !projects/.env.production
-!projects/.env.test
 !projects/.env.example
 # dotenvx keys (never commit these!)
 .env.keys

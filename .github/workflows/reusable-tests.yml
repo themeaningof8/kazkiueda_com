@@ -41,6 +41,8 @@ jobs:
       NODE_ENV: test
       DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
       DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
+      # Override DATABASE_URL for CI test environment
+      DATABASE_URL: postgresql://test:test@localhost:5433/kazkiueda_test
     steps:
       - name: Checkout
         uses: actions/checkout@v4

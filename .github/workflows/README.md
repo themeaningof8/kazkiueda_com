@@ -37,10 +37,10 @@ Testing Trophyに沿ったCI/CDと環境ゲートの概要です。
 - ci-fast.yml, e2e.yml, e2e-full.yml, deploy.yml, deploy-fast.yml
 
 ## Secrets / 環境変数の入口
-- dotenvxを統一利用。CIでは `DOTENV_PRIVATE_KEY_DEVELOPMENT` / `DOTENV_PRIVATE_KEY_PRODUCTION` を渡す。  
+- dotenvxを統一利用。CIでは `DOTENV_PRIVATE_KEY_DEVELOPMENT` / `DOTENV_PRIVATE_KEY_PRODUCTION` を渡す。
 - Vercel: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
 - 本番: `DOTENV_PRIVATE_KEY_PRODUCTION`, `NEXT_PUBLIC_SERVER_URL`, S3関連
-- テスト: `DOTENV_PRIVATE_KEY_DEVELOPMENT`（envファイルは `projects/.env.test`）
+- テスト: `DOTENV_PRIVATE_KEY_DEVELOPMENT`（envファイルは `projects/.env.development`）、`DATABASE_URL`はCIで直接設定
 
 ## パイプラインの流れ
 - PR/main: テスト（static/unit/integration/e2e-essential）→ mainのみ stagingデプロイ → staging smoke

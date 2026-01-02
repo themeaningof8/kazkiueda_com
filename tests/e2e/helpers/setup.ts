@@ -4,7 +4,7 @@ import { config as dotenvConfig } from "dotenv";
 import { chromium } from "playwright";
 
 // 環境変数ファイルの読み込み
-const envTestPath = join(process.cwd(), "projects/.env.test");
+const envTestPath = join(process.cwd(), "projects/.env.development");
 if (existsSync(envTestPath)) {
   dotenvConfig({ path: envTestPath });
 }

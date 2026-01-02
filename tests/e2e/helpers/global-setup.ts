@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { config } from "dotenv";
 
 // テスト環境変数を読み込み（他のインポート前に実行）
-const envTestPath = join(process.cwd(), "projects/.env.test");
+const envTestPath = join(process.cwd(), "projects/.env.development");
 
 config({ path: envTestPath });
 

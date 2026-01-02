@@ -19,7 +19,7 @@ echo "Invoking next dev via dotenvx..."
 cd "$(dirname "$0")/../../"
 
 # Run next dev
-bunx dotenvx run -f projects/.env.test -- npx next dev --port 3001 > /tmp/next-server.log 2>&1 &
+bunx dotenvx run -f projects/.env.development -- npx next dev --port 3001 > /tmp/next-server.log 2>&1 &
 SERVER_PID=$!
 echo "Server PID: $SERVER_PID"
 
