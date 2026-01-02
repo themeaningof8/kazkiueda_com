@@ -1,4 +1,4 @@
-import type { Payload } from "payload";
+import type { CollectionSlug, Payload } from "payload";
 import { expect } from "vitest";
 import type { User } from "@/payload-types";
 import { createTestUser } from "./factories";
@@ -34,8 +34,8 @@ export async function createRegularUser(payload: Payload): Promise<User> {
  */
 export async function findAsUnauthenticated<_T>(
   payload: Payload,
-  collection: string,
-  options: any = {},
+  collection: CollectionSlug,
+  options: Record<string, unknown> = {},
 ) {
   return await payload.find({
     collection,
@@ -51,8 +51,8 @@ export async function findAsUnauthenticated<_T>(
 export async function findAsUser<_T>(
   payload: Payload,
   user: User,
-  collection: string,
-  options: any = {},
+  collection: CollectionSlug,
+  options: Record<string, unknown> = {},
 ) {
   return await payload.find({
     collection,
@@ -66,6 +66,6 @@ export async function findAsUser<_T>(
 /**
  * アクセス制御違反が発生することを検証するヘルパー
  */
-export async function expectAccessDenied(promise: Promise<any>) {
+export async function expectAccessDenied(promise: Promise<unknown>) {
   await expect(promise).rejects.toThrow();
 }

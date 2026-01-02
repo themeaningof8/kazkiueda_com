@@ -43,11 +43,11 @@ export async function createTestPost(
   overrides?: Partial<{
     title: string;
     slug: string | null;
-    content: any;
+    content?: unknown;
     status: "draft" | "published";
     publishedDate?: string;
     excerpt?: string;
-    tags?: any[];
+    tags?: { tag: string }[];
   }>,
 ): Promise<Post> {
   const post = await payload.create({
@@ -59,7 +59,8 @@ export async function createTestPost(
           ? null
           : (overrides?.slug ?? `post-${faker.string.alphanumeric(12).toLowerCase()}`),
       author: authorId,
-      content: overrides?.content ?? makeLexicalContent(faker.lorem.paragraph()),
+      content: (overrides?.content ??
+        makeLexicalContent(faker.lorem.paragraph())) as Post["content"],
       tags: overrides?.tags ?? [{ tag: "test" }],
       _status: overrides?.status ?? "published",
       ...(overrides?.publishedDate && { publishedDate: overrides.publishedDate }),
@@ -87,7 +88,7 @@ export async function createBulkTestPosts(
     status: "draft" | "published";
     publishedDate?: string;
     excerpt?: string;
-    tags?: any[];
+    tags?: { tag: string }[];
   }>,
 ): Promise<Post[]> {
   const BATCH_SIZE = 50; // Payload CMSのパフォーマンスを考慮したバッチサイズ
@@ -131,7 +132,7 @@ export async function createTestMedia(
     alt: string;
     filename: string;
   }>,
-): Promise<any> {
+): Promise<unknown> {
   // Media型が未定義のためanyを使用
   // TODO: Mediaコレクションの実装後に型を定義
   // 現在は未使用のため、基本実装のみ

@@ -11,7 +11,11 @@ export async function getTestPayload(testKey = "default"): Promise<Payload> {
     payloadInstances.set(testKey, await getPayload({ config }));
   }
 
-  return payloadInstances.get(testKey)!;
+  const instance = payloadInstances.get(testKey);
+  if (!instance) {
+    throw new Error(`Payload instance for key "${testKey}" not found`);
+  }
+  return instance;
 }
 
 export async function destroyTestPayload(testKey = "default") {

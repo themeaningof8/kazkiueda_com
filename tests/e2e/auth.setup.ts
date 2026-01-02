@@ -1,6 +1,6 @@
-import { expect, test as setup } from "@playwright/test";
-import { existsSync, mkdirSync } from "fs";
-import { dirname } from "path";
+import { existsSync, mkdirSync } from "node:fs";
+import { dirname } from "node:path";
+import { test as setup } from "@playwright/test";
 
 const authFile = "tests/e2e/.auth/admin.json";
 

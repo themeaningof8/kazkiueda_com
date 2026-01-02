@@ -1,6 +1,6 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { config as dotenvConfig } from "dotenv";
-import { existsSync } from "fs";
-import { join } from "path";
 import { chromium } from "playwright";
 
 // 環境変数ファイルの読み込み

@@ -89,14 +89,14 @@ export async function truncateAllTables(pool: Pool) {
 
       await client.query("COMMIT");
       return;
-    } catch (err: any) {
+    } catch (err: unknown) {
       try {
         await client.query("ROLLBACK");
       } catch {
         // ignore
       }
 
-      const code = err?.code as string | undefined;
+      const code = (err as { code?: string })?.code;
       const retryable =
         code === "40P01" || // deadlock_detected
         code === "55P03" || // lock_not_available
