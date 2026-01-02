@@ -60,7 +60,7 @@ jobs:
         env:
           DOTENV_PRIVATE_KEY: ${{ secrets[inputs.dotenv-key-name] }}
         run: |
-          dotenvx run -f "${{ inputs.env-file }}" -- bun run test:coverage:unit
+          bunx dotenvx run -f "${{ inputs.env-file }}" -- bun run test:coverage:unit
 
       # ---------- Integration ----------
       - name: Start test database
@@ -91,7 +91,7 @@ jobs:
         env:
           DOTENV_PRIVATE_KEY: ${{ secrets[inputs.dotenv-key-name] }}
         run: |
-          dotenvx run -f "${{ inputs.env-file }}" -- bunx next dev --port 3001 > /tmp/next-dev.log 2>&1 &
+          bunx dotenvx run -f "${{ inputs.env-file }}" -- bunx next dev --port 3001 > /tmp/next-dev.log 2>&1 &
           bunx wait-on http://localhost:3001 -t 60000
 
       - name: Run E2E tests
