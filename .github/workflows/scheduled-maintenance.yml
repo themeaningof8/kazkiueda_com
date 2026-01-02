@@ -120,7 +120,6 @@ jobs:
         run: bun run test:migrate
         env:
           DATABASE_URL: postgresql://test:test@localhost:5433/kazkiueda_test
-          PAYLOAD_SECRET: test-secret-key
           NODE_ENV: test
 
       # 全テストのカバレッジを収集
@@ -128,8 +127,6 @@ jobs:
         run: bun run test:coverage:all
         env:
           DATABASE_URL: postgresql://test:test@localhost:5433/kazkiueda_test
-          PAYLOAD_SECRET: test-secret-key
-          PAYLOAD_PREVIEW_SECRET: test-preview-secret
           NODE_ENV: test
 
       - name: Cleanup
@@ -180,7 +177,6 @@ jobs:
         run: bun run test:migrate
         env:
           DATABASE_URL: postgresql://test:test@localhost:5433/kazkiueda_test
-          PAYLOAD_SECRET: test-secret-key
           NODE_ENV: test
 
       # パフォーマンステスト実行
@@ -188,8 +184,6 @@ jobs:
         run: bunx dotenvx run -f projects/.env.development -- vitest run src/__tests__/performance/
         env:
           DATABASE_URL: postgresql://test:test@localhost:5433/kazkiueda_test
-          PAYLOAD_SECRET: test-secret-key
-          PAYLOAD_PREVIEW_SECRET: test-preview-secret
           NODE_ENV: test
 
       - name: Cleanup

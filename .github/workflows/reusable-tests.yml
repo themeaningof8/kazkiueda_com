@@ -41,7 +41,7 @@ jobs:
       NODE_ENV: test
       DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
       DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
-      # Override DATABASE_URL for CI test environment
+      # Override DATABASE_URL for CI test environment (docker-compose.test.yml)
       DATABASE_URL: postgresql://test:test@localhost:5433/kazkiueda_test
     steps:
       - name: Checkout
@@ -99,7 +99,7 @@ jobs:
       - name: Start Next.js server
         if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
         run: |
-          bunx dotenvx run -f projects/.env.development -- bun next dev --port 3001 > /tmp/next-dev.log 2>&1 &
+          bun next dev --port 3001 > /tmp/next-dev.log 2>&1 &
           bunx wait-on http://localhost:3001 -t 60000
 
       - name: Run E2E tests
@@ -108,11 +108,11 @@ jobs:
           CI: true
         run: |
           if [ "${{ inputs.e2e-file }}" != "" ]; then
-            bunx dotenvx run -f projects/.env.development -- bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
+            bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
           elif [ "${{ inputs.suite }}" = "e2e-essential" ]; then
-            bunx dotenvx run -f projects/.env.development -- bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github
+            bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github
           else
-            bunx dotenvx run -f projects/.env.development -- bunx playwright test tests/e2e --reporter=github
+            bunx playwright test tests/e2e --reporter=github
           fi
 
       - name: Upload Playwright report

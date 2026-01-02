@@ -4,9 +4,12 @@ import { config as dotenvConfig } from "dotenv";
 import { chromium } from "playwright";
 
 // 環境変数ファイルの読み込み
-const envTestPath = join(process.cwd(), "projects/.env.development");
-if (existsSync(envTestPath)) {
-  dotenvConfig({ path: envTestPath });
+// CI環境では既に環境変数が設定されているため、ローカル環境のみdotenvを使用
+if (!process.env.CI) {
+  const envTestPath = join(process.cwd(), "projects/.env.development");
+  if (existsSync(envTestPath)) {
+    dotenvConfig({ path: envTestPath });
+  }
 }
 
 async function setupAuthentication() {

@@ -40,7 +40,10 @@ Testing Trophyに沿ったCI/CDと環境ゲートの概要です。
 - dotenvxを統一利用。CIでは `DOTENV_PRIVATE_KEY_DEVELOPMENT` / `DOTENV_PRIVATE_KEY_PRODUCTION` を渡す。
 - Vercel: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
 - 本番: `DOTENV_PRIVATE_KEY_PRODUCTION`, `NEXT_PUBLIC_SERVER_URL`, S3関連
-- テスト: `DOTENV_PRIVATE_KEY_DEVELOPMENT`（envファイルは `projects/.env.development`）、`DATABASE_URL`はCIで直接設定
+- テスト:
+  - `DOTENV_PRIVATE_KEY_DEVELOPMENT` で暗号化された `projects/.env.development` を復号
+  - `.env.development` には `PAYLOAD_SECRET`、`PAYLOAD_PREVIEW_SECRET` などが含まれる
+  - `DATABASE_URL` のみCIワークフローで直接オーバーライド（`postgresql://test:test@localhost:5433/kazkiueda_test`）
 
 ## パイプラインの流れ
 - PR/main: テスト（static/unit/integration/e2e-essential）→ mainのみ stagingデプロイ → staging smoke
