@@ -40,12 +40,11 @@ Stage 5: Build Test (10分)
   ├─ 本番ビルド実行
   └─ バンドルサイズ分析
 
-Stage 6: E2E Tests (20分・並列実行)
-  ├─ blog
-  ├─ post-detail
-  ├─ accessibility
-  ├─ preview
-  └─ error-handling
+Stage 6: E2E Tests (10分・並列実行)
+  ├─ smoke-production (5テスト)
+  ├─ accessibility-essential (2テスト)
+  ├─ preview-essential (4テスト)
+  └─ error-essential (2テスト)
 
 Final: CI Success Check
   └─ 全ジョブの成功確認
@@ -57,16 +56,26 @@ Final: CI Success Check
 - **キャッシング**: 依存関係、Playwrightブラウザ、ビルド成果物をキャッシュ
 - **カバレッジレポート**: Codecovへ自動アップロード
 - **fail-fast無効**: 一部のテストが失敗しても全テストを実行
+- **concurrency制御**: PRの再pushで古い実行を自動キャンセル
+- **Testing Trophy準拠**: E2Eテストを13テストに削減（44→13）、削除分はIntegrationテストへ移行
 
-### 2. `e2e.yml` - E2Eテスト（既存）
+### 2. `ci-fast.yml` - 高速CIパイプライン（手動実行専用）
 
-**トリガー**: PR作成時、mainブランチへのpush
+**トリガー**: 手動実行のみ（`workflow_dispatch`）
 
-Playwrightを使用したE2Eテストのみを実行します。
+手動で速く確認したい時に使用する、軽量版のCIパイプラインです。
 
-**Note**: `ci.yml`が導入されたため、このワークフローは統合される予定です。
+**Note**: PRでは実行されません。通常のCIは `ci.yml` を使用してください。
 
-### 3. `deploy.yml` - 本番デプロイメント
+### 3. `e2e.yml` - フルE2Eテスト（手動実行専用）
+
+**トリガー**: 手動実行のみ（`workflow_dispatch`）
+
+全てのE2Eテストを実行したい時に使用します。
+
+**Note**: PRでは実行されません。通常のE2Eテストは `ci.yml` に統合済みです。
+
+### 4. `deploy.yml` - 本番デプロイメント
 
 **トリガー**: mainブランチへのpush、手動トリガー
 
@@ -107,7 +116,7 @@ concurrency:
   cancel-in-progress: false
 ```
 
-### 4. `pr-preview.yml` - PRプレビューデプロイ
+### 5. `pr-preview.yml` - PRプレビューデプロイ
 
 **トリガー**: PR作成、更新、再オープン
 
@@ -136,7 +145,7 @@ concurrency:
   cancel-in-progress: true
 ```
 
-### 5. `scheduled-maintenance.yml` - 定期メンテナンス
+### 6. `scheduled-maintenance.yml` - 定期メンテナンス
 
 **トリガー**: 毎週月曜日 9:00 JST、手動トリガー
 
@@ -291,10 +300,10 @@ Slack通知を有効にする場合:
 
 | ワークフロー | 目標時間 | 現在の設定 |
 |------------|---------|-----------|
-| CI (全体) | 30-40分 | 40分 |
+| CI (全体) | 30-40分 | 30-35分 |
 | Unit Tests | 5分以内 | 5分 |
 | Integration | 15分以内 | 15分（並列） |
-| E2E | 20分以内 | 20分（並列） |
+| E2E | 10分以内 | 10分（並列、13テスト） |
 | Deploy | 15分以内 | 15分 |
 | PR Preview | 10分以内 | 10分 |
 

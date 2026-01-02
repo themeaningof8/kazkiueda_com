@@ -113,7 +113,7 @@ describe("ArticleContent", () => {
   });
 
   test("contentがnullの場合、RichTextRendererが表示されない", () => {
-    const post = createMockPost({ content: null });
+    const post = createMockPost({ content: null as unknown as Post["content"] });
     render(<ArticleContent post={post} />);
     expect(screen.queryByTestId("rich-text")).not.toBeInTheDocument();
   });

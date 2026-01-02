@@ -1,9 +1,8 @@
 name: CI Pipeline (Fast)
 
+# 手動実行専用（PRでは実行されない）
 on:
-  pull_request:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 env:
   NODE_ENV: test

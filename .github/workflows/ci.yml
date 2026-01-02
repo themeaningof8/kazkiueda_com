@@ -5,6 +5,11 @@ on:
   push:
     branches: [main]
 
+# PRの再pushで古い実行をキャンセル
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 # 並列ジョブ間での環境変数の共有
 env:
   NODE_ENV: test
@@ -266,16 +271,14 @@ jobs:
       fail-fast: false
       matrix:
         suite:
-          - name: blog
-            file: tests/e2e/blog-list.spec.ts
-          - name: post-detail
-            file: tests/e2e/post-detail.spec.ts
-          - name: accessibility
-            file: tests/e2e/accessibility.spec.ts
-          - name: preview
-            file: tests/e2e/preview.spec.ts
-          - name: error-handling
-            file: tests/e2e/error-handling.spec.ts
+          - name: smoke
+            file: tests/e2e/smoke-production.spec.ts
+          - name: accessibility-essential
+            file: tests/e2e/accessibility-essential.spec.ts
+          - name: preview-essential
+            file: tests/e2e/preview-essential.spec.ts
+          - name: error-essential
+            file: tests/e2e/error-essential.spec.ts
 
     steps:
       - uses: actions/checkout@v4

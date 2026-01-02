@@ -1,5 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
+import { findAsUnauthenticated, findAsUser } from "@/test/helpers/auth";
 import { createTestPost, createTestUser } from "@/test/helpers/factories";
 import { makeLexicalContent } from "@/test/helpers/lexical";
 import { destroyTestPayload, getTestPayload } from "@/test/payload";
@@ -42,7 +43,7 @@ describe("collections/Posts.ts Integration Tests", () => {
 
       // Then: 公開記事のみ返される
       expect(result.docs).toHaveLength(1);
-      expect((result.docs[0] as Record<string, unknown>)._status).toBe("published");
+      expect((result.docs[0] as unknown as Record<string, unknown>)._status).toBe("published");
     });
 
     test("2. ログインユーザーは全記事を読める（drafts含む）", async () => {
@@ -64,7 +65,7 @@ describe("collections/Posts.ts Integration Tests", () => {
 
       // Then: 全記事が返される
       expect(result.docs).toHaveLength(2);
-      const statuses = result.docs.map((doc: Record<string, unknown>) => doc.status);
+      const statuses = result.docs.map((doc) => (doc as unknown as Record<string, unknown>).status);
       expect(statuses).toContain("published");
       expect(statuses).toContain("draft");
     });
@@ -327,6 +328,7 @@ describe("collections/Posts.ts Integration Tests", () => {
             content: makeLexicalContent("Test content"),
             author: user.id,
           } as Record<string, unknown>,
+          draft: true,
           user,
           overrideAccess: false,
         }),
@@ -441,6 +443,7 @@ describe("collections/Posts.ts Integration Tests", () => {
             content: makeLexicalContent("Test content"),
             author: user.id,
           } as Record<string, unknown>,
+          draft: true,
           user,
           overrideAccess: false,
         }),
@@ -459,6 +462,7 @@ describe("collections/Posts.ts Integration Tests", () => {
             title: "Test Post",
             author: user.id,
           } as Record<string, unknown>,
+          draft: true,
           user,
           overrideAccess: false,
         }),

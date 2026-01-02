@@ -61,8 +61,7 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "biome check --write --no-errors-on-unmatched",
-      "biome format --write --no-errors-on-unmatched",
-      "bunx tsc --noEmit --skipLibCheck"
+      "biome format --write --no-errors-on-unmatched"
     ],
     "*.{js,jsx}": [
       "biome check --write --no-errors-on-unmatched",

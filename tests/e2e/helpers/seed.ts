@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { Payload } from "payload";
+import type { Post, User } from "@/payload-types";
+import type { E2ETestData } from "./test-data";
 
 type SeedData = {
   version: string;
@@ -12,7 +14,7 @@ type SeedData = {
   posts: Array<{
     title: string;
     slug: string;
-    content: any;
+    content: Post["content"];
     status: "published" | "draft";
     tags: Array<{ tag: string }>;
   }>;
@@ -57,7 +59,7 @@ export async function cleanDatabase(
   }
 }
 
-export async function seedDatabase(payload: Payload) {
+export async function seedDatabase(payload: Payload): Promise<E2ETestData> {
   const seedDataJson = await getSeedData();
 
   // 既存のユーザーをチェック（認証状態を維持するため）
@@ -67,14 +69,14 @@ export async function seedDatabase(payload: Payload) {
     limit: 1,
   });
 
-  let adminUser;
+  let adminUser: User;
   if (existingUser.docs.length > 0) {
-    adminUser = existingUser.docs[0];
+    adminUser = existingUser.docs[0] as User;
   } else {
-    adminUser = await payload.create({
+    adminUser = (await payload.create({
       collection: "users",
       data: seedDataJson.users[0],
-    });
+    })) as User;
   }
 
   // 投稿を作成（statusを_statusに変換）
@@ -91,25 +93,29 @@ export async function seedDatabase(payload: Payload) {
     ),
   );
 
+  const draftPost = posts.find((p) => p._status === "draft");
+  if (!draftPost) {
+    throw new Error("Draft post not found in seed data");
+  }
+
   return {
     version: seedDataJson.version,
     adminUser: {
-      id: adminUser.id,
+      id: typeof adminUser.id === "number" ? adminUser.id : Number(adminUser.id),
       email: adminUser.email,
       password: seedDataJson.users[0].password, // シードデータからパスワードを取得
     },
-    posts,
     // E2ETestData形式で返す
     publishedPosts: posts
       .filter((p) => p._status === "published")
       .map((p) => ({
-        id: p.id,
+        id: typeof p.id === "number" ? p.id : Number(p.id),
         slug: p.slug || "",
         title: p.title,
       })),
     draftPost: {
-      id: posts.find((p) => p._status === "draft")?.id || 0,
-      slug: posts.find((p) => p._status === "draft")?.slug || "",
+      id: typeof draftPost.id === "number" ? draftPost.id : Number(draftPost.id),
+      slug: draftPost.slug || "",
     },
   };
 }

@@ -234,7 +234,7 @@ describe("safe-action.ts Integration Tests", () => {
       expect(callArgs[0]).toHaveProperty("err");
       const err = (callArgs[0] as Record<string, unknown>).err;
       expect(err).toBeInstanceOf(Error);
-      expect(err.message).toBe("Generic error");
+      expect((err as Error).message).toBe("Generic error");
     });
   });
 

@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import { test as base, type TestInfo } from "@playwright/test";
 import type { Payload } from "payload";
 import { chromium } from "playwright";
+import type { Post, User } from "@/payload-types";
 import {
   createBulkTestPosts,
   createTestPost,
@@ -17,7 +18,7 @@ type TestFixtures = {
 };
 
 export const test = base.extend<TestFixtures>({
-  payload: async ({}, use) => {
+  payload: async (_fixtures, use) => {
     const payload = await getTestPayload("e2e-fixture");
     await use(payload);
     await payload.destroy();
@@ -28,7 +29,7 @@ export const test = base.extend<TestFixtures>({
 
     try {
       // 既存の管理者ユーザーを検索、なければ作成
-      let adminUser;
+      let adminUser: User;
       try {
         const existingUsers = await payload.find({
           collection: "users",
@@ -59,7 +60,7 @@ export const test = base.extend<TestFixtures>({
         limit: 20,
       });
 
-      let posts;
+      let posts: Post[];
       if (existingPosts.docs.length >= 10) {
         // 既存の記事を使用
         posts = existingPosts.docs.slice(0, 10);
@@ -80,7 +81,7 @@ export const test = base.extend<TestFixtures>({
       }
 
       // 下書き記事を確認
-      let draftPost;
+      let draftPost: Post;
       try {
         const existingDraft = await payload.find({
           collection: "posts",
@@ -112,12 +113,12 @@ export const test = base.extend<TestFixtures>({
           password: "test-password",
         },
         publishedPosts: posts.map((p) => ({
-          id: p.id,
+          id: typeof p.id === "number" ? p.id : Number(p.id),
           slug: p.slug || "",
           title: p.title,
         })),
         draftPost: {
-          id: draftPost.id,
+          id: typeof draftPost.id === "number" ? draftPost.id : Number(draftPost.id),
           slug: draftPost.slug || "",
         },
       };
