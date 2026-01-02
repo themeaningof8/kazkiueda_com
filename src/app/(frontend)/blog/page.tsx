@@ -113,15 +113,14 @@ async function BlogContent({
         </div>
       ) : (
         <>
-          <div
+          <main
             className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-            role="main"
             aria-labelledby="blog-description"
           >
             {posts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
-          </div>
+          </main>
 
           {totalPages > 1 && (
             <Pagination className="mt-12">

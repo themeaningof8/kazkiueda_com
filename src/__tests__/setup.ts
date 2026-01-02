@@ -4,7 +4,7 @@ import { vi } from "vitest";
 
 // Next.js Image のモック（fillプロパティを除外、SSR不要のため通常のimgタグに変換）
 vi.mock("next/image", () => ({
-  default: ({ fill, ...props }: any) => {
+  default: ({ fill, ...props }: React.ComponentPropsWithoutRef<"img"> & { fill?: boolean }) => {
     // fillプロパティはimgタグには存在しないため除外
     return React.createElement("img", props);
   },
@@ -12,7 +12,11 @@ vi.mock("next/image", () => ({
 
 // Next.js Link のモック（通常のaタグに変換）
 vi.mock("next/link", () => ({
-  default: ({ children, href, ...props }: any) => {
+  default: ({
+    children,
+    href,
+    ...props
+  }: React.ComponentPropsWithoutRef<"a"> & { href: string }) => {
     return React.createElement("a", { href, ...props }, children);
   },
 }));

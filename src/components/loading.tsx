@@ -35,6 +35,7 @@ export function LoadingTimeout({ onRetry }: { onRetry?: () => void }) {
       <p className="text-sm text-muted-foreground mb-4">ネットワーク接続を確認してください</p>
       {onRetry && (
         <button
+          type="button"
           onClick={onRetry}
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
         >

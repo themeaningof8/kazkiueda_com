@@ -68,7 +68,7 @@ describe("PostCard", () => {
         alt: "Test image",
         updatedAt: "2024-01-01T00:00:00Z",
         createdAt: "2024-01-01T00:00:00Z",
-      } as any,
+      } as Post["featuredImage"],
     });
     render(<PostCard post={post} />);
     const image = screen.getByRole("img");
@@ -85,7 +85,7 @@ describe("PostCard", () => {
         alt: null,
         updatedAt: "2024-01-01T00:00:00Z",
         createdAt: "2024-01-01T00:00:00Z",
-      } as any,
+      } as Post["featuredImage"],
     });
     render(<PostCard post={post} />);
     // ImageIconはSVGなので、画像として検出されない
@@ -110,7 +110,7 @@ describe("PostCard", () => {
 
   test("タグがstring[]形式の場合、正しく表示される", () => {
     const post = createMockPost({
-      tags: ["React", "TypeScript"] as any,
+      tags: ["React", "TypeScript"] as unknown as Post["tags"],
     });
     render(<PostCard post={post} />);
     expect(screen.getByText("React")).toBeInTheDocument();
