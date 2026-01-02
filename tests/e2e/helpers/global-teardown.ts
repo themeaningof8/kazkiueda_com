@@ -5,6 +5,8 @@ import { config } from "dotenv";
 // テスト環境変数を読み込み（他のインポート前に実行）
 // CI環境では既に環境変数が設定されているため、ローカル環境のみdotenvを使用
 if (!process.env.CI) {
+  // .envを先に読み込み、次に.env.developmentを読み込む（後者が優先される）
+  config({ path: join(process.cwd(), "projects/.env") });
   config({ path: join(process.cwd(), "projects/.env.development") });
 }
 

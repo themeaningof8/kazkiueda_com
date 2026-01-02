@@ -42,7 +42,8 @@ Testing Trophyに沿ったCI/CDと環境ゲートの概要です。
 - 本番: `DOTENV_PRIVATE_KEY_PRODUCTION`, `NEXT_PUBLIC_SERVER_URL`, S3関連
 - テスト:
   - `DOTENV_PRIVATE_KEY_DEVELOPMENT` で暗号化された `projects/.env.development` を復号
-  - `.env.development` には `PAYLOAD_SECRET`、`PAYLOAD_PREVIEW_SECRET` などが含まれる
+  - `.env` (共通) には `PAYLOAD_PREVIEW_SECRET` が含まれる（全環境で共有）
+  - `.env.development` には `PAYLOAD_SECRET` などが含まれる
   - `DATABASE_URL` のみCIワークフローで直接オーバーライド（`postgresql://test:test@localhost:5433/kazkiueda_test`）
 
 ## パイプラインの流れ

@@ -6,9 +6,14 @@ import { chromium } from "playwright";
 // 環境変数ファイルの読み込み
 // CI環境では既に環境変数が設定されているため、ローカル環境のみdotenvを使用
 if (!process.env.CI) {
-  const envTestPath = join(process.cwd(), "projects/.env.development");
-  if (existsSync(envTestPath)) {
-    dotenvConfig({ path: envTestPath });
+  // .envを先に読み込み、次に.env.developmentを読み込む（後者が優先される）
+  const envPath = join(process.cwd(), "projects/.env");
+  const envDevPath = join(process.cwd(), "projects/.env.development");
+  if (existsSync(envPath)) {
+    dotenvConfig({ path: envPath });
+  }
+  if (existsSync(envDevPath)) {
+    dotenvConfig({ path: envDevPath });
   }
 }
 
