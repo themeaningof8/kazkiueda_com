@@ -118,7 +118,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Create Neon test branch
-        run: bunx dotenvx run -f projects/.env -f projects/.env.development -- bun scripts/neon-branch.ts create
+        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts create
 
       - name: Update DATABASE_URL to use Neon branch
         run: echo "DATABASE_URL=${{ env.NEON_DATABASE_URL }}" >> $GITHUB_ENV
@@ -132,7 +132,7 @@ jobs:
 
       - name: Cleanup Neon branch
         if: always()
-        run: bunx dotenvx run -f projects/.env -f projects/.env.development -- bun scripts/neon-branch.ts delete
+        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts delete
 
       # カバレッジレポートをアップロード
       - name: Upload coverage to Codecov
@@ -176,7 +176,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Create Neon test branch
-        run: bunx dotenvx run -f projects/.env -f projects/.env.development -- bun scripts/neon-branch.ts create
+        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts create
 
       - name: Update DATABASE_URL to use Neon branch
         run: echo "DATABASE_URL=${{ env.NEON_DATABASE_URL }}" >> $GITHUB_ENV
@@ -190,7 +190,7 @@ jobs:
 
       - name: Cleanup Neon branch
         if: always()
-        run: bunx dotenvx run -f projects/.env -f projects/.env.development -- bun scripts/neon-branch.ts delete
+        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts delete
 
   # ==========================================
   # Database health check
