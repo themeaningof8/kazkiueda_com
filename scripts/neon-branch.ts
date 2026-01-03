@@ -138,20 +138,27 @@ async function createBranch(): Promise<void> {
   }
 
   // Wait for endpoint to be fully ready (Neon sometimes takes a few seconds)
-  console.log("⏳ Waiting for database endpoint to stabilize (up to 1 minute)...");
+  console.log("⏳ Waiting for database endpoint to stabilize (up to 3 minutes)...");
   let connected = false;
-  const maxAttempts = 12; // 12 * 5s = 60s = 1 minute
-  const delay = 5000;
+  const maxAttempts = 36; // 36 * 5s = 180s = 3 minutes
+  const initialDelay = 10000; // Give it 10s before even trying
+  const standardDelay = 5000;
+
+  await new Promise((resolve) => setTimeout(resolve, initialDelay));
 
   for (let i = 1; i <= maxAttempts; i++) {
     console.log(`   Attempt ${i}/${maxAttempts}...`);
     connected = await testConnection(connectionUri);
+
     if (connected) {
       console.log("✅ Database is ready and authenticated");
       break;
     }
+
     if (i < maxAttempts) {
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      // After 10 attempts, increase delay to 10s to reduce load/noise
+      const currentDelay = i > 10 ? 10000 : standardDelay;
+      await new Promise((resolve) => setTimeout(resolve, currentDelay));
     }
   }
 
