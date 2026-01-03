@@ -97,7 +97,7 @@ async function createBranch(): Promise<void> {
 
   // Export environment variables for GitHub Actions
   if (process.env.GITHUB_ENV) {
-    const fs = await import("fs");
+    const fs = await import("node:fs");
     fs.appendFileSync(
       process.env.GITHUB_ENV,
       `NEON_DATABASE_URL=${connectionUri}\n` +

@@ -48,17 +48,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup environment keys
-        run: |
-          key_name="${{ inputs.dotenv-key-name }}"
-          if [ "$key_name" = "DOTENV_PRIVATE_KEY_DEVELOPMENT" ]; then
-            key_value="${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}"
-          elif [ "$key_name" = "DOTENV_PRIVATE_KEY_PRODUCTION" ]; then
-            key_value="${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}"
-          fi
-          echo "DOTENV_PRIVATE_KEY=$key_value" >> $GITHUB_ENV
-          echo "$key_name=$key_value" >> $GITHUB_ENV
-
       - name: Setup (with Playwright when needed)
         uses: ./.github/actions/setup
         with:
