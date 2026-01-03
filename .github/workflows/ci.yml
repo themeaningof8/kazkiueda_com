@@ -59,32 +59,7 @@ jobs:
       suite: e2e-essential
       dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
 
-  staging-deploy:
-    name: Deploy to Staging
-    if: github.ref == 'refs/heads/main'
-    needs: e2e-essential
-    runs-on: ubuntu-latest
-    environment: staging
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy to Vercel (Staging)
-        id: deploy
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          github-comment: false
-          alias-domains: |
-            staging.kazkiueda.com
-
-      - name: Staging smoke test (homepage)
-        run: |
-          url="${{ steps.deploy.outputs.preview-url || 'https://staging.kazkiueda.com' }}"
-          curl -f "$url" || exit 1
-      - name: Staging smoke test (blog)
-        run: |
-          url="${{ steps.deploy.outputs.preview-url || 'https://staging.kazkiueda.com' }}"
-          curl -f "$url/blog" || exit 1
+  # Note: Vercel handles all deployments automatically via GitHub integration
+  # - Production: main branch pushes
+  # - Preview: Pull requests
+  # No manual staging deployment needed
