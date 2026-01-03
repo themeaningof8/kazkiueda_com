@@ -15,6 +15,8 @@ import { payloadLogger } from './lib/logger'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+console.log(`[Payload Config] Running with isDevelopment=${isDevelopment}, isProduction=${isProduction}`)
+
 /**
  * R2ストレージ設定の構築
  * 環境変数が全て設定されている場合のみ設定を返す

@@ -77,12 +77,6 @@ jobs:
 
       - name: Run migrations
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
-        run: |
-          # Use environment variables directly instead of dotenvx
-          bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
-            PAYLOAD_CONFIG_PATH=src/payload.config.ts \
-            CI=true \
-            payload migrate
         env:
           PAYLOAD_SECRET: ci-test-secret-key-for-testing-only
 
