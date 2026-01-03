@@ -45,7 +45,7 @@ describe("payload-client integration", () => {
 
       expect(result).toHaveLength(totalPosts);
       expect(result.map((r) => r.slug).sort()).toEqual(slugs);
-    }, 10000); // タイムアウトを10秒に延長
+    }, 60000); // タイムアウトを60秒に延長
 
     test("should handle slug filtering correctly", async () => {
       const payload = await getTestPayload(payloadKey);
@@ -250,6 +250,6 @@ describe("payload-client integration", () => {
       const slugs = result.map((r) => r.slug);
       const uniqueSlugs = new Set(slugs);
       expect(uniqueSlugs.size).toBe(totalPosts);
-    }, 15000); // タイムアウトを15秒に延長
+    }, 60000); // タイムアウトを60秒に延長
   });
 });

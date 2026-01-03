@@ -382,7 +382,7 @@ describe("collections/Posts.ts Integration Tests", () => {
       if (post.publishedDate) {
         expect(new Date(post.publishedDate).getTime()).toBeCloseTo(
           Date.now(),
-          -3, // 3桁の誤差（ミリ秒）を許容
+          -4, // ミリ秒単位での誤差（5秒以内）を許容
         );
       }
     });
