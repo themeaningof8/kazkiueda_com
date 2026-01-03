@@ -64,10 +64,7 @@ jobs:
       # ---------- Static ----------
       - name: Run static checks
         if: inputs.suite == 'static'
-        run: |
-          bunx tsc --noEmit
-          bun run lint
-          bun run check
+        run: bun run test:static
 
       # ---------- Unit ----------
       - name: Run unit tests
