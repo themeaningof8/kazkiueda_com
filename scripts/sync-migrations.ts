@@ -87,8 +87,24 @@ async function syncMigrations() {
           syncedCount++;
         } else {
           console.log(
-            `   ⚠️  Skipping sync for ${name}: 'users' table exists but is missing 'role' column. Migration needed.`,
+            `   ⚠️  Skipping sync for ${name}: 'users' table exists but is missing 'role' column.`,
           );
+
+          // CI/Test環境での不整合解消：テーブルをすべて削除してクリーンな状態にする
+          const isCI = process.env.CI === "true" || process.env.NODE_ENV === "test";
+          if (isCI) {
+            console.log("   🔥 Stale schema detected in CI/Test. Dropping all tables and types...");
+            await client.query(`
+              DROP SCHEMA public CASCADE;
+              CREATE SCHEMA public;
+              GRANT ALL ON SCHEMA public TO public;
+            `);
+            console.log("   ✅ Database cleaned. 'payload migrate' will now run on a clean slate.");
+            // すべて削除したので、以降のマイグレーション同期（このループ）は不要
+            break;
+          } else {
+            console.log("   👉 Not in CI/Test environment. Please manually update your schema.");
+          }
         }
       }
     }
