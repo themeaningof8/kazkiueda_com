@@ -88,83 +88,33 @@ async function createBranch(): Promise<void> {
     }
 
     if (error?.message?.includes("branch already exists")) {
-      console.log(`⚠️  Branch already exists: ${BRANCH_NAME}. Fetching existing branch info...`);
-      // Find the existing branch
+      console.log(`⚠️  Branch already exists: ${BRANCH_NAME}. Recovering...`);
+
+      // Find the existing branch ID to delete it
       const listResponse = await fetch(`${API_BASE}/projects/${NEON_PROJECT_ID}/branches`, {
         headers: {
           Authorization: `Bearer ${NEON_API_KEY}`,
           Accept: "application/json",
         },
       });
+
       if (!listResponse.ok) {
         console.error("❌ Failed to list branches during recovery:", await listResponse.text());
         process.exit(1);
       }
+
       const listData = (await listResponse.json()) as { branches: NeonBranch[] };
       const existingBranch = listData.branches.find((b) => b.name === BRANCH_NAME);
 
-      if (!existingBranch) {
-        console.error("❌ Branch reported as existing but not found in list");
-        process.exit(1);
+      if (existingBranch) {
+        console.log("🔄 Deleting existing branch for a clean state...");
+        await deleteExistingBranch(existingBranch.id);
+        // Retry creation
+        return createBranch();
       }
 
-      // Fetch connection URI for the existing branch
-      const endpointsResponse = await fetch(
-        `${API_BASE}/projects/${NEON_PROJECT_ID}/branches/${existingBranch.id}/endpoints`,
-        {
-          headers: {
-            Authorization: `Bearer ${NEON_API_KEY}`,
-            Accept: "application/json",
-          },
-        },
-      );
-      if (!endpointsResponse.ok) {
-        console.error(
-          "❌ Failed to fetch endpoints for existing branch:",
-          await endpointsResponse.text(),
-        );
-        process.exit(1);
-      }
-      const endpointsData = (await endpointsResponse.json()) as { endpoints: NeonEndpoint[] };
-      const endpoint = endpointsData.endpoints[0];
-
-      if (!endpoint) {
-        console.error("❌ No endpoint found for existing branch");
-        process.exit(1);
-      }
-
-      // Construct connection string (Neon API v2 connection_uris format is preferred, but we can synthesize it or find it)
-      // For simplicity, let's try to get it from the branch details if available or just use the host
-      // Actually, create branch response has it. Let's see if we can get connection_uris for existing branch.
-      // There's no direct "get connection uris" for a branch in v2 easily without knowing role/db.
-      // Let's use the project-level info or just handle it.
-
-      console.log("✅ Reusing existing branch");
-      // Note: In a real scenario, we might want to reset the database.
-      // But for CI, reuse is often fine if it's the same run ID.
-
-      // Actually, the simplest way is to fetch everything including connection string.
-      // Let's call the detailed branch info.
-      const branchDetailResponse = await fetch(
-        `${API_BASE}/projects/${NEON_PROJECT_ID}/branches/${existingBranch.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${NEON_API_KEY}`,
-            Accept: "application/json",
-          },
-        },
-      );
-      const _branchDetail = (await branchDetailResponse.json()) as {
-        branch: NeonBranch;
-        connection_uris?: Array<{ connection_uri: string }>;
-      };
-
-      // If connection_uris is not in detail, we might need to recreate it.
-      // But for now, let's assume we can get it or just inform the user.
-      // A better way in CI is to DELETE and RECREATE if it exists, to ensure a clean state.
-      console.log("🔄 Deleting and recreating for clean state...");
-      await deleteExistingBranch(existingBranch.id);
-      return createBranch(); // Recursive call after deletion
+      console.error("❌ Branch reported as existing but not found in list");
+      process.exit(1);
     }
 
     console.error("❌ Failed to create branch:", errorText);
