@@ -46,34 +46,41 @@ export async function GET(request: NextRequest) {
   const collection = searchParams.get("collection");
   const path = searchParams.get("path");
 
+  const htmlResponse = (message: string, status: number) => {
+    return new Response(`<!DOCTYPE html><html><body><div>${message}</div></body></html>`, {
+      status,
+      headers: { "Content-Type": "text/html" },
+    });
+  };
+
   if (!previewSecret || previewSecret !== process.env.PAYLOAD_PREVIEW_SECRET) {
-    return new Response("Invalid preview secret", { status: 403 });
+    return htmlResponse("Invalid preview secret", 403);
   }
 
   if (!slug || !collection) {
-    return new Response("Missing slug or collection", { status: 400 });
+    return htmlResponse("Missing slug or collection", 400);
   }
 
   // slugの形式を検証
   if (!SLUG_PATTERN.test(slug)) {
-    return new Response("Invalid slug format", { status: 400 });
+    return htmlResponse("Invalid slug format", 400);
   }
 
   if (collection !== "posts") {
-    return new Response("Unsupported collection", { status: 400 });
+    return htmlResponse("Unsupported collection", 400);
   }
 
   // リダイレクト先のパスを検証（Open Redirect対策）
   const redirectPath = validateRedirectPath(path, slug);
   if (!redirectPath) {
-    return new Response("Invalid redirect path", { status: 400 });
+    return htmlResponse("Invalid redirect path", 400);
   }
 
   const payload = await getPayload({ config });
   const { user } = await payload.auth({ headers: request.headers });
 
   if (!user) {
-    return new Response("Unauthorized", { status: 403 });
+    return htmlResponse("Unauthorized", 403);
   }
 
   const draft = await draftMode();
