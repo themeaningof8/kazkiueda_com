@@ -133,6 +133,18 @@ async function createBranch(): Promise<void> {
   console.log(`   Branch ID: ${data.branch.id}`);
   console.log(`   Branch Name: ${data.branch.name}`);
 
+  // Debug connection string safely
+  try {
+    const uri = new URL(connectionUri);
+    console.log(`   Connection: ${uri.protocol}//${uri.username}:****@${uri.host}${uri.pathname}`);
+  } catch {
+    console.log("   Connection URI format is non-standard, skipping debug log.");
+  }
+
+  // Wait for endpoint to be fully ready (Neon sometimes takes a few seconds)
+  console.log("⏳ Waiting 10 seconds for database endpoint to stabilize...");
+  await new Promise((resolve) => setTimeout(resolve, 10000));
+
   // Export environment variables for GitHub Actions
   if (process.env.GITHUB_ENV) {
     const fs = await import("node:fs");
