@@ -90,7 +90,7 @@ jobs:
           # Use environment variables directly instead of dotenvx
           bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
             PAYLOAD_CONFIG_PATH=src/payload.config.ts \
-            payload migrate
+            payload migrate --yes
         env:
           PAYLOAD_SECRET: ci-test-secret-key-for-testing-only
 
