@@ -9,15 +9,11 @@ import { getPostBySlug, getPublishedPostSlugs } from "@/lib/posts";
 // ISR: 1時間ごとに再検証
 export const revalidate = 3600;
 
-// SSG: 公開記事の静的生成
-export async function generateStaticParams() {
-  const result = await getPublishedPostSlugs();
-  if (!result.success) {
-    renderLogger.error({ err: result.error }, "Failed to generate static params");
-    return [];
-  }
-  return result.data;
-}
+// 動的レンダリング: ビルド時のDB接続を回避
+export const dynamic = "force-dynamic";
+
+// Note: generateStaticParams は Vercel のビルド時に DB 接続できないため無効化
+// ISR により初回アクセス時に生成され、その後 1 時間キャッシュされる
 
 interface PageProps {
   params: Promise<{
