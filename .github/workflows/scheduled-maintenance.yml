@@ -133,14 +133,14 @@ jobs:
         if: always()
         run: bun run test:db:down
 
-      # カバレッジレポートをアップロード
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage/coverage-final.json
-          flags: scheduled
-          name: scheduled-coverage
-          token: ${{ secrets.CODECOV_TOKEN }}
+      # カバレッジレポートをアップロード（オプション）
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v5
+      #   with:
+      #     files: ./coverage/coverage-final.json
+      #     flags: scheduled
+      #     name: scheduled-coverage
+      #     token: ${{ secrets.CODECOV_TOKEN }}
 
   # ==========================================
   # Performance benchmarks
@@ -211,8 +211,7 @@ jobs:
         run: |
           echo "Checking database connectivity..."
           # 実際のヘルスチェックスクリプトを実行
-        env:
-          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          # TODO: Implement actual database health check script
 
       # データベースバックアップ確認など追加可能
       # - name: Verify recent backups
