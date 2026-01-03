@@ -15,3 +15,9 @@ env:
 jobs:
   # Note: Vercel handles preview deployments automatically via GitHub integration
   # This workflow is kept minimal - Vercel will build and deploy on each PR automatically
+  placeholder:
+    name: Placeholder
+    runs-on: ubuntu-latest
+    steps:
+      - name: Note
+        run: echo "Vercel handles preview deployments automatically"
