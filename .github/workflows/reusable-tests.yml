@@ -78,6 +78,10 @@ jobs:
       - name: Run migrations
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
         run: |
+          # Sync migration state first (in case parent was managed via 'push')
+          bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
+            bun scripts/sync-migrations.ts
+
           # Use yes | to bypass "It looks like you've run Payload in dev mode" prompt
           yes | bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
             PAYLOAD_CONFIG_PATH=src/payload.config.ts \

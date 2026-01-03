@@ -138,9 +138,9 @@ async function createBranch(): Promise<void> {
   }
 
   // Wait for endpoint to be fully ready (Neon sometimes takes a few seconds)
-  console.log("⏳ Waiting for database endpoint to stabilize (up to 3 minutes)...");
+  console.log("⏳ Waiting for database endpoint to stabilize (up to 1 minute)...");
   let connected = false;
-  const maxAttempts = 36; // 36 * 5s = 180s = 3 minutes
+  const maxAttempts = 12; // 12 * 5s = 60s = 1 minute
   const delay = 5000;
 
   for (let i = 1; i <= maxAttempts; i++) {
