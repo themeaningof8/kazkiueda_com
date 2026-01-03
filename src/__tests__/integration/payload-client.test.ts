@@ -46,7 +46,7 @@ describe("payload-client integration", () => {
 
       expect(result).toHaveLength(totalPosts);
       expect(result.map((r) => r.slug).sort()).toEqual(slugs);
-    }, 120000); // タイムアウトを120秒に延長
+    });
 
     test("should handle slug filtering correctly", async () => {
       const payload = await getTestPayload(payloadKey);

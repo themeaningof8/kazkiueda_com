@@ -67,7 +67,7 @@ export async function truncateAllTables(pool: Pool) {
     try {
       await client.query("BEGIN");
       // ロックが取れない場合は早めに失敗させてリトライする
-      await client.query("SET LOCAL lock_timeout = '2s'");
+      await client.query("SET LOCAL lock_timeout = '5s'");
 
       const { rows } = await client.query<{ tablename: string }>(
         `

@@ -7,16 +7,11 @@ export default defineConfig({
     setupFiles: ["./src/__tests__/setup.ts"],
     globals: true,
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
-    testTimeout: 30000, // 5秒 → 30秒（Deadlock対策）
-    hookTimeout: 30000, // hookも30秒
+    testTimeout: 60000, // 30秒 → 60秒（全体的な安定性のため）
+    hookTimeout: 60000,
 
-    // Vitest 4での並列制御設定（現在はpackage.jsonの順次実行スクリプトでDeadlockを回避しているため未使用）
-    // pool: "forks",
-    // poolOptions: {
-    //   forks: {
-    //     singleFork: true, // 1プロセスで実行（Deadlock回避）
-    //   },
-    // },
+    // Deadlock対策: インテグレーションテストが共有DBを使うため、完全に直列実行する
+    fileParallelism: false,
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],

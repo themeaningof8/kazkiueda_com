@@ -101,6 +101,8 @@ async function syncMigrations() {
             `);
             console.log("   ✅ Database cleaned. 'payload migrate' will now run on a clean slate.");
             // すべて削除したので、以降のマイグレーション同期（このループ）は不要
+            console.log("   ⏳ Waiting 5秒 for database to stabilize after cleanup...");
+            await new Promise((resolve) => setTimeout(resolve, 5000));
             break;
           } else {
             console.log("   👉 Not in CI/Test environment. Please manually update your schema.");

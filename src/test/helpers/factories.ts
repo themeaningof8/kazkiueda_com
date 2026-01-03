@@ -59,8 +59,9 @@ export async function createTestPost(
           ? null
           : (overrides?.slug ?? `post-${faker.string.alphanumeric(12).toLowerCase()}`),
       author: authorId,
-      content: (overrides?.content ??
-        makeLexicalContent(faker.lorem.paragraph())) as Post["content"],
+      content: (typeof overrides?.content === "string"
+        ? makeLexicalContent(overrides.content)
+        : (overrides?.content ?? makeLexicalContent(faker.lorem.paragraph()))) as Post["content"],
       tags: overrides?.tags ?? [{ tag: "test" }],
       _status: overrides?.status ?? "published",
       ...(overrides?.publishedDate && { publishedDate: overrides.publishedDate }),
@@ -92,7 +93,7 @@ export async function createBulkTestPosts(
     tags?: { tag: string }[];
   }>,
 ): Promise<Post[]> {
-  const BATCH_SIZE = 20; // Payload CMSのパフォーマンスを考慮したバッチサイズ（並列数を制限してCI負荷を軽減）
+  const BATCH_SIZE = 50; // 直列実行化されたため、バッチサイズを通常の設定に戻して高速化
   const results: Post[] = [];
 
   const baseTimestamp = Date.now();
