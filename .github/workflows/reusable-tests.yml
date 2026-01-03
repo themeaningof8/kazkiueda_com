@@ -78,7 +78,7 @@ jobs:
       # ---------- Integration / E2E Database Setup ----------
       - name: Create Neon test branch
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
-        run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts create
+        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts create
 
       - name: Update DATABASE_URL to use Neon branch
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
