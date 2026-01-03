@@ -3,8 +3,7 @@ import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { ArticleContent } from "@/components/article-content";
 import { ErrorPage } from "@/components/error-page";
-import { renderLogger } from "@/lib/logger";
-import { getPostBySlug, getPublishedPostSlugs } from "@/lib/posts";
+import { getPostBySlug } from "@/lib/posts";
 
 // ISR: 1時間ごとに再検証
 export const revalidate = 3600;

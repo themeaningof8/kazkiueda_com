@@ -185,7 +185,7 @@ async function createBranch(): Promise<void> {
   }
 }
 
-async function deleteExistingBranch(branchId: string): Promise<void> {
+async function _deleteExistingBranch(branchId: string): Promise<void> {
   console.log(`🗑️  Deleting existing Neon branch: ${branchId}`);
   const response = await fetch(`${API_BASE}/projects/${NEON_PROJECT_ID}/branches/${branchId}`, {
     method: "DELETE",
