@@ -45,6 +45,8 @@ jobs:
       DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
       DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
       DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
+      PAYLOAD_SECRET: ci-test-secret-key-for-e2e-testing-only
+      PAYLOAD_PREVIEW_SECRET: ci-preview-secret-key-for-e2e-testing-only
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -110,7 +112,6 @@ jobs:
         env:
           # Required for Next.js/Payload to start
           NEXT_PUBLIC_SERVER_URL: http://localhost:3001
-          PAYLOAD_SECRET: ci-test-secret-key-for-e2e-testing-only
 
       - name: Run E2E tests
         if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
@@ -118,7 +119,6 @@ jobs:
           CI: true
           # Use environment variables directly instead of dotenvx
           NEXT_PUBLIC_SERVER_URL: http://localhost:3001
-          PAYLOAD_SECRET: ci-test-secret-key-for-e2e-testing-only
         run: |
           if [ "${{ inputs.e2e-file }}" != "" ]; then
             bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test "${{ inputs.e2e-file }}" --reporter=github

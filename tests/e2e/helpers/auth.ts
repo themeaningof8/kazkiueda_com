@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { requireE2ETestData } from "./test-data";
 
 /**
@@ -43,10 +43,19 @@ export async function loginAsAdmin(page: Page): Promise<void> {
   await page.waitForURL("**/admin**", { timeout: 10000 });
 
   // 認証Cookieがセットされるのを待つ（/preview が 403 にならないように）
-  await page.waitForFunction(
-    () => document.cookie.split(";").some((c) => c.trim().startsWith("payload-token")),
-    { timeout: 20000 },
-  );
+  // document.cookie は HttpOnly クッキーが見えないため、page.context().cookies() をポーリングする
+  await expect
+    .poll(
+      async () => {
+        const cookies = await page.context().cookies();
+        return cookies.some((c) => c.name === "payload-token");
+      },
+      {
+        timeout: 20000,
+        message: "payload-token cookie was not set after login",
+      },
+    )
+    .toBeTruthy();
 }
 
 /**
