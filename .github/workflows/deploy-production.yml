@@ -45,15 +45,8 @@ jobs:
             PAYLOAD_CONFIG_PATH=src/payload.config.ts \
             payload migrate
 
-      - name: Deploy to Vercel (Production)
-        id: deploy
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: "--prod"
-          github-comment: false
+      # Note: Vercel handles deployment automatically via GitHub integration
+      # This workflow only runs migrations manually when needed
 
       - name: Production smoke test (homepage)
         run: |
