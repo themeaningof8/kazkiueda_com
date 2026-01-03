@@ -31,6 +31,3 @@ export const getPostsSchema = v.object({
  * スラッグ一覧取得のスキーマ
  */
 export const getPublishedPostSlugsSchema = v.object({});
-
-export type GetPostBySlugInput = v.InferInput<typeof getPostBySlugSchema>;
-export type GetPostsInput = v.InferInput<typeof getPostsSchema>;

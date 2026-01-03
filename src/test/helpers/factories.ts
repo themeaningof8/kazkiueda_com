@@ -122,30 +122,3 @@ export async function createBulkTestPosts(
 
   return results;
 }
-
-/**
- * テスト用メディアを作成（将来の拡張用）
- * @param payload Payloadインスタンス
- * @param overrides カスタマイズ可能なフィールド
- * @returns 作成されたメディア
- */
-export async function createTestMedia(
-  payload: Payload,
-  overrides?: Partial<{
-    alt: string;
-    filename: string;
-  }>,
-): Promise<unknown> {
-  // Media型が未定義のためanyを使用
-  // TODO: Mediaコレクションの実装後に型を定義
-  // 現在は未使用のため、基本実装のみ
-  const media = await payload.create({
-    collection: "media",
-    data: {
-      alt: overrides?.alt ?? "Test Media",
-      filename: overrides?.filename ?? `test-media-${Date.now()}.jpg`,
-    },
-  });
-
-  return media;
-}

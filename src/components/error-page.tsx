@@ -115,27 +115,3 @@ export function ErrorPage({ error, onRetry }: ErrorPageProps) {
     </div>
   );
 }
-
-/**
- * ネットワークエラー専用のコンポーネント
- * Error Handlingテストの「ネットワーク完全遮断時の挙動」に対応
- */
-export function NetworkErrorPage({ onRetry }: { onRetry?: () => void }) {
-  return <ErrorPage error={{ type: "network" }} onRetry={onRetry} />;
-}
-
-/**
- * サーバーエラー専用のコンポーネント
- * Error Handlingテストの「500エラー時の挙動」に対応
- */
-export function ServerErrorPage({ onRetry }: { onRetry?: () => void }) {
-  return <ErrorPage error={{ type: "server" }} onRetry={onRetry} />;
-}
-
-/**
- * タイムアウトエラー専用のコンポーネント
- * Error Handlingテストの「タイムアウト時の挙動」に対応
- */
-export function TimeoutErrorPage({ onRetry }: { onRetry?: () => void }) {
-  return <ErrorPage error={{ type: "timeout" }} onRetry={onRetry} />;
-}

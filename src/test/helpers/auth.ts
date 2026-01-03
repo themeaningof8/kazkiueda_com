@@ -1,5 +1,4 @@
 import type { CollectionSlug, Payload } from "payload";
-import { expect } from "vitest";
 import type { User } from "@/payload-types";
 import { createTestUser } from "./factories";
 
@@ -61,11 +60,4 @@ export async function findAsUser<_T>(
     // draftのデフォルト値を削除 - optionsで指定可能
     ...options,
   });
-}
-
-/**
- * アクセス制御違反が発生することを検証するヘルパー
- */
-export async function expectAccessDenied(promise: Promise<unknown>) {
-  await expect(promise).rejects.toThrow();
 }

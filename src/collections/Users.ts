@@ -8,8 +8,6 @@ export const USER_ROLES = {
   USER: "user",
 } as const;
 
-export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
-
 // Payload認証コンテキストのユーザーが適切な型を持つことを確認する型ガード
 function hasRole(user: unknown): user is User {
   return (

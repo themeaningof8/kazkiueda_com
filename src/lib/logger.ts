@@ -33,4 +33,3 @@ export const logger = pino({
 export const actionLogger = logger.child({ context: "ServerAction" });
 export const envLogger = logger.child({ context: "Environment" });
 export const payloadLogger = logger.child({ context: "Payload" });
-export const renderLogger = logger.child({ context: "Render" });
