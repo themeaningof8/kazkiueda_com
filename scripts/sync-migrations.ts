@@ -68,22 +68,27 @@ async function syncMigrations() {
     for (const name of migrationFiles) {
       if (!existingNames.has(name)) {
         // テーブルが存在するか確認（存在する場合のみ同期対象）
-        // 代表的なテーブル 'users' でチェック
-        const usersExist = await client.query(`
+        // 代表的なテーブル 'users' でチェックし、かつ最近追加された 'role' カラムがあることも確認する
+        const syncCheck = await client.query(`
           SELECT EXISTS (
-            SELECT FROM information_schema.tables 
+            SELECT FROM information_schema.columns 
             WHERE table_schema = 'public' 
             AND table_name = 'users'
-          );
+            AND column_name = 'role'
+          ) as "canSync";
         `);
 
-        if (usersExist.rows[0].exists) {
+        if (syncCheck.rows[0].canSync) {
           console.log(`   📝 Marking as synced: ${name}`);
           await client.query("INSERT INTO payload_migrations (name, batch) VALUES ($1, $2)", [
             name,
             1,
           ]);
           syncedCount++;
+        } else {
+          console.log(
+            `   ⚠️  Skipping sync for ${name}: 'users' table exists but is missing 'role' column. Migration needed.`,
+          );
         }
       }
     }
@@ -91,7 +96,9 @@ async function syncMigrations() {
     if (syncedCount > 0) {
       console.log(`✅ Successfully synced ${syncedCount} migration(s).`);
     } else {
-      console.log("✅ All migrations are already in sync or DB is empty.");
+      console.log(
+        "✅ All migrations are already in sync, DB is empty, or schema mismatch detected.",
+      );
     }
   } catch (err) {
     console.error("❌ Failed to sync migrations:", err);
