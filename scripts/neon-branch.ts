@@ -13,7 +13,9 @@ export {};
 const NEON_API_KEY = process.env.NEON_API_KEY;
 const NEON_PROJECT_ID = process.env.NEON_PROJECT_ID;
 const NEON_PARENT_BRANCH_ID = process.env.NEON_PARENT_BRANCH_ID;
-const BRANCH_NAME = `ci-${process.env.GITHUB_RUN_ID || Date.now()}`;
+const RUN_ID = process.env.GITHUB_RUN_ID || Date.now();
+const RUN_ATTEMPT = process.env.GITHUB_RUN_ATTEMPT ? `-${process.env.GITHUB_RUN_ATTEMPT}` : "";
+const BRANCH_NAME = `ci-${RUN_ID}${RUN_ATTEMPT}`;
 
 if (!NEON_API_KEY || !NEON_PROJECT_ID || !NEON_PARENT_BRANCH_ID) {
   console.error("❌ Missing required environment variables:");
@@ -103,32 +105,9 @@ async function createBranch(): Promise<void> {
     }
 
     if (error?.message?.includes("branch already exists")) {
-      console.log(`⚠️  Branch already exists: ${BRANCH_NAME}. Recovering...`);
-
-      // Find the existing branch ID to delete it
-      const listResponse = await fetch(`${API_BASE}/projects/${NEON_PROJECT_ID}/branches`, {
-        headers: {
-          Authorization: `Bearer ${NEON_API_KEY}`,
-          Accept: "application/json",
-        },
-      });
-
-      if (!listResponse.ok) {
-        console.error("❌ Failed to list branches during recovery:", await listResponse.text());
-        process.exit(1);
-      }
-
-      const listData = (await listResponse.json()) as { branches: NeonBranch[] };
-      const existingBranch = listData.branches.find((b) => b.name === BRANCH_NAME);
-
-      if (existingBranch) {
-        console.log("🔄 Deleting existing branch for a clean state...");
-        await deleteExistingBranch(existingBranch.id);
-        // Retry creation
-        return createBranch();
-      }
-
-      console.error("❌ Branch reported as existing but not found in list");
+      console.error(
+        `❌ Branch already exists: ${BRANCH_NAME}. This should not happen with unique run attempts.`,
+      );
       process.exit(1);
     }
 
