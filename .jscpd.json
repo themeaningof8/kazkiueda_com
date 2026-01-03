@@ -1,5 +1,5 @@
 {
-  "threshold": 5.0,
+  "threshold": 3.0,
   "reporters": ["console", "html"],
   "ignore": [
     "node_modules/**",
@@ -8,7 +8,10 @@
     "build/**",
     "coverage/**",
     "**/*.min.js",
-    "**/payload-types.ts"
+    "**/payload-types.ts",
+    "**/__tests__/**",
+    "**/tests/**",
+    "**/admin/**"
   ],
   "format": ["typescript", "javascript", "tsx", "jsx"],
   "minLines": 5,

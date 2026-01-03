@@ -3,6 +3,7 @@ import { getSiteUrl } from "@/lib/config/site";
 import { env } from "@/lib/env";
 import { generateSlugFromTitle, validateSlug } from "@/lib/validators/slug";
 import { validateTag, validateTagsArray } from "@/lib/validators/tag";
+import { authenticatedOnly } from "./access";
 
 export const Posts: CollectionConfig = {
   slug: "posts",
@@ -53,9 +54,9 @@ export const Posts: CollectionConfig = {
         },
       };
     },
-    create: ({ req: { user } }) => !!user,
-    update: ({ req: { user } }) => !!user,
-    delete: ({ req: { user } }) => !!user,
+    create: authenticatedOnly,
+    update: authenticatedOnly,
+    delete: authenticatedOnly,
   },
   fields: [
     {

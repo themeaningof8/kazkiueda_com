@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { IMAGE_SIZES } from "@/lib/constants";
+import { authenticatedOnly } from "./access";
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -26,9 +27,9 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true, // 公開画像は誰でも読める
-    create: ({ req: { user } }) => !!user,
-    update: ({ req: { user } }) => !!user,
-    delete: ({ req: { user } }) => !!user,
+    create: authenticatedOnly,
+    update: authenticatedOnly,
+    delete: authenticatedOnly,
   },
   fields: [
     {

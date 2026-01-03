@@ -18,6 +18,20 @@ function hasRole(user: unknown): user is User {
   );
 }
 
+// 管理者または本人のみアクセス可能な共通アクセス制御ロジック
+function adminOrSelfAccess({
+  req: { user },
+  doc,
+}: {
+  req: { user: unknown };
+  doc?: { id?: number | string };
+}) {
+  if (!hasRole(user)) return false;
+  if (user.role === USER_ROLES.ADMIN) return true;
+  // docのidはstringまたはnumberの可能性があるため、文字列に変換して比較
+  return String(user.id) === String(doc?.id);
+}
+
 export const Users: CollectionConfig = {
   slug: "users",
   auth: true,
@@ -62,17 +76,9 @@ export const Users: CollectionConfig = {
       unique: true,
       access: {
         // メール露出を抑制（推奨）
-        read: ({ req: { user }, doc }) => {
-          if (!hasRole(user)) return false;
-          if (user.role === USER_ROLES.ADMIN) return true;
-          return user.id === doc?.id;
-        },
+        read: adminOrSelfAccess,
         // 管理者または本人のみ更新可能（パスワードリセット攻撃を防ぐ）
-        update: ({ req: { user }, doc }) => {
-          if (!hasRole(user)) return false;
-          if (user.role === USER_ROLES.ADMIN) return true;
-          return user.id === doc?.id;
-        },
+        update: adminOrSelfAccess,
       },
     },
     {
