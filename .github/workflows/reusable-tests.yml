@@ -41,8 +41,6 @@ jobs:
       NODE_ENV: test
       DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
       DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
-      # Override DATABASE_URL for CI test environment (docker-compose.test.yml)
-      DATABASE_URL: postgresql://test:test@localhost:5433/kazkiueda_test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -76,14 +74,24 @@ jobs:
         if: inputs.suite == 'unit'
         run: bun run test:coverage:unit
 
-      # ---------- Integration ----------
-      - name: Start test database
+      # ---------- Integration / E2E Database Setup ----------
+      - name: Create Neon test branch
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
-        run: bun run test:db:up
+        run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts create
+
+      - name: Update DATABASE_URL to use Neon branch
+        if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
+        run: echo "DATABASE_URL=${{ env.NEON_DATABASE_URL }}" >> $GITHUB_ENV
 
       - name: Run migrations
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
-        run: bun run test:migrate
+        run: |
+          # Use environment variables directly instead of dotenvx
+          bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
+            PAYLOAD_CONFIG_PATH=src/payload.config.ts \
+            payload migrate
+        env:
+          PAYLOAD_SECRET: ci-test-secret-key-for-testing-only
 
       - name: Run integration tests
         if: inputs.suite == 'integration'
@@ -101,11 +109,18 @@ jobs:
         run: |
           bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next dev --port 3001 > /tmp/next-dev.log 2>&1 &
           bunx wait-on http://localhost:3001 -t 60000
+        env:
+          # Required for Next.js/Payload to start
+          NEXT_PUBLIC_SERVER_URL: http://localhost:3001
+          PAYLOAD_SECRET: ci-test-secret-key-for-e2e-testing-only
 
       - name: Run E2E tests
         if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
         env:
           CI: true
+          # Use environment variables directly instead of dotenvx
+          NEXT_PUBLIC_SERVER_URL: http://localhost:3001
+          PAYLOAD_SECRET: ci-test-secret-key-for-e2e-testing-only
         run: |
           if [ "${{ inputs.e2e-file }}" != "" ]; then
             bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
@@ -136,6 +151,6 @@ jobs:
         if: always() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
         run: pkill -f 'next dev' || true
 
-      - name: Stop test database
+      - name: Delete Neon test branch
         if: always() && (inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
-        run: bun run test:db:down
+        run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts delete
