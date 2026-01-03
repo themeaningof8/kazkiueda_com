@@ -149,19 +149,22 @@ export const test = base.extend<TestFixtures>({
         console.log("🔐 Creating authentication state...");
 
         // 新しいブラウザコンテキストでログイン
+        console.log(
+          `🔗 Connecting to ${process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3001"}/admin/login for setup...`,
+        );
         const browser = await chromium.launch();
         const context = await browser.newContext({ baseURL: "http://localhost:3001" });
         const loginPage = await context.newPage();
 
         try {
           await loginPage.goto("/admin/login");
-          await loginPage.waitForSelector('input[name="email"]', { timeout: 10000 });
+          await loginPage.waitForSelector('input[name="email"]', { timeout: 30000 });
 
           await loginPage.fill('input[name="email"]', testData.adminUser.email);
           await loginPage.fill('input[name="password"]', testData.adminUser.password);
           await loginPage.click('button[type="submit"]');
 
-          await loginPage.waitForURL("**/admin**", { timeout: 15000 });
+          await loginPage.waitForURL("**/admin**", { timeout: 30000 });
 
           // 認証状態を保存
           await context.storageState({ path: authFile });

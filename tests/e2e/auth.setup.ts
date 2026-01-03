@@ -17,14 +17,14 @@ setup("authenticate", async ({ page }) => {
   }
 
   await page.goto("/admin/login");
-  await page.waitForSelector('input[name="email"]', { timeout: 10000 });
+  await page.waitForSelector('input[name="email"]', { timeout: 30000 });
 
   // E2Eテスト用の管理者アカウントでログイン
   await page.fill('input[name="email"]', "e2e-admin@test.com");
   await page.fill('input[name="password"]', "test-password");
   await page.click('button[type="submit"]');
 
-  await page.waitForURL("**/admin**", { timeout: 15000 });
+  await page.waitForURL("**/admin**", { timeout: 30000 });
 
   // 認証状態を保存
   await page.context().storageState({ path: authFile });

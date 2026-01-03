@@ -11,7 +11,8 @@ test.describe("プレビュー機能（重要）", () => {
 
     // 403ステータスを確認
     expect(response?.status()).toBe(403);
-    await expect(page.locator("text=Invalid preview secret")).toBeVisible();
+    const body = await response?.text();
+    expect(body).toContain("Invalid preview secret");
   });
 
   test("認証なしアクセスの拒否 - 不正なシークレット", async ({ page }) => {
@@ -22,22 +23,29 @@ test.describe("プレビュー機能（重要）", () => {
 
     // 403ステータスを確認
     expect(response?.status()).toBe(403);
-    await expect(page.locator("text=Invalid preview secret")).toBeVisible();
+    const body = await response?.text();
+    expect(body).toContain("Invalid preview secret");
   });
 
   test("認証なしでのプレビューアクセス時は認証エラー", async ({ page }) => {
     // 認証なしで正しいシークレットとパラメータでアクセス
     const testSlug = "test-post-slug";
     const previewUrl = `/preview?collection=posts&slug=${testSlug}&previewSecret=${previewSecret}`;
+
+    // 完全にクリーンな状態でテストするためクッキーをクリア
+    await page.context().clearCookies();
+
     const response = await page.goto(previewUrl);
 
     // 認証されていない場合は403が返る
     expect(response?.status()).toBe(403);
-    await expect(page.locator("text=Unauthorized")).toBeVisible();
+    const body = await response?.text();
+    expect(body).toContain("Unauthorized");
   });
 
   test("認証済み + 正しいsecretでプレビューがリダイレクトする", async ({ page, testData }) => {
-    // 管理者としてログイン
+    // 管理者としてログイン（既にauthenticated projectの場合はクッキーが入っているが、
+    //念のためヘルパーでセットアップを確実にする）
     await loginAsAdmin(page);
 
     // 下書き記事のslugを使用（testDataから取得）

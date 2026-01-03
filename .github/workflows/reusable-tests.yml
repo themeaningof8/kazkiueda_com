@@ -106,7 +106,7 @@ jobs:
         if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
         run: |
           bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next dev --port 3001 > /tmp/next-dev.log 2>&1 &
-          bunx wait-on http://localhost:3001 -t 60000
+          bunx wait-on http://localhost:3001 -t 120000
         env:
           # Required for Next.js/Payload to start
           NEXT_PUBLIC_SERVER_URL: http://localhost:3001

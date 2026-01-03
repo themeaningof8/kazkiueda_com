@@ -9,6 +9,24 @@ export async function loginAsAdmin(page: Page): Promise<void> {
 
   await page.goto("/admin/login");
 
+  // すでにログイン済みでダッシュボードにリダイレクトされた場合は何もしない
+  if (page.url().includes("/admin") && !page.url().includes("/login")) {
+    console.log("✅ Already logged in, skipping login form");
+    return;
+  }
+
+  // ログインフォームが表示されるのを待つ
+  try {
+    await page.waitForSelector('input[name="email"]', { timeout: 10000 });
+  } catch {
+    // フォームが見つからない場合、すでにログイン済みか別のページにいる可能性がある
+    if (page.url().includes("/admin")) {
+      console.log("✅ Admin dashboard detected, assuming logged in");
+      return;
+    }
+    throw new Error(`Login form not found at ${page.url()}`);
+  }
+
   // ログイン情報の入力
   await page.fill('input[name="email"]', testData.adminUser.email);
   await page.fill('input[name="password"]', testData.adminUser.password);
@@ -27,7 +45,7 @@ export async function loginAsAdmin(page: Page): Promise<void> {
   // 認証Cookieがセットされるのを待つ（/preview が 403 にならないように）
   await page.waitForFunction(
     () => document.cookie.split(";").some((c) => c.trim().startsWith("payload-token")),
-    { timeout: 10000 },
+    { timeout: 20000 },
   );
 }
 

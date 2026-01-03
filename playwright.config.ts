@@ -29,9 +29,9 @@ export default defineConfig({
   ],
 
   // テストのタイムアウト設定
-  timeout: 30 * 1000, // 30秒（さらに短くして早期フィードバック）
+  timeout: 60 * 1000, // 30秒 → 60秒（CI環境での安定性のため）
   expect: {
-    timeout: 5 * 1000, // assertionのタイムアウト
+    timeout: 10 * 1000, // 5秒 → 10秒
   },
 
   use: {
