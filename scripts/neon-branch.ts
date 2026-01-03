@@ -15,7 +15,9 @@ const NEON_PROJECT_ID = process.env.NEON_PROJECT_ID;
 const NEON_PARENT_BRANCH_ID = process.env.NEON_PARENT_BRANCH_ID;
 const RUN_ID = process.env.GITHUB_RUN_ID || Date.now();
 const RUN_ATTEMPT = process.env.GITHUB_RUN_ATTEMPT ? `-${process.env.GITHUB_RUN_ATTEMPT}` : "";
-const BRANCH_NAME = `ci-${RUN_ID}${RUN_ATTEMPT}`;
+// Add random suffix to ensure uniqueness even on manual retries or overlaps
+const RANDOM_SUFFIX = Math.random().toString(36).substring(2, 7);
+const BRANCH_NAME = `ci-${RUN_ID}${RUN_ATTEMPT}-${RANDOM_SUFFIX}`;
 
 if (!NEON_API_KEY || !NEON_PROJECT_ID || !NEON_PARENT_BRANCH_ID) {
   console.error("❌ Missing required environment variables:");
@@ -136,9 +138,9 @@ async function createBranch(): Promise<void> {
   }
 
   // Wait for endpoint to be fully ready (Neon sometimes takes a few seconds)
-  console.log("⏳ Waiting for database endpoint to stabilize...");
+  console.log("⏳ Waiting for database endpoint to stabilize (up to 3 minutes)...");
   let connected = false;
-  const maxAttempts = 12;
+  const maxAttempts = 36; // 36 * 5s = 180s = 3 minutes
   const delay = 5000;
 
   for (let i = 1; i <= maxAttempts; i++) {
