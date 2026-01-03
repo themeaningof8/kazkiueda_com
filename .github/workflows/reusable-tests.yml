@@ -28,6 +28,8 @@ on:
         default: ""
         type: string
     secrets:
+      DOTENV_PRIVATE_KEY:
+        required: false
       DOTENV_PRIVATE_KEY_DEVELOPMENT:
         required: false
       DOTENV_PRIVATE_KEY_PRODUCTION:
@@ -39,6 +41,7 @@ jobs:
     timeout-minutes: 30
     env:
       NODE_ENV: test
+      DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
       DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
       DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
     steps:
