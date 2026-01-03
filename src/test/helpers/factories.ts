@@ -88,10 +88,11 @@ export async function createBulkTestPosts(
     status: "draft" | "published";
     publishedDate?: string;
     excerpt?: string;
+    content?: unknown;
     tags?: { tag: string }[];
   }>,
 ): Promise<Post[]> {
-  const BATCH_SIZE = 50; // Payload CMSのパフォーマンスを考慮したバッチサイズ
+  const BATCH_SIZE = 20; // Payload CMSのパフォーマンスを考慮したバッチサイズ（並列数を制限してCI負荷を軽減）
   const results: Post[] = [];
 
   const baseTimestamp = Date.now();
@@ -104,6 +105,7 @@ export async function createBulkTestPosts(
         status: overrides?.status ?? "published",
         publishedDate: overrides?.publishedDate,
         excerpt: overrides?.excerpt,
+        content: overrides?.content,
         tags: overrides?.tags,
       }),
     );

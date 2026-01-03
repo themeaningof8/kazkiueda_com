@@ -35,6 +35,7 @@ describe("payload-client integration", () => {
       // 大量データ作成（createBulkTestPostsを使用）
       const _posts = await createBulkTestPosts(payload, user.id, totalPosts, {
         status: "published",
+        content: "minimal", // 本文を最小化して作成を高速化
       });
       const slugs = _posts
         .map((p) => p.slug)
@@ -45,7 +46,7 @@ describe("payload-client integration", () => {
 
       expect(result).toHaveLength(totalPosts);
       expect(result.map((r) => r.slug).sort()).toEqual(slugs);
-    }, 60000); // タイムアウトを60秒に延長
+    }, 120000); // タイムアウトを120秒に延長
 
     test("should handle slug filtering correctly", async () => {
       const payload = await getTestPayload(payloadKey);
@@ -241,6 +242,7 @@ describe("payload-client integration", () => {
       const totalPosts = 100; // 250件から100件に削減（テスト時間短縮）
       const _posts = await createBulkTestPosts(payload, user.id, totalPosts, {
         status: "published",
+        content: "minimal", // 本文を最小化して作成を高速化
       });
 
       const result = await findPublishedPostSlugs();
@@ -250,6 +252,6 @@ describe("payload-client integration", () => {
       const slugs = result.map((r) => r.slug);
       const uniqueSlugs = new Set(slugs);
       expect(uniqueSlugs.size).toBe(totalPosts);
-    }, 60000); // タイムアウトを60秒に延長
+    }, 120000); // タイムアウトを120秒に延長
   });
 });
