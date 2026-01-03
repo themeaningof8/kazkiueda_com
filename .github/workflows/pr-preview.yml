@@ -18,6 +18,8 @@ jobs:
   # ==========================================
   build-preview:
     name: Build Preview
+    # PRがメインリポジトリ自身からのものである場合のみ実行（フォークからのPRではシークレットが利用できないため）
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
