@@ -53,6 +53,21 @@ interface CreateBranchResponse {
   }>;
 }
 
+async function testConnection(uri: string): Promise<boolean> {
+  try {
+    const { default: pg } = await import("pg");
+    const client = new pg.Client({ connectionString: uri });
+    await client.connect();
+    await client.query("SELECT 1");
+    await client.end();
+    return true;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`   ⚠️  Connection attempt failed: ${message}`);
+    return false;
+  }
+}
+
 async function createBranch(): Promise<void> {
   console.log(`🌿 Creating Neon branch: ${BRANCH_NAME}`);
 
@@ -142,8 +157,27 @@ async function createBranch(): Promise<void> {
   }
 
   // Wait for endpoint to be fully ready (Neon sometimes takes a few seconds)
-  console.log("⏳ Waiting 10 seconds for database endpoint to stabilize...");
-  await new Promise((resolve) => setTimeout(resolve, 10000));
+  console.log("⏳ Waiting for database endpoint to stabilize...");
+  let connected = false;
+  const maxAttempts = 12;
+  const delay = 5000;
+
+  for (let i = 1; i <= maxAttempts; i++) {
+    console.log(`   Attempt ${i}/${maxAttempts}...`);
+    connected = await testConnection(connectionUri);
+    if (connected) {
+      console.log("✅ Database is ready and authenticated");
+      break;
+    }
+    if (i < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  if (!connected) {
+    console.error("❌ Database failed to become ready within timeout");
+    process.exit(1);
+  }
 
   // Export environment variables for GitHub Actions
   if (process.env.GITHUB_ENV) {
