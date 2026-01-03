@@ -9,7 +9,7 @@ import sharp from 'sharp'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Posts } from './collections/Posts'
-import { env, isProduction } from './lib/env'
+import { env, isProduction, isDevelopment } from './lib/env'
 import { payloadLogger } from './lib/logger'
 
 const filename = fileURLToPath(import.meta.url)
@@ -89,6 +89,7 @@ export default buildConfig({
         connectionTimeoutMillis: 2000, // 接続タイムアウト（2秒）
       }),
     },
+    push: isDevelopment,
   }),
   // Define your collections here - you'll probably need at least one
   collections: [Users, Media, Posts],
