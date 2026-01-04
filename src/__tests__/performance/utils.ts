@@ -39,7 +39,10 @@ export function getMemoryUsage(): number {
 /**
  * 実行時間を測定するデコレーター
  */
-export function measureExecutionTime<T extends (...args: any[]) => any>(fn: T, label?: string): T {
+export function measureExecutionTime<T extends (...args: unknown[]) => unknown>(
+  fn: T,
+  label?: string,
+): T {
   return ((...args: Parameters<T>) => {
     const start = performance.now();
     const result = fn(...args);
@@ -123,18 +126,21 @@ export function extractCoreWebVitals(lighthouseResult: any) {
 /**
  * バンドルサイズ情報を解析
  */
-export function analyzeBundleSize(stats: any) {
+export function analyzeBundleSize(stats: {
+  chunks?: Array<{ names?: string[]; size?: number; files?: string[] }>;
+  assets?: Array<{ name: string; size?: number }>;
+}) {
   const chunks = stats.chunks || [];
   const assets = stats.assets || [];
 
   return {
-    totalSize: assets.reduce((sum: number, asset: any) => sum + (asset.size || 0), 0),
-    chunks: chunks.map((chunk: any) => ({
+    totalSize: assets.reduce((sum, asset) => sum + (asset.size || 0), 0),
+    chunks: chunks.map((chunk) => ({
       name: chunk.names?.[0] || "unknown",
       size: chunk.size || 0,
       files: chunk.files || [],
     })),
-    assets: assets.map((asset: any) => ({
+    assets: assets.map((asset) => ({
       name: asset.name,
       size: asset.size || 0,
     })),

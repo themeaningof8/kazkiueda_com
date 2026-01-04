@@ -5,17 +5,11 @@
  * これにより、不要な依存関係の追加やコードの肥大化を早期に検出できます。
  */
 
-import { execSync } from "child_process";
-import { existsSync, readFileSync } from "fs";
-import { join } from "path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "./config";
-import {
-  analyzeBundleSize,
-  assertPerformanceThreshold,
-  formatFileSize,
-  shouldSkipPerformanceTest,
-} from "./utils";
+import { shouldSkipPerformanceTest } from "./utils";
 
 describe("Bundle Size Analysis", () => {
   // Next.jsのビルド統計ファイルのパス
@@ -30,7 +24,9 @@ describe("Bundle Size Analysis", () => {
         expect(existsSync(nextBuildStatsPath)).toBe(true);
 
         try {
-          const buildManifest = JSON.parse(readFileSync(nextBuildStatsPath, "utf-8"));
+          const buildManifest = JSON.parse(readFileSync(nextBuildStatsPath, "utf-8")) as {
+            pages?: Record<string, string[]>;
+          };
 
           // ビルドマニフェストの構造を検証
           expect(buildManifest).toBeDefined();
@@ -41,7 +37,7 @@ describe("Bundle Size Analysis", () => {
           expect(Object.keys(pages).length).toBeGreaterThan(0);
 
           // 各ページのバンドルサイズをチェック
-          Object.entries(pages).forEach(([pagePath, chunks]: [string, any]) => {
+          Object.entries(pages).forEach(([_pagePath, chunks]: [string, string[]]) => {
             if (Array.isArray(chunks)) {
               const totalSize = chunks.reduce((sum: number, chunk: string) => {
                 // chunkファイルの存在確認とサイズ取得
@@ -70,7 +66,13 @@ describe("Bundle Size Analysis", () => {
 
     test("should validate bundle size limits", async () => {
       // package.jsonからバンドルサイズ設定を読み込み
-      const packageJson = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf-8"));
+      const packageJson = JSON.parse(
+        readFileSync(join(process.cwd(), "package.json"), "utf-8"),
+      ) as {
+        bundlesize?: unknown;
+        dependencies?: Record<string, string>;
+        devDependencies?: Record<string, string>;
+      };
 
       // bundlesize設定が存在する場合の検証
       if (packageJson.bundlesize) {
@@ -78,11 +80,12 @@ describe("Bundle Size Analysis", () => {
           ? packageJson.bundlesize
           : [packageJson.bundlesize];
 
-        bundleConfigs.forEach((config: any) => {
-          if (config.maxSize) {
+        bundleConfigs.forEach((config: unknown) => {
+          const typedConfig = config as { maxSize?: string };
+          if (typedConfig.maxSize) {
             // maxSizeが有効なフォーマットであることを確認
-            expect(typeof config.maxSize).toBe("string");
-            expect(config.maxSize).toMatch(/^\d+(\.\d+)?[kmg]?b?$/i);
+            expect(typeof typedConfig.maxSize).toBe("string");
+            expect(typedConfig.maxSize).toMatch(/^\d+(\.\d+)?[kmg]?b?$/i);
           }
         });
       }
@@ -96,7 +99,13 @@ describe("Bundle Size Analysis", () => {
   describe("Dependency Analysis", () => {
     test("should check for unnecessary dependencies", () => {
       // package.jsonの依存関係を分析
-      const packageJson = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf-8"));
+      const packageJson = JSON.parse(
+        readFileSync(join(process.cwd(), "package.json"), "utf-8"),
+      ) as {
+        bundlesize?: unknown;
+        dependencies?: Record<string, string>;
+        devDependencies?: Record<string, string>;
+      };
 
       const dependencies = {
         ...packageJson.dependencies,
@@ -130,7 +139,9 @@ describe("Bundle Size Analysis", () => {
       try {
         // Next.jsの静的分析ファイルが存在する場合
         if (existsSync(nextStaticAnalysisPath)) {
-          const staticAnalysis = JSON.parse(readFileSync(nextStaticAnalysisPath, "utf-8"));
+          const staticAnalysis = JSON.parse(readFileSync(nextStaticAnalysisPath, "utf-8")) as {
+            dynamicImports?: Record<string, unknown>;
+          };
 
           // 静的分析データの構造検証
           expect(staticAnalysis).toBeDefined();
@@ -186,7 +197,7 @@ describe("Bundle Size Analysis", () => {
     test("should check for efficient lazy loading", () => {
       // React.lazyや動的インポートが使用されていることを確認するために
       // ソースコードを簡易的にチェック
-      const srcDir = join(process.cwd(), "src");
+      const _srcDir = join(process.cwd(), "src");
 
       // このテストは実際のコード解析が必要だが、簡易的なチェックとして
       // React.lazyの使用を推奨するメッセージを表示

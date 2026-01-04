@@ -12,7 +12,7 @@ import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "./config";
 import { assertPerformanceThreshold, getMemoryUsage, shouldSkipPerformanceTest } from "./utils";
 
 describe("Memory Leak Detection", () => {
-  let browser: any;
+  let browser: import("puppeteer").Browser | undefined;
   let serverUrl: string;
 
   beforeAll(async () => {
@@ -43,7 +43,10 @@ describe("Memory Leak Detection", () => {
     test.skipIf(shouldSkipPerformanceTest("heavy") || !TEST_ENVIRONMENT.isCI)(
       "should not have memory leaks during navigation",
       async () => {
-        const page = await browser.newPage();
+        if (!browser) {
+          throw new Error("Browser not initialized");
+        }
+        const page = await browser!.newPage();
 
         try {
           // 初期メモリ使用量を測定
@@ -66,7 +69,7 @@ describe("Memory Leak Detection", () => {
             });
 
             // 各ページで少し待機
-            await page.waitForTimeout(2000);
+            await new Promise((resolve) => setTimeout(resolve, 2000));
 
             // メモリ使用量を測定
             const currentMemory = await page.evaluate(() => {
@@ -84,9 +87,7 @@ describe("Memory Leak Detection", () => {
 
             // ガベージコレクションを強制
             await page.evaluate(() => {
-              // @ts-expect-error
-              if (window.gc) {
-                // @ts-expect-error
+              if ("gc" in window && typeof window.gc === "function") {
                 window.gc();
               }
             });
@@ -114,6 +115,9 @@ describe("Memory Leak Detection", () => {
     test(
       "should monitor memory usage during user interactions",
       async () => {
+        if (!browser) {
+          throw new Error("Browser not initialized");
+        }
         const page = await browser.newPage();
 
         try {
@@ -135,11 +139,11 @@ describe("Memory Leak Detection", () => {
           // ユーザーの行動をシミュレート（スクロール、クリックなど）
           const actions = [
             async () => await page.evaluate(() => window.scrollTo(0, 500)),
-            async () => await page.waitForTimeout(1000),
+            async () => await new Promise((resolve) => setTimeout(resolve, 1000)),
             async () => await page.evaluate(() => window.scrollTo(0, 1000)),
-            async () => await page.waitForTimeout(1000),
+            async () => await new Promise((resolve) => setTimeout(resolve, 1000)),
             async () => await page.evaluate(() => window.scrollTo(0, 0)),
-            async () => await page.waitForTimeout(1000),
+            async () => await new Promise((resolve) => setTimeout(resolve, 1000)),
           ];
 
           for (const action of actions) {
@@ -170,6 +174,9 @@ describe("Memory Leak Detection", () => {
     test.skipIf(shouldSkipPerformanceTest("heavy") || !TEST_ENVIRONMENT.isCI)(
       "should properly clean up event listeners",
       async () => {
+        if (!browser) {
+          throw new Error("Browser not initialized");
+        }
         const page = await browser.newPage();
 
         try {
@@ -183,8 +190,9 @@ describe("Memory Leak Detection", () => {
             // 簡易的なイベントリスナー数のチェック
             let count = 0;
             const elements = document.querySelectorAll("*");
-            elements.forEach((el: any) => {
-              if (el._events || el.__events) {
+            elements.forEach((el: Element) => {
+              const element = el as any;
+              if (element._events || element.__events) {
                 count++;
               }
             });
@@ -198,8 +206,9 @@ describe("Memory Leak Detection", () => {
           const afterReloadListeners = await page.evaluate(() => {
             let count = 0;
             const elements = document.querySelectorAll("*");
-            elements.forEach((el: any) => {
-              if (el._events || el.__events) {
+            elements.forEach((el: Element) => {
+              const element = el as any;
+              if (element._events || element.__events) {
                 count++;
               }
             });
@@ -220,6 +229,9 @@ describe("Memory Leak Detection", () => {
     test(
       "should handle component unmounting properly",
       async () => {
+        if (!browser) {
+          throw new Error("Browser not initialized");
+        }
         const page = await browser.newPage();
 
         try {
@@ -243,7 +255,7 @@ describe("Memory Leak Detection", () => {
           expect(hasContent).toBeTruthy();
 
           // 少し待機してからメモリを再チェック
-          await page.waitForTimeout(3000);
+          await new Promise((resolve) => setTimeout(resolve, 3000));
 
           const afterWaitMemory = await page.evaluate(() => {
             // @ts-expect-error
@@ -314,7 +326,7 @@ describe("Memory Leak Detection", () => {
         expect(resources).toBeGreaterThan(0);
 
         // ページを閉じる前にメモリ使用量を記録
-        const beforeCloseMemory = await page.evaluate(() => {
+        const _beforeCloseMemory = await page.evaluate(() => {
           // @ts-expect-error
           if (performance.memory) {
             // @ts-expect-error

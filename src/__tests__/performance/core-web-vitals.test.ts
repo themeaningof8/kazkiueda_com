@@ -16,7 +16,7 @@ import {
 } from "./utils";
 
 describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
-  let browser: any;
+  let browser: import("puppeteer").Browser | undefined;
   let serverUrl: string;
 
   beforeAll(async () => {
@@ -42,15 +42,18 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test.skipIf(shouldSkipPerformanceTest("ci-only") || !TEST_ENVIRONMENT.isCI)(
       "should meet Core Web Vitals thresholds for homepage",
       async () => {
+        const url = new URL(serverUrl);
         const runnerResult = await lighthouse(serverUrl, {
           ...LIGHTHOUSE_CONFIG,
-          port: new URL(serverUrl).port,
+          port: url.port ? parseInt(url.port, 10) : 80,
         });
 
         expect(runnerResult).toBeDefined();
-        expect(runnerResult?.lhr).toBeDefined();
+        if (!runnerResult?.lhr) {
+          throw new Error("Lighthouse result is missing lhr property");
+        }
 
-        const vitals = extractCoreWebVitals(runnerResult);
+        const vitals = extractCoreWebVitals(runnerResult as any);
 
         // LCP: 2.5秒以内 (Good threshold)
         assertPerformanceThreshold("coreWebVitals", "lcp", vitals.lcp, "ms");
@@ -73,7 +76,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test(
       "should load homepage within acceptable time",
       async () => {
-        const page = await browser.newPage();
+        const page = await browser!.newPage();
 
         try {
           const startTime = Date.now();
@@ -108,9 +111,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
       async () => {
         const blogUrl = `${serverUrl}/blog`;
 
+        const url = new URL(serverUrl);
         const runnerResult = await lighthouse(blogUrl, {
           ...LIGHTHOUSE_CONFIG,
-          port: new URL(serverUrl).port,
+          port: url.port ? parseInt(url.port, 10) : 80,
         });
 
         expect(runnerResult).toBeDefined();
@@ -134,7 +138,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test(
       "should load blog page efficiently",
       async () => {
-        const page = await browser.newPage();
+        const page = await browser!.newPage();
 
         try {
           const startTime = Date.now();
@@ -167,9 +171,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
         // テスト用の記事URLを取得（実際の環境に合わせて調整）
         const postUrl = `${serverUrl}/posts/sample-post`;
 
+        const url = new URL(serverUrl);
         const runnerResult = await lighthouse(postUrl, {
           ...LIGHTHOUSE_CONFIG,
-          port: new URL(serverUrl).port,
+          port: url.port ? parseInt(url.port, 10) : 80,
         });
 
         expect(runnerResult).toBeDefined();
@@ -193,7 +198,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test(
       "should handle dynamic content loading efficiently",
       async () => {
-        const page = await browser.newPage();
+        const page = await browser!.newPage();
 
         try {
           // 実際の記事が存在しない場合もあるので、404ページのテストに変更

@@ -5,15 +5,25 @@
  * ロード時間、ファイルサイズ、フォーマット、Next.js Imageコンポーネントの使用状況などを検証します。
  */
 
-import { existsSync, readFileSync } from "fs";
-import { join } from "path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import puppeteer from "puppeteer";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "./config";
-import { assertPerformanceThreshold, shouldSkipPerformanceTest } from "./utils";
+import { shouldSkipPerformanceTest } from "./utils";
+
+declare global {
+  interface Window {
+    imageLoadTimes?: Array<{
+      url: string;
+      loadTime: number;
+      size: number;
+    }>;
+  }
+}
 
 describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => {
-  let browser: any;
+  let browser: import("puppeteer").Browser | undefined;
   let serverUrl: string;
 
   beforeAll(async () => {
@@ -38,27 +48,29 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should load images within acceptable time",
       async () => {
-        const page = await browser.newPage();
+        if (!browser) {
+          throw new Error("Browser not initialized");
+        }
+        const page = await browser!.newPage();
 
         try {
           // Performance observerを設定して画像のロード時間を監視
           await page.evaluateOnNewDocument(() => {
-            // @ts-expect-error
             window.imageLoadTimes = [];
 
             const observer = new PerformanceObserver((list) => {
               for (const entry of list.getEntries()) {
+                const resourceEntry = entry as PerformanceResourceTiming;
                 if (
-                  entry.name.includes(".jpg") ||
-                  entry.name.includes(".png") ||
-                  entry.name.includes(".webp") ||
-                  entry.name.includes(".avif")
+                  resourceEntry.name.includes(".jpg") ||
+                  resourceEntry.name.includes(".png") ||
+                  resourceEntry.name.includes(".webp") ||
+                  resourceEntry.name.includes(".avif")
                 ) {
-                  // @ts-expect-error
                   window.imageLoadTimes.push({
-                    url: entry.name,
-                    loadTime: entry.responseEnd - entry.requestStart,
-                    size: entry.transferSize,
+                    url: resourceEntry.name,
+                    loadTime: resourceEntry.responseEnd - resourceEntry.requestStart,
+                    size: resourceEntry.transferSize,
                   });
                 }
               }
@@ -73,16 +85,15 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
           });
 
           // 画像のロードが完了するまで待機
-          await page.waitForTimeout(2000);
+          await new Promise((resolve) => setTimeout(resolve, 2000));
 
           // 画像のロード時間を取得
           const imageLoadTimes = await page.evaluate(() => {
-            // @ts-expect-error
             return window.imageLoadTimes || [];
           });
 
           // 各画像のロード時間を検証
-          imageLoadTimes.forEach((image: any) => {
+          imageLoadTimes.forEach((image: { url: string; loadTime: number; size: number }) => {
             expect(image.loadTime).toBeLessThan(PERFORMANCE_THRESHOLDS.images.maxLoadTime);
 
             // 画像サイズが適切であることを確認（0より大きい）
@@ -103,7 +114,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should use optimized image formats",
       async () => {
-        const page = await browser.newPage();
+        const page = await browser!.newPage();
 
         try {
           await page.goto(serverUrl, {
@@ -112,7 +123,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
           });
 
           // ページ上の画像を取得
-          const images = await page.$$eval("img", (imgs) => {
+          const images = await page.$$eval("img", (imgs: HTMLImageElement[]) => {
             return imgs.map((img) => ({
               src: img.src,
               alt: img.alt,
@@ -126,7 +137,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
           expect(images.length).toBeGreaterThanOrEqual(0);
 
           // Next.js Imageコンポーネントが使用されていることを確認
-          const nextImages = await page.$$eval("img[data-nimg]", (imgs) => {
+          const nextImages = await page.$$eval("img[data-nimg]", (imgs: HTMLImageElement[]) => {
             return imgs.map((img) => ({
               src: img.src,
               priority: img.getAttribute("data-nimg") === "1",
@@ -140,17 +151,25 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
           }
 
           // 画像の最適化を確認
-          images.forEach((image) => {
-            // alt属性が存在することを確認
-            expect(image.alt).toBeTruthy();
-            expect(typeof image.alt).toBe("string");
-            expect(image.alt.length).toBeGreaterThan(0);
+          images.forEach(
+            (image: {
+              src: string;
+              alt: string;
+              loading?: string;
+              width: number;
+              height: number;
+            }) => {
+              // alt属性が存在することを確認
+              expect(image.alt).toBeTruthy();
+              expect(typeof image.alt).toBe("string");
+              expect(image.alt.length).toBeGreaterThan(0);
 
-            // loading属性が設定されていることを確認（Next.js Imageの場合）
-            if (image.loading) {
-              expect(["lazy", "eager"]).toContain(image.loading);
-            }
-          });
+              // loading属性が設定されていることを確認（Next.js Imageの場合）
+              if (image.loading) {
+                expect(["lazy", "eager"]).toContain(image.loading);
+              }
+            },
+          );
         } finally {
           await page.close();
         }
@@ -163,7 +182,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test.skipIf(shouldSkipPerformanceTest("ci-only") || !TEST_ENVIRONMENT.isCI)(
       "should use modern image formats",
       async () => {
-        const page = await browser.newPage();
+        const page = await browser!.newPage();
 
         try {
           await page.goto(serverUrl, {
@@ -173,26 +192,28 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
 
           // 画像のリクエストを監視
           const imageRequests = await page.evaluate(() => {
-            const resources = performance.getEntriesByType("resource");
+            const resources = performance.getEntriesByType(
+              "resource",
+            ) as PerformanceResourceTiming[];
             return resources
               .filter(
-                (entry: any) =>
+                (entry) =>
                   entry.name.includes(".jpg") ||
                   entry.name.includes(".jpeg") ||
                   entry.name.includes(".png") ||
                   entry.name.includes(".webp") ||
                   entry.name.includes(".avif"),
               )
-              .map((entry: any) => ({
+              .map((entry) => ({
                 url: entry.name,
-                contentType: entry.responseHeaders?.["content-type"] || "",
+                contentType: "",
                 size: entry.transferSize,
               }));
           });
 
           // モダンな画像フォーマット（WebP, AVIF）の使用を推奨
           const modernFormats = imageRequests.filter(
-            (req: any) => req.contentType.includes("webp") || req.contentType.includes("avif"),
+            (req) => req.contentType.includes("webp") || req.contentType.includes("avif"),
           );
 
           if (imageRequests.length > 0) {
@@ -212,7 +233,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should optimize image sizes",
       async () => {
-        const page = await browser.newPage();
+        const page = await browser!.newPage();
 
         try {
           await page.setViewport({ width: 1920, height: 1080 });
@@ -223,7 +244,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
           });
 
           // ビューポート内の画像を取得
-          const visibleImages = await page.$$eval("img", (imgs) => {
+          const visibleImages = await page.$$eval("img", (imgs: HTMLImageElement[]) => {
             return imgs
               .filter((img) => {
                 const rect = img.getBoundingClientRect();
@@ -239,20 +260,36 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
           });
 
           // 表示されている画像のサイズを検証
-          visibleImages.forEach((image) => {
-            // 画像が適切なサイズで読み込まれていることを確認
-            expect(image.width).toBeGreaterThan(0);
-            expect(image.height).toBeGreaterThan(0);
+          visibleImages.forEach(
+            (image: {
+              src: string;
+              width: number;
+              height: number;
+              displayWidth?: number;
+              displayHeight?: number;
+            }) => {
+              // 画像が適切なサイズで読み込まれていることを確認
+              expect(image.width).toBeGreaterThan(0);
+              expect(image.height).toBeGreaterThan(0);
 
-            // 表示サイズが自然サイズを超えていないことを確認（拡大されていない）
-            if (image.displayWidth && image.displayHeight) {
-              expect(image.displayWidth).toBeLessThanOrEqual(image.width);
-              expect(image.displayHeight).toBeLessThanOrEqual(image.height);
-            }
-          });
+              // 表示サイズが自然サイズを超えていないことを確認（拡大されていない）
+              if (image.displayWidth && image.displayHeight) {
+                expect(image.displayWidth).toBeLessThanOrEqual(image.width);
+                expect(image.displayHeight).toBeLessThanOrEqual(image.height);
+              }
+            },
+          );
 
           // 大きな画像のサイズをチェック
-          const largeImages = visibleImages.filter((img) => img.width > 2000 || img.height > 2000);
+          const largeImages = visibleImages.filter(
+            (img: {
+              src: string;
+              width: number;
+              height: number;
+              displayWidth?: number;
+              displayHeight?: number;
+            }) => img.width > 2000 || img.height > 2000,
+          );
           if (largeImages.length > 0) {
             console.warn(`${largeImages.length} large images detected. Consider optimization.`);
           }
@@ -295,10 +332,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should check for missing images",
       async () => {
-        const page = await browser.newPage();
+        const page = await browser!.newPage();
 
         try {
-          const brokenImages: any[] = [];
+          const brokenImages: Array<{ url: string; status: number }> = [];
 
           // 画像のエラーを監視
           page.on("response", (response) => {
@@ -323,7 +360,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
           // 代替テキストのない画像がないことを確認
           const imagesWithoutAlt = await page.$$eval(
             "img:not([alt]), img[alt='']",
-            (imgs) => imgs.length,
+            (imgs: HTMLImageElement[]) => imgs.length,
           );
           expect(imagesWithoutAlt).toBe(0);
         } finally {
@@ -338,7 +375,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should adapt image sizes to viewport",
       async () => {
-        const page = await browser.newPage();
+        const page = await browser!.newPage();
 
         try {
           // モバイルビューポート
@@ -348,7 +385,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
             timeout: 30000,
           });
 
-          const mobileImageSizes = await page.$$eval("img", (imgs) =>
+          const mobileImageSizes = await page.$$eval("img", (imgs: HTMLImageElement[]) =>
             imgs.map((img) => ({
               src: img.src,
               width: img.naturalWidth,
@@ -360,7 +397,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
           await page.setViewport({ width: 1920, height: 1080 });
           await page.reload({ waitUntil: "networkidle0" });
 
-          const desktopImageSizes = await page.$$eval("img", (imgs) =>
+          const desktopImageSizes = await page.$$eval("img", (imgs: HTMLImageElement[]) =>
             imgs.map((img) => ({
               src: img.src,
               width: img.naturalWidth,
@@ -375,7 +412,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
           // Next.jsのレスポンシブ画像機能が使用されていることを確認
           const responsiveImages = await page.$$eval(
             "img[srcset], img[data-sizes]",
-            (imgs) => imgs.length,
+            (imgs: HTMLImageElement[]) => imgs.length,
           );
           if (mobileImageSizes.length > 0) {
             console.info(`${responsiveImages} responsive images detected`);
