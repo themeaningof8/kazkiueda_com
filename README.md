@@ -94,11 +94,50 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 bun run dev
 ```
 
+**重要:** このプロジェクトは `dotenvx` で環境変数を暗号化しています。必ず `bun run dev` コマンドを使用してサーバーを起動してください。`bun next dev` や `next dev` を直接実行すると、暗号化された環境変数が復号されず、データベース接続エラーが発生します。
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## トラブルシューティング
+
+### "cannot connect to Postgres" エラーが発生する
+
+**エラーメッセージ:**
+```
+Error: cannot connect to Postgres
+```
+
+**原因:**
+このプロジェクトは `dotenvx` で環境変数を暗号化しています。`bun next dev` や `next dev` を直接実行すると、暗号化された `DATABASE_URL` が復号されずにそのまま使用され、データベース接続に失敗します。
+
+**解決方法:**
+必ず `bun run dev` コマンドを使用してサーバーを起動してください：
+
+```bash
+bun run dev
+```
+
+このコマンドは内部的に `dotenvx run` を使用して環境変数を復号してからサーバーを起動します。
+
+**その他の `dotenvx` コマンド:**
+```bash
+# テストを実行する場合
+bun run test
+
+# ビルドする場合
+bun run build
+
+# 本番サーバーを起動する場合
+bun run start
+```
+
+### 環境変数が見つからない
+
+環境変数は `projects/.env` と `projects/.env.development` (または `projects/.env.production`) に暗号化されて保存されています。これらのファイルは `dotenvx` によって自動的に読み込まれます。
 
 ## Learn More
 

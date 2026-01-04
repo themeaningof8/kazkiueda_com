@@ -7,6 +7,10 @@ const postgresUrlSchema = v.pipe(
   v.string(),
   v.minLength(1, "DATABASE_URLは必須です"),
   v.check(
+    (input) => !input.startsWith("encrypted:"),
+    "DATABASE_URLが暗号化されたままです。`bun run dev`コマンドを使用してサーバーを起動してください。dotenvxによる復号が必要です。",
+  ),
+  v.check(
     (input) => input.startsWith("postgresql://") || input.startsWith("postgres://"),
     "DATABASE_URLはpostgresql://またはpostgres://で始まる必要があります",
   ),
@@ -26,6 +30,10 @@ const baseEnvSchema = v.object({
   ),
   PAYLOAD_SECRET: v.pipe(
     v.string(),
+    v.check(
+      (input) => !input.startsWith("encrypted:"),
+      "PAYLOAD_SECRETが暗号化されたままです。`bun run dev`コマンドを使用してサーバーを起動してください。dotenvxによる復号が必要です。",
+    ),
     v.minLength(32, "PAYLOAD_SECRETは32文字以上である必要があります"),
     v.check(
       (input) => input !== "your-secret-key",
@@ -88,7 +96,15 @@ function validateEnv() {
           issue.path?.map((p: { key: string | number | symbol }) => p.key).join(".") || "root";
         return `  - ${path}: ${issue.message}`;
       });
-      console.error({ issues }, "環境変数の検証に失敗しました");
+      console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      console.error("環境変数の検証に失敗しました");
+      console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      issues.forEach((issue) => console.error(issue));
+      console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      console.error("\n💡 ヒント:");
+      console.error("  環境変数が暗号化されている場合は、以下のコマンドで起動してください:");
+      console.error("    bun run dev");
+      console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
       process.exit(1);
     }
     throw error;
