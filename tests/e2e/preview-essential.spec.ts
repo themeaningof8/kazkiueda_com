@@ -1,8 +1,8 @@
 import { getPreviewSecret, loginAsAdmin } from "./helpers/auth";
 import { expect, test } from "./helpers/fixtures";
 
-// 正しいプレビューシークレットを取得
-const previewSecret = getPreviewSecret();
+// 正しいプレビューシークレットを取得（URL エンコードする）
+const getEncodedPreviewSecret = () => encodeURIComponent(getPreviewSecret());
 
 test.describe("プレビュー機能（重要）", () => {
   test("認証なしアクセスの拒否 - シークレットなし", async ({ page }) => {
@@ -16,7 +16,7 @@ test.describe("プレビュー機能（重要）", () => {
   });
 
   test("認証なしアクセスの拒否 - 不正なシークレット", async ({ page }) => {
-    // 不正なプレビューシークレットでアクセス
+    // 不正なプレビューシークレットでアクセス（URL エンコード済み）
     const response = await page.goto(
       "/preview?collection=posts&slug=any-slug&previewSecret=invalid-secret",
     );
@@ -27,10 +27,12 @@ test.describe("プレビュー機能（重要）", () => {
     expect(body).toContain("Invalid preview secret");
   });
 
-  test("認証なしでのプレビューアクセス時は認証エラー", async ({ page }) => {
+  test("認証なしでのプレビューアクセス時は認証エラー", async ({ page, testData }) => {
     // 認証なしで正しいシークレットとパラメータでアクセス
-    const testSlug = "test-post-slug";
-    const previewUrl = `/preview?collection=posts&slug=${testSlug}&previewSecret=${previewSecret}`;
+    // testDataから実際に存在するslugを使用
+    const testSlug = testData.draftPost.slug;
+    const encodedSecret = getEncodedPreviewSecret();
+    const previewUrl = `/preview?collection=posts&slug=${testSlug}&previewSecret=${encodedSecret}`;
 
     // 完全にクリーンな状態でテストするためクッキーをクリア
     await page.context().clearCookies();
@@ -50,7 +52,8 @@ test.describe("プレビュー機能（重要）", () => {
 
     // 下書き記事のslugを使用（testDataから取得）
     const draftSlug = testData.draftPost.slug;
-    const previewUrl = `/preview?collection=posts&slug=${draftSlug}&previewSecret=${previewSecret}`;
+    const encodedSecret = getEncodedPreviewSecret();
+    const previewUrl = `/preview?collection=posts&slug=${draftSlug}&previewSecret=${encodedSecret}`;
 
     // プレビューURLにアクセス（リダイレクトされることを確認）
     await page.goto(previewUrl, {
