@@ -1,6 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
-import { findPostBySlug, findPosts, findPublishedPostSlugs } from "@/lib/api/payload-client";
+import {
+  clearPayloadCache,
+  findPostBySlug,
+  findPosts,
+  findPublishedPostSlugs,
+} from "@/lib/api/payload-client";
 import { BLOG_CONFIG } from "@/lib/constants";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
 import { createBulkTestPosts, createTestPost, createTestUser } from "@/test/helpers/factories";
@@ -17,6 +22,8 @@ describe("payload-client integration", () => {
 
   afterEach(async () => {
     await truncateAllTables(pool);
+    // テスト間でPayloadインスタンスのキャッシュをクリア
+    clearPayloadCache();
   });
 
   afterAll(async () => {
