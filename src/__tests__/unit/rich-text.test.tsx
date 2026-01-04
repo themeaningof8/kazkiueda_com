@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, test, vi, beforeEach } from "vitest";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
+import { render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { RichTextRenderer } from "@/components/rich-text";
 import { makeLexicalContent } from "@/test/helpers/lexical";
 
@@ -70,15 +70,14 @@ describe("RichTextErrorBoundary", () => {
 
   // console.errorのモック
   const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  let originalError: typeof console.error;
 
   beforeEach(() => {
     consoleErrorSpy.mockClear();
-  });
 
-  test("子コンポーネントでエラーが発生した場合、エラーメッセージが表示される", () => {
     // React はエラーバウンダリーのエラーを console.error に出力するため、
     // テスト中の不要なエラーログを抑制
-    const originalError = console.error;
+    originalError = console.error;
     console.error = vi.fn();
 
     // RichTextコンポーネントがエラーをスローするようにモック
@@ -88,33 +87,24 @@ describe("RichTextErrorBoundary", () => {
         throw new Error("RichText rendering error");
       },
     }));
+  });
 
+  afterEach(() => {
+    // console.errorを元に戻す
+    console.error = originalError;
+  });
+
+  test("子コンポーネントでエラーが発生した場合、エラーメッセージが表示される", () => {
     // 動的にインポートして、新しいモックを使用
     return import("@/components/rich-text").then(({ RichTextRenderer }) => {
       const data = createMockEditorState();
       render(<RichTextRenderer data={data} />);
 
       expect(screen.getByText("コンテンツの読み込みに失敗しました")).toBeInTheDocument();
-
-      // console.errorを元に戻す
-      console.error = originalError;
     });
   });
 
   test("エラーメッセージは適切なスタイルで表示される", () => {
-    // React はエラーバウンダリーのエラーを console.error に出力するため、
-    // テスト中の不要なエラーログを抑制
-    const originalError = console.error;
-    console.error = vi.fn();
-
-    // RichTextコンポーネントがエラーをスローするようにモック
-    vi.resetModules();
-    vi.doMock("@payloadcms/richtext-lexical/react", () => ({
-      RichText: () => {
-        throw new Error("RichText rendering error");
-      },
-    }));
-
     // 動的にインポートして、新しいモックを使用
     return import("@/components/rich-text").then(({ RichTextRenderer }) => {
       const data = createMockEditorState();
@@ -125,9 +115,6 @@ describe("RichTextErrorBoundary", () => {
       expect(errorElement).toHaveClass("bg-destructive/10");
       expect(errorElement).toHaveClass("text-destructive");
       expect(errorElement).toHaveClass("rounded-lg");
-
-      // console.errorを元に戻す
-      console.error = originalError;
     });
   });
 });
