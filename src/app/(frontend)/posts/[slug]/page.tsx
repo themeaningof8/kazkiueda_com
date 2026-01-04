@@ -5,7 +5,7 @@ import { ArticleContent } from "@/components/article-content";
 import { ErrorPage } from "@/components/error-page";
 import { getPostBySlug } from "@/lib/posts";
 
-// ISR: 1時間ごとに再検証
+// ISR: 個別記事は1時間ごとに再検証（SEOとパフォーマンスのバランス）
 export const revalidate = 3600;
 
 // 動的レンダリング: ビルド時のDB接続を回避

@@ -8,6 +8,13 @@ import {
 import { BLOG_CONFIG } from "./constants";
 import type { FetchResult } from "./types";
 
+/**
+ * キャッシュ戦略:
+ * - React cache() を使用してリクエスト内の重複呼び出しを防ぐ
+ * - ISR (revalidate = 3600) と組み合わせて1時間のキャッシュを実現
+ * - キャッシュキーは関数引数に基づいて自動生成される
+ */
+
 type FetchOptions = {
   draft?: boolean;
   overrideAccess?: boolean;

@@ -47,7 +47,6 @@ jobs:
     with:
       suite: integration
       dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
-      integration-script: ${{ matrix.integration-script }}
 
   e2e-essential:
     name: E2E Essential

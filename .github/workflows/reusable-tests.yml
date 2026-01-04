@@ -100,14 +100,9 @@ jobs:
       - name: Run integration tests
         if: inputs.suite == 'integration'
         run: |
-          if [ -n "${{ inputs.integration-script }}" ]; then
-            # Extract test file path from script name (e.g., test:integration:payload-client -> payload-client.test.ts)
-            test_file=$(echo "${{ inputs.integration-script }}" | sed 's/test:integration://').test.ts
-            bunx dotenvx run -f projects/.env.development -- bunx vitest run "src/__tests__/integration/${test_file}"
-          else
-            bun run test:integration:posts
-            bun run test:integration:server-actions
-          fi
+          # Run all integration tests sequentially using the created Neon branch
+          # fileParallelism is set to false in vitest.config.ts to prevent DB deadlocks
+          bunx dotenvx run -f projects/.env.development -- bunx vitest run src/__tests__/integration
         env:
           ALLOW_NON_TEST_DATABASE_URL: true
 
