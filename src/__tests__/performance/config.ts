@@ -49,22 +49,19 @@ export const PERFORMANCE_THRESHOLDS = {
 } as const;
 
 /**
- * Lighthouse設定
+ * Lighthouse設定 (Flags形式)
  */
 export const LIGHTHOUSE_CONFIG = {
-  extends: "lighthouse:default",
-  settings: {
-    onlyCategories: ["performance"],
-    formFactor: "desktop",
-    screenEmulation: {
-      mobile: false,
-      width: 1350,
-      height: 940,
-      deviceScaleFactor: 1,
-      disabled: false,
-    },
+  onlyCategories: ["performance"],
+  formFactor: "desktop" as const,
+  screenEmulation: {
+    mobile: false,
+    width: 1350,
+    height: 940,
+    deviceScaleFactor: 1,
+    disabled: false,
   },
-} as const;
+};
 
 /**
  * テスト実行環境の設定

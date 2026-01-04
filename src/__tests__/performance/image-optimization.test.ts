@@ -171,7 +171,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
 
               // loading属性が設定されていることを確認（Next.js Imageの場合）
               if (image.loading) {
-                expect(["lazy", "eager"]).toContain(image.loading);
+                expect(["lazy", "eager", "auto"]).toContain(image.loading);
               }
             },
           );

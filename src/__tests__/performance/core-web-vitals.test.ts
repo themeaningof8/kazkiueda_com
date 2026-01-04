@@ -42,11 +42,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test.skipIf(shouldSkipPerformanceTest("ci-only") || !TEST_ENVIRONMENT.isCI)(
       "should meet Core Web Vitals thresholds for homepage",
       async () => {
-        const url = new URL(serverUrl);
-        const runnerResult = await lighthouse(serverUrl, {
-          ...LIGHTHOUSE_CONFIG,
-          port: url.port ? parseInt(url.port, 10) : 80,
-        });
+        const runnerResult = await lighthouse(serverUrl, LIGHTHOUSE_CONFIG);
 
         expect(runnerResult).toBeDefined();
         if (!runnerResult?.lhr) {
@@ -114,11 +110,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
       async () => {
         const blogUrl = `${serverUrl}/blog`;
 
-        const url = new URL(serverUrl);
-        const runnerResult = await lighthouse(blogUrl, {
-          ...LIGHTHOUSE_CONFIG,
-          port: url.port ? parseInt(url.port, 10) : 80,
-        });
+        const runnerResult = await lighthouse(blogUrl, LIGHTHOUSE_CONFIG);
 
         expect(runnerResult).toBeDefined();
 
@@ -177,11 +169,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
         // テスト用の記事URLを取得（実際の環境に合わせて調整）
         const postUrl = `${serverUrl}/posts/sample-post`;
 
-        const url = new URL(serverUrl);
-        const runnerResult = await lighthouse(postUrl, {
-          ...LIGHTHOUSE_CONFIG,
-          port: url.port ? parseInt(url.port, 10) : 80,
-        });
+        const runnerResult = await lighthouse(postUrl, LIGHTHOUSE_CONFIG);
 
         expect(runnerResult).toBeDefined();
 
