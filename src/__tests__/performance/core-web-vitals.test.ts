@@ -21,7 +21,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
 
   beforeAll(async () => {
     // テスト環境のセットアップ
-    serverUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 
     // CI環境でのみブラウザを起動
     if (TEST_ENVIRONMENT.isCI && !TEST_ENVIRONMENT.headless) {
