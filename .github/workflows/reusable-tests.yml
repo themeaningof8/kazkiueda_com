@@ -115,8 +115,10 @@ jobs:
       - name: Start Next.js server
         if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
         run: |
-          bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next dev --port 3001 > /tmp/next-dev.log 2>&1 &
-          bunx wait-on http://localhost:3001 -t 60000
+          # Build first for production-like environment and stability
+          bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next build
+          bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next start --port 3001 > /tmp/next-server.log 2>&1 &
+          bunx wait-on http://localhost:3001 -t 120000
         env:
           # Required for Next.js/Payload to start
           NEXT_PUBLIC_SERVER_URL: http://localhost:3001
@@ -151,13 +153,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: server-logs-${{ inputs.suite }}
-          path: /tmp/next-dev.log
+          path: /tmp/next-server.log
           retention-days: 7
 
       # ---------- Cleanup ----------
       - name: Stop Next.js server
         if: always() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
-        run: pkill -f 'next dev' || true
+        run: pkill -f 'next start' || true
 
       - name: Delete Neon test branch
         if: always() && (inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
