@@ -95,11 +95,15 @@ jobs:
         if: inputs.suite == 'integration'
         run: |
           if [ -n "${{ inputs.integration-script }}" ]; then
-            bun run "${{ inputs.integration-script }}"
+            # Extract test file path from script name (e.g., test:integration:payload-client -> payload-client.test.ts)
+            test_file=$(echo "${{ inputs.integration-script }}" | sed 's/test:integration://').test.ts
+            bunx vitest run "src/__tests__/integration/${test_file}"
           else
             bun run test:integration:posts
             bun run test:integration:server-actions
           fi
+        env:
+          ALLOW_NON_TEST_DATABASE_URL: true
 
       # ---------- E2E ----------
       - name: Start Next.js server
