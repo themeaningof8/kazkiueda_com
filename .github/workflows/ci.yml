@@ -48,9 +48,18 @@ jobs:
       dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
       integration-script: ${{ matrix.integration-script }}
 
+  performance:
+    name: Performance Tests
+    needs: integration
+    uses: ./.github/workflows/reusable-tests.yml
+    secrets: inherit
+    with:
+      suite: performance
+      dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
+
   e2e-essential:
     name: E2E Essential
-    needs: integration
+    needs: performance
     uses: ./.github/workflows/reusable-tests.yml
     secrets: inherit
     with:

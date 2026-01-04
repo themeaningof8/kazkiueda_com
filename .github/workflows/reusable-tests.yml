@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       suite:
-        description: "Test preset: static | unit | integration | e2e-essential | e2e-full"
+        description: "Test preset: static | unit | integration | performance | e2e-essential | e2e-full"
         required: true
         type: string
       env-file:
@@ -65,7 +65,7 @@ jobs:
       - name: Setup (with Playwright when needed)
         uses: ./.github/actions/setup
         with:
-          playwright: ${{ inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full' }}
+          playwright: ${{ inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full' || inputs.suite == 'performance' }}
 
       # ---------- Static ----------
       - name: Run static checks
@@ -76,6 +76,11 @@ jobs:
       - name: Run unit tests
         if: inputs.suite == 'unit'
         run: bun run test:coverage:unit
+
+      # ---------- Performance ----------
+      - name: Run performance tests
+        if: inputs.suite == 'performance'
+        run: bun run test:performance:ci
 
       # ---------- Integration / E2E Database Setup ----------
       - name: Create Neon test branch
