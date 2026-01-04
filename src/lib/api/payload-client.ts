@@ -84,7 +84,7 @@ type PayloadFindOptions<T extends "posts" | "media" | "users"> = {
   select?: {
     slug?: boolean;
   };
-  populate?: any; // リレーションシップのpopulate設定
+  populate?: Record<string, boolean>; // リレーションシップのpopulate設定
 };
 
 type CollectionDataType = {
