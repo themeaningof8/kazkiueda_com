@@ -84,9 +84,10 @@ jobs:
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
         run: |
           # Use environment variables directly instead of dotenvx
+          # Use migrate:fresh for clean test database setup
           bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
             PAYLOAD_CONFIG_PATH=src/payload.config.ts \
-            payload migrate --force-accept-warning
+            payload migrate:fresh --force-accept-warning
         env:
           PAYLOAD_SECRET: ci-test-secret-key-for-testing-only
 
