@@ -13,6 +13,8 @@
  * パフォーマンス回帰を早期に検出します。
  */
 
+// knip: ignore
+
 export * from "./bundle-size.test";
 export * from "./core-web-vitals.test";
 export * from "./image-optimization.test";

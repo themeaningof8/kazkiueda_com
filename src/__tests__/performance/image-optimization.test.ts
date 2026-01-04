@@ -14,7 +14,7 @@ import { shouldSkipPerformanceTest } from "./utils";
 
 declare global {
   interface Window {
-    imageLoadTimes?: Array<{
+    imageLoadTimes: Array<{
       url: string;
       loadTime: number;
       size: number;
@@ -48,10 +48,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should load images within acceptable time",
       async () => {
-        if (!browser) {
-          throw new Error("Browser not initialized");
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
         }
-        const page = await browser!.newPage();
 
         try {
           // Performance observerを設定して画像のロード時間を監視
@@ -89,7 +89,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
 
           // 画像のロード時間を取得
           const imageLoadTimes = await page.evaluate(() => {
-            return window.imageLoadTimes || [];
+            return window.imageLoadTimes;
           });
 
           // 各画像のロード時間を検証
@@ -114,7 +114,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should use optimized image formats",
       async () => {
-        const page = await browser!.newPage();
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
+        }
 
         try {
           await page.goto(serverUrl, {
@@ -182,7 +185,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test.skipIf(shouldSkipPerformanceTest("ci-only") || !TEST_ENVIRONMENT.isCI)(
       "should use modern image formats",
       async () => {
-        const page = await browser!.newPage();
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
+        }
 
         try {
           await page.goto(serverUrl, {
@@ -233,7 +239,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should optimize image sizes",
       async () => {
-        const page = await browser!.newPage();
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
+        }
 
         try {
           await page.setViewport({ width: 1920, height: 1080 });
@@ -332,7 +341,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should check for missing images",
       async () => {
-        const page = await browser!.newPage();
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
+        }
 
         try {
           const brokenImages: Array<{ url: string; status: number }> = [];
@@ -375,7 +387,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
     test(
       "should adapt image sizes to viewport",
       async () => {
-        const page = await browser!.newPage();
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
+        }
 
         try {
           // モバイルビューポート

@@ -3,7 +3,14 @@
   "entry": ["src/app/**/*.{ts,tsx}", "src/payload.config.ts"],
   "project": ["src/**/*.{ts,tsx}"],
   "ignore": ["src/payload-types.ts", "src/migrations/**/*.ts", "**/*.d.ts"],
-  "ignoreDependencies": ["tailwindcss", "tw-animate-css", "tsx"],
+  "ignoreDependencies": [
+    "tailwindcss",
+    "tw-animate-css",
+    "tsx",
+    "bundlesize",
+    "memlab",
+    "webpack-bundle-analyzer"
+  ],
   "ignoreBinaries": ["build"],
   "ignoreExportsUsedInFile": true,
   "next": {

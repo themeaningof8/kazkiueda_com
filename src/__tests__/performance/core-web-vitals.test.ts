@@ -53,7 +53,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
           throw new Error("Lighthouse result is missing lhr property");
         }
 
-        const vitals = extractCoreWebVitals(runnerResult as any);
+        const vitals = extractCoreWebVitals(runnerResult);
 
         // LCP: 2.5秒以内 (Good threshold)
         assertPerformanceThreshold("coreWebVitals", "lcp", vitals.lcp, "ms");
@@ -76,7 +76,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test(
       "should load homepage within acceptable time",
       async () => {
-        const page = await browser!.newPage();
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
+        }
 
         try {
           const startTime = Date.now();
@@ -138,7 +141,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test(
       "should load blog page efficiently",
       async () => {
-        const page = await browser!.newPage();
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
+        }
 
         try {
           const startTime = Date.now();
@@ -198,7 +204,10 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test(
       "should handle dynamic content loading efficiently",
       async () => {
-        const page = await browser!.newPage();
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
+        }
 
         try {
           // 実際の記事が存在しない場合もあるので、404ページのテストに変更

@@ -43,10 +43,10 @@ describe("Memory Leak Detection", () => {
     test.skipIf(shouldSkipPerformanceTest("heavy") || !TEST_ENVIRONMENT.isCI)(
       "should not have memory leaks during navigation",
       async () => {
-        if (!browser) {
-          throw new Error("Browser not initialized");
+        const page = await browser?.newPage();
+        if (!page) {
+          throw new Error("Browser not available");
         }
-        const page = await browser!.newPage();
 
         try {
           // 初期メモリ使用量を測定
@@ -191,7 +191,7 @@ describe("Memory Leak Detection", () => {
             let count = 0;
             const elements = document.querySelectorAll("*");
             elements.forEach((el: Element) => {
-              const element = el as any;
+              const element = el as Element & { _events?: unknown; __events?: unknown };
               if (element._events || element.__events) {
                 count++;
               }
@@ -207,7 +207,7 @@ describe("Memory Leak Detection", () => {
             let count = 0;
             const elements = document.querySelectorAll("*");
             elements.forEach((el: Element) => {
-              const element = el as any;
+              const element = el as Element & { _events?: unknown; __events?: unknown };
               if (element._events || element.__events) {
                 count++;
               }
@@ -310,6 +310,9 @@ describe("Memory Leak Detection", () => {
 
   describe.skipIf(!TEST_ENVIRONMENT.isCI)("Resource Cleanup Verification", () => {
     test("should properly close browser resources", async () => {
+      if (!browser) {
+        throw new Error("Browser not initialized");
+      }
       const page = await browser.newPage();
 
       try {

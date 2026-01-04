@@ -4,6 +4,8 @@
  * パフォーマンステストで使用する共通のユーティリティ関数を提供します。
  */
 
+// knip: ignore
+
 import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "./config";
 
 /**
@@ -112,6 +114,7 @@ export function shouldSkipPerformanceTest(reason?: string): boolean {
 /**
  * Lighthouse結果からCore Web Vitalsを取得
  */
+// biome-ignore lint/suspicious/noExplicitAny: Lighthouse API returns complex nested object
 export function extractCoreWebVitals(lighthouseResult: any) {
   const audits = lighthouseResult.lhr.audits;
 
