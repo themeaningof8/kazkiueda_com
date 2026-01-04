@@ -41,12 +41,12 @@ jobs:
           - test:integration:collections-posts
           - test:integration:collections-users
           - test:integration:collections-media
+          - test:integration:preview-route
     uses: ./.github/workflows/reusable-tests.yml
     secrets: inherit
     with:
       suite: integration
       dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
-      integration-script: ${{ matrix.integration-script }}
 
   performance:
     name: Performance Tests
