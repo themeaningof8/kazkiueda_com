@@ -76,11 +76,6 @@ describe("RichTextErrorBoundary", () => {
   });
 
   test("子コンポーネントでエラーが発生した場合、エラーメッセージが表示される", () => {
-    // React はエラーバウンダリーのエラーを console.error に出力するため、
-    // テスト中の不要なエラーログを抑制
-    const originalError = console.error;
-    console.error = vi.fn();
-
     // RichTextコンポーネントがエラーをスローするようにモック
     vi.resetModules();
     vi.doMock("@payloadcms/richtext-lexical/react", () => ({
@@ -95,18 +90,10 @@ describe("RichTextErrorBoundary", () => {
       render(<RichTextRenderer data={data} />);
 
       expect(screen.getByText("コンテンツの読み込みに失敗しました")).toBeInTheDocument();
-
-      // console.errorを元に戻す
-      console.error = originalError;
     });
   });
 
   test("エラーメッセージは適切なスタイルで表示される", () => {
-    // React はエラーバウンダリーのエラーを console.error に出力するため、
-    // テスト中の不要なエラーログを抑制
-    const originalError = console.error;
-    console.error = vi.fn();
-
     // RichTextコンポーネントがエラーをスローするようにモック
     vi.resetModules();
     vi.doMock("@payloadcms/richtext-lexical/react", () => ({
@@ -125,9 +112,6 @@ describe("RichTextErrorBoundary", () => {
       expect(errorElement).toHaveClass("bg-destructive/10");
       expect(errorElement).toHaveClass("text-destructive");
       expect(errorElement).toHaveClass("rounded-lg");
-
-      // console.errorを元に戻す
-      console.error = originalError;
     });
   });
 });
