@@ -28,6 +28,8 @@ on:
         default: ""
         type: string
     secrets:
+      DOTENV_PRIVATE_KEY:
+        required: false
       DOTENV_PRIVATE_KEY_DEVELOPMENT:
         required: false
       DOTENV_PRIVATE_KEY_PRODUCTION:
@@ -39,6 +41,7 @@ jobs:
     timeout-minutes: 30
     env:
       NODE_ENV: test
+      DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
       DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
       DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
     steps:
@@ -47,14 +50,17 @@ jobs:
 
       - name: Setup environment keys
         run: |
+          # Note: DOTENV_PRIVATE_KEY is already set in job env for .env decryption
+          # This step only sets the specific key variant if needed
           key_name="${{ inputs.dotenv-key-name }}"
-          if [ "$key_name" = "DOTENV_PRIVATE_KEY_DEVELOPMENT" ]; then
-            key_value="${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}"
-          elif [ "$key_name" = "DOTENV_PRIVATE_KEY_PRODUCTION" ]; then
-            key_value="${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}"
+          if [ -n "$key_name" ]; then
+            if [ "$key_name" = "DOTENV_PRIVATE_KEY_DEVELOPMENT" ]; then
+              key_value="${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}"
+            elif [ "$key_name" = "DOTENV_PRIVATE_KEY_PRODUCTION" ]; then
+              key_value="${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}"
+            fi
+            echo "$key_name=$key_value" >> $GITHUB_ENV
           fi
-          echo "DOTENV_PRIVATE_KEY=$key_value" >> $GITHUB_ENV
-          echo "$key_name=$key_value" >> $GITHUB_ENV
 
       - name: Setup (with Playwright when needed)
         uses: ./.github/actions/setup
