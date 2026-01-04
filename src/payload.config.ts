@@ -10,7 +10,6 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Posts } from './collections/Posts'
 import { env, isProduction, isDevelopment } from './lib/env'
-import { payloadLogger } from './lib/logger'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -108,14 +107,14 @@ export default buildConfig({
     // 初回ユーザー作成の案内
     const usersCount = await payload.count({ collection: 'users' })
     if (usersCount.totalDocs === 0) {
-      payloadLogger.warn('No users found. Please create your first admin user at /admin')
+      console.warn('No users found. Please create your first admin user at /admin')
     }
     // ストレージ設定の確認
     const storageConfig = buildStorageConfig()
     if (storageConfig) {
-      payloadLogger.info({ storageType: 'r2' }, 'Cloudflare R2 storage is configured')
+      console.info({ storageType: 'r2' }, 'Cloudflare R2 storage is configured')
     } else {
-      payloadLogger.info({ storageType: 'local' }, 'Using local storage (set R2 environment variables to use Cloudflare R2)')
+      console.info({ storageType: 'local' }, 'Using local storage (set R2 environment variables to use Cloudflare R2)')
     }
   },
 })

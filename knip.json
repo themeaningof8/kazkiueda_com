@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "entry": ["src/app/**/*.{ts,tsx}", "src/payload.config.ts", "src/lib/actions/**/*.ts"],
+  "entry": ["src/app/**/*.{ts,tsx}", "src/payload.config.ts"],
   "project": ["src/**/*.{ts,tsx}"],
   "ignore": ["src/payload-types.ts", "src/migrations/**/*.ts", "**/*.d.ts"],
   "ignoreDependencies": ["pino-pretty", "tailwindcss", "tw-animate-css", "tsx"],

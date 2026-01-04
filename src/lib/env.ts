@@ -1,5 +1,4 @@
 import * as v from "valibot";
-import { envLogger } from "./logger";
 
 /**
  * PostgreSQL接続文字列の検証
@@ -89,7 +88,7 @@ function validateEnv() {
           issue.path?.map((p: { key: string | number | symbol }) => p.key).join(".") || "root";
         return `  - ${path}: ${issue.message}`;
       });
-      envLogger.error({ issues }, "環境変数の検証に失敗しました");
+      console.error({ issues }, "環境変数の検証に失敗しました");
       process.exit(1);
     }
     throw error;
