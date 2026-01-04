@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, test, vi, beforeEach } from "vitest";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
+import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { RichTextRenderer } from "@/components/rich-text";
 import { makeLexicalContent } from "@/test/helpers/lexical";
 

@@ -1,5 +1,5 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorPage } from "@/components/error-page";
 
 describe("ErrorPage", () => {
@@ -20,37 +20,49 @@ describe("ErrorPage", () => {
     test("networkエラーの場合、接続エラーが表示される", () => {
       render(<ErrorPage error={{ type: "network" }} />);
       expect(screen.getByText("接続エラー")).toBeInTheDocument();
-      expect(screen.getByText("ネットワークに接続できません。インターネット接続を確認してください。")).toBeInTheDocument();
+      expect(
+        screen.getByText("ネットワークに接続できません。インターネット接続を確認してください。"),
+      ).toBeInTheDocument();
     });
 
     test("serverエラーの場合、サーバーエラーが表示される", () => {
       render(<ErrorPage error={{ type: "server" }} />);
       expect(screen.getByText("サーバーエラー")).toBeInTheDocument();
-      expect(screen.getByText("サーバーで問題が発生しました。しばらく経ってから再度お試しください。")).toBeInTheDocument();
+      expect(
+        screen.getByText("サーバーで問題が発生しました。しばらく経ってから再度お試しください。"),
+      ).toBeInTheDocument();
     });
 
     test("timeoutエラーの場合、タイムアウトが表示される", () => {
       render(<ErrorPage error={{ type: "timeout" }} />);
       expect(screen.getByText("タイムアウト")).toBeInTheDocument();
-      expect(screen.getByText("読み込みに時間がかかっています。ネットワーク接続を確認してください。")).toBeInTheDocument();
+      expect(
+        screen.getByText("読み込みに時間がかかっています。ネットワーク接続を確認してください。"),
+      ).toBeInTheDocument();
     });
 
     test("not_foundエラーの場合、ページが見つかりませんが表示される", () => {
       render(<ErrorPage error={{ type: "not_found" }} />);
       expect(screen.getByText("ページが見つかりません")).toBeInTheDocument();
-      expect(screen.getByText("お探しのページは存在しないか、移動した可能性があります。")).toBeInTheDocument();
+      expect(
+        screen.getByText("お探しのページは存在しないか、移動した可能性があります。"),
+      ).toBeInTheDocument();
     });
 
     test("unknownエラーの場合、デフォルトのエラーメッセージが表示される", () => {
       render(<ErrorPage error={{ type: "unknown" }} />);
       expect(screen.getByText("エラーが発生しました")).toBeInTheDocument();
-      expect(screen.getByText("予期しないエラーが発生しました。再度お試しください。")).toBeInTheDocument();
+      expect(
+        screen.getByText("予期しないエラーが発生しました。再度お試しください。"),
+      ).toBeInTheDocument();
     });
 
     test("エラーが指定されていない場合、デフォルトのエラーメッセージが表示される", () => {
       render(<ErrorPage />);
       expect(screen.getByText("エラーが発生しました")).toBeInTheDocument();
-      expect(screen.getByText("予期しないエラーが発生しました。再度お試しください。")).toBeInTheDocument();
+      expect(
+        screen.getByText("予期しないエラーが発生しました。再度お試しください。"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -60,7 +72,9 @@ describe("ErrorPage", () => {
       render(<ErrorPage error={{ type: "server" }} />);
 
       expect(screen.getByText("オフライン")).toBeInTheDocument();
-      expect(screen.getByText("インターネットに接続されていません。接続を確認して再度お試しください。")).toBeInTheDocument();
+      expect(
+        screen.getByText("インターネットに接続されていません。接続を確認して再度お試しください。"),
+      ).toBeInTheDocument();
     });
 
     test("オンラインイベントが発生すると、エラーメッセージが表示される", async () => {
@@ -102,7 +116,9 @@ describe("ErrorPage", () => {
     test("error.messageが指定されている場合、追加メッセージが表示される", () => {
       render(<ErrorPage error={{ type: "server", message: "詳細なエラーメッセージ" }} />);
       expect(screen.getByText("詳細なエラーメッセージ")).toBeInTheDocument();
-      expect(screen.getByText("サーバーで問題が発生しました。しばらく経ってから再度お試しください。")).toBeInTheDocument();
+      expect(
+        screen.getByText("サーバーで問題が発生しました。しばらく経ってから再度お試しください。"),
+      ).toBeInTheDocument();
     });
 
     test("error.messageが指定されていない場合、追加メッセージは表示されない", () => {
