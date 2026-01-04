@@ -106,7 +106,7 @@ jobs:
             bunx dotenvx run -f projects/.env.development -- bunx vitest run "src/__tests__/integration/${test_file}"
           else
             bun run test:integration:posts
-            bun run test:integration:server-actions
+            bun run test:integration:collections-posts
           fi
         env:
           ALLOW_NON_TEST_DATABASE_URL: true

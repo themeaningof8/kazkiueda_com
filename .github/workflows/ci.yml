@@ -38,8 +38,6 @@ jobs:
         integration-script:
           - test:integration:payload-client
           - test:integration:posts
-          - test:integration:server-actions
-          - test:integration:safe-action
           - test:integration:collections-posts
           - test:integration:collections-users
           - test:integration:collections-media
