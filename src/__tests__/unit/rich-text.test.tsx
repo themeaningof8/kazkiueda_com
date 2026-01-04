@@ -60,14 +60,6 @@ describe("RichTextRenderer", () => {
 });
 
 describe("RichTextErrorBoundary", () => {
-  // エラーをスローするコンポーネント
-  const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
-    if (shouldThrow) {
-      throw new Error("Test error");
-    }
-    return <div>No error</div>;
-  };
-
   // console.errorのモック
   const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
