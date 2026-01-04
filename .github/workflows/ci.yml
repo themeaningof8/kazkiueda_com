@@ -32,21 +32,11 @@ jobs:
   integration:
     name: Integration Tests
     needs: unit
-    strategy:
-      fail-fast: false
-      matrix:
-        integration-script:
-          - test:integration:payload-client
-          - test:integration:posts
-          - test:integration:collections-posts
-          - test:integration:collections-users
-          - test:integration:collections-media
     uses: ./.github/workflows/reusable-tests.yml
     secrets: inherit
     with:
       suite: integration
       dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
-      integration-script: ${{ matrix.integration-script }}
 
   e2e-essential:
     name: E2E Essential
