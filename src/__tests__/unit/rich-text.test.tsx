@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import { RichTextRenderer } from "@/components/rich-text";
+import { makeLexicalContent } from "@/test/helpers/lexical";
 
 // RichTextコンポーネントのモック
 const mockRichText = vi.fn();
@@ -14,35 +15,7 @@ vi.mock("@payloadcms/richtext-lexical/react", () => ({
 
 // テスト用のモックデータ生成関数
 const createMockEditorState = (): SerializedEditorState => {
-  return {
-    root: {
-      children: [
-        {
-          children: [
-            {
-              detail: 0,
-              format: 0,
-              mode: "normal",
-              style: "",
-              text: "Sample text",
-              type: "text",
-              version: 1,
-            },
-          ],
-          direction: "ltr",
-          format: "",
-          indent: 0,
-          type: "paragraph",
-          version: 1,
-        },
-      ],
-      direction: "ltr",
-      format: "",
-      indent: 0,
-      type: "root",
-      version: 1,
-    },
-  };
+  return makeLexicalContent("Sample text") as SerializedEditorState;
 };
 
 describe("RichTextRenderer", () => {

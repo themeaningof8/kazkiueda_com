@@ -1,5 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import { ErrorPage } from "@/components/error-page";
 
@@ -121,13 +120,12 @@ describe("ErrorPage", () => {
       expect(screen.getByRole("button", { name: "再読み込み" })).toBeInTheDocument();
     });
 
-    test("リトライボタンをクリックすると、onRetryが呼ばれる", async () => {
-      const user = userEvent.setup();
+    test("リトライボタンをクリックすると、onRetryが呼ばれる", () => {
       const onRetry = vi.fn();
       render(<ErrorPage error={{ type: "server" }} onRetry={onRetry} />);
 
       const retryButton = screen.getByRole("button", { name: "再読み込み" });
-      await user.click(retryButton);
+      fireEvent.click(retryButton);
 
       expect(onRetry).toHaveBeenCalledTimes(1);
     });
@@ -165,14 +163,13 @@ describe("ErrorPage", () => {
       expect(screen.queryByRole("button")).not.toBeInTheDocument();
     });
 
-    test("再読み込みボタンをクリックすると、window.location.reloadが呼ばれる", async () => {
-      const user = userEvent.setup();
+    test("再読み込みボタンをクリックすると、window.location.reloadが呼ばれる", () => {
       const reloadSpy = vi.spyOn(window.location, "reload").mockImplementation(() => {});
 
       render(<ErrorPage error={{ type: "timeout" }} />);
 
       const reloadButton = screen.getByRole("button", { name: "再読み込み" });
-      await user.click(reloadButton);
+      fireEvent.click(reloadButton);
 
       expect(reloadSpy).toHaveBeenCalledTimes(1);
 
