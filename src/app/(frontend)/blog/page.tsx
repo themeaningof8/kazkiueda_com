@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description: "ブログ記事の一覧ページです。",
 };
 
-// ISR: 1時間ごとに再検証
+// ISR: 記事一覧は1時間ごとに再検証（最新記事の反映バランス）
 export const revalidate = 3600;
 
 interface BlogPageProps {

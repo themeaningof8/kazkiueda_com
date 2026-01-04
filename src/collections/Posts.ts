@@ -173,5 +173,10 @@ export const Posts: CollectionConfig = {
     {
       fields: ["_status", "publishedDate"],
     },
+    // slug検索を最適化（slugと_statusの組み合わせ）
+    // 公開記事のslug検索時に使用されるため、複合インデックスを追加
+    {
+      fields: ["slug", "_status"],
+    },
   ],
 };

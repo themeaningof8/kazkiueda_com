@@ -1,9 +1,12 @@
 import config from "@payload-config";
-import { getPayload, type Where } from "payload";
+import { getPayload, type Payload, type Where } from "payload";
 import { BLOG_CONFIG } from "@/lib/constants";
 import type { ErrorType, PayloadFindResult } from "@/lib/types";
 import type { Media, Post, User } from "@/payload-types";
 import { buildPublishStatusFilter, buildSlugFilter } from "./payload-filters";
+
+// Payloadインスタンスのキャッシュ（プロセス内で一度だけ初期化）
+let payloadInstance: Payload | null = null;
 
 /**
  * エラーを分類して適切なErrorTypeを返す
@@ -53,6 +56,23 @@ function classifyError(error: unknown): ErrorType {
   return "UNKNOWN";
 }
 
+/**
+ * Payloadインスタンスを取得（キャッシュされたものを使用）
+ */
+async function getPayloadInstance(): Promise<Payload> {
+  if (!payloadInstance) {
+    payloadInstance = await getPayload({ config });
+  }
+  return payloadInstance;
+}
+
+/**
+ * テスト用：Payloadインスタンスのキャッシュをクリア
+ */
+export function clearPayloadCache(): void {
+  payloadInstance = null;
+}
+
 type PayloadFindOptions<T extends "posts" | "media" | "users"> = {
   collection: T;
   where?: Where;
@@ -64,6 +84,7 @@ type PayloadFindOptions<T extends "posts" | "media" | "users"> = {
   select?: {
     slug?: boolean;
   };
+  populate?: any; // リレーションシップのpopulate設定
 };
 
 type CollectionDataType = {
@@ -83,7 +104,7 @@ async function findPayload<T extends "posts" | "media" | "users">(
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const payload = await getPayload({ config });
+      const payload = await getPayloadInstance();
 
       const result = await payload.find({
         collection: options.collection,
@@ -94,6 +115,7 @@ async function findPayload<T extends "posts" | "media" | "users">(
         draft: options.draft,
         overrideAccess: options.overrideAccess,
         select: options.select,
+        populate: options.populate,
       });
 
       // PaginatedDocs を PayloadFindResult に変換
@@ -142,6 +164,10 @@ export async function findPostBySlug(
       limit: 1,
       draft: options.draft,
       overrideAccess: options.overrideAccess,
+      populate: {
+        featuredImage: true,
+        author: true,
+      },
     });
   } catch (_error) {
     // エラーが発生したら空の結果を返す
@@ -170,6 +196,10 @@ export async function findPosts(
       page: options.page,
       draft: options.draft,
       overrideAccess: options.overrideAccess,
+      populate: {
+        featuredImage: true,
+        author: true,
+      },
     });
   } catch (_error) {
     // エラーが発生したら空の結果を返す
@@ -184,30 +214,70 @@ export async function findPosts(
 
 /**
  * 公開記事のスラッグ一覧を取得（SSG用）
+ * 並列処理でパフォーマンスを最適化
  */
 export async function findPublishedPostSlugs(): Promise<Array<{ slug: string }>> {
   try {
-    const allSlugs: { slug: string }[] = [];
-    let currentPage = 1;
-    let hasMore = true;
     const pageSize = BLOG_CONFIG.PAGINATION_PAGE_SIZE_SSG;
+    const maxConcurrentRequests = 5; // 同時実行数を制限してDB負荷をコントロール
 
-    while (hasMore) {
-      const result = await findPayload<"posts">({
-        collection: "posts",
-        where: { _status: { equals: "published" } },
-        limit: pageSize,
-        page: currentPage,
-        select: { slug: true },
+    // 最初のページを取得して総件数を把握
+    const firstResult = await findPayload<"posts">({
+      collection: "posts",
+      where: { _status: { equals: "published" } },
+      limit: pageSize,
+      page: 1,
+      select: { slug: true },
+    });
+
+    const allSlugs: { slug: string }[] = [];
+    const firstPageSlugs = firstResult.docs.map((post) => ({
+      slug: post.slug ?? "",
+    }));
+    allSlugs.push(...firstPageSlugs.filter((s) => s.slug));
+
+    const totalPages = firstResult.totalPages ?? 1;
+
+    if (totalPages <= 1) {
+      // 1ページのみの場合はそのまま返す
+      return allSlugs;
+    }
+
+    // 残りのページを並列で取得
+    const remainingPages = [];
+    for (let page = 2; page <= totalPages; page++) {
+      remainingPages.push(page);
+    }
+
+    // 同時実行数を制限しながら並列処理
+    const pagePromises: Promise<{ slug: string }[]>[] = [];
+    for (let i = 0; i < remainingPages.length; i += maxConcurrentRequests) {
+      const batch = remainingPages.slice(i, i + maxConcurrentRequests);
+      const batchPromises = batch.map(async (page) => {
+        const result = await findPayload<"posts">({
+          collection: "posts",
+          where: { _status: { equals: "published" } },
+          limit: pageSize,
+          page,
+          select: { slug: true },
+        });
+
+        return result.docs
+          .map((post) => ({
+            slug: post.slug ?? "",
+          }))
+          .filter((s) => s.slug);
       });
 
-      const slugs = result.docs.map((post) => ({
-        slug: post.slug ?? "",
-      }));
+      pagePromises.push(...batchPromises);
+    }
 
-      allSlugs.push(...slugs.filter((s) => s.slug));
-      hasMore = result.hasNextPage ?? false;
-      currentPage++;
+    // すべてのバッチが完了するのを待つ
+    const batchResults = await Promise.all(pagePromises);
+
+    // 結果を統合
+    for (const slugs of batchResults) {
+      allSlugs.push(...slugs);
     }
 
     return allSlugs;
