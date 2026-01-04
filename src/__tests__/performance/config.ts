@@ -76,6 +76,8 @@ export const TEST_ENVIRONMENT = {
   isCI: process.env.CI === "true",
   // ヘッドレスブラウザを使用
   headless: process.env.CI === "true" || process.env.HEADLESS === "true",
+  // サーバーURL (CI環境では3001、ローカルでは3000を使用)
+  serverUrl: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   // タイムアウト設定 (ms)
   timeout: {
     lighthouse: 60000,

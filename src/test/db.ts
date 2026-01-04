@@ -14,11 +14,16 @@ function requireDatabaseUrl(): string {
   try {
     const parsed = new URL(url);
     const dbName = (parsed.pathname || "").replace(/^\//, "");
+
+    // CI環境のNeonブランチDBを検出（環境変数NEON_BRANCH_NAMEでci-プレフィックスを確認）
+    const isNeonCIBranch = process.env.NEON_BRANCH_NAME?.startsWith("ci-") ?? false;
+
     const looksLikeTestDb =
       dbName.toLowerCase().includes("test") ||
       parsed.port === "5433" ||
       parsed.hostname === "localhost" ||
-      parsed.hostname === "127.0.0.1";
+      parsed.hostname === "127.0.0.1" ||
+      isNeonCIBranch;
 
     if (!looksLikeTestDb) {
       throw new Error(
@@ -29,7 +34,9 @@ function requireDatabaseUrl(): string {
     }
   } catch {
     // URLとしてパースできない場合（postgres://以外など）は、最低限 "test" を含むことだけ確認
-    if (!url.toLowerCase().includes("test")) {
+    // ただし、CI環境のNeonブランチは許可
+    const isNeonCIBranch = process.env.NEON_BRANCH_NAME?.startsWith("ci-") ?? false;
+    if (!url.toLowerCase().includes("test") && !isNeonCIBranch) {
       throw new Error(
         `DATABASE_URL does not look like a test database. Refusing to run destructive test cleanup. ` +
           `Set ALLOW_NON_TEST_DATABASE_URL=true to override.`,

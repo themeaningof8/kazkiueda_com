@@ -27,7 +27,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
   let serverUrl: string;
 
   beforeAll(async () => {
-    serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    serverUrl = TEST_ENVIRONMENT.serverUrl;
 
     // CI環境でのみブラウザを起動
     if (TEST_ENVIRONMENT.isCI) {

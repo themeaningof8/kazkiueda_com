@@ -170,14 +170,20 @@ describe("Bundle Size Analysis", () => {
         const chunksExist = existsSync(join(nextDir, "static", "chunks"));
 
         if (chunksExist) {
-          // ページ固有のチャンクが存在することを確認
+          // Next.js 13+ App Router: app-pages チャンクディレクトリを確認
+          const appPagesExist = existsSync(join(nextDir, "static", "chunks", "app-pages"));
+          // Pages Router: pages チャンクディレクトリを確認
           const pagesExist = existsSync(join(nextDir, "static", "chunks", "pages"));
-          if (!pagesExist) {
+
+          // どちらかのルーティング方式でチャンクが存在すればOK
+          const hasCodeSplitting = appPagesExist || pagesExist;
+
+          if (!hasCodeSplitting) {
             console.info(
-              "Next.js pages chunks not found. This may be expected if no pages have been built yet.",
+              "Next.js pages/app-pages chunks not found. This may be expected if no pages have been built yet.",
             );
           }
-          expect(pagesExist).toBe(true);
+          expect(hasCodeSplitting).toBe(true);
         } else {
           // チャンクファイルが存在しない場合（ビルドされていない場合）
           console.info(
