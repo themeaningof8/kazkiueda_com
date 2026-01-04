@@ -1,19 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 // NOTE: ここは設定ファイルです。ターミナルコマンドを貼らないでください。
-import { config as dotenvConfig } from 'dotenv';
-import { existsSync } from 'fs';
-import { join } from 'path';
+// 環境変数は dotenvx から注入されるため、dotenv による直接読み込みは行わない
 
 const isCI = !!process.env.GITHUB_ACTIONS;
-
-// 環境変数ファイルの存在確認
-const envDevPath = join(process.cwd(), 'projects/.env.development');
-const envDevExists = existsSync(envDevPath);
-
-// Playwright(テスト側)にも .env.development を読み込ませる
-if (envDevExists) {
-  dotenvConfig({ path: envDevPath });
-}
 
 export default defineConfig({
   // グローバルセットアップ・ティアダウンは各テストで個別に実行
