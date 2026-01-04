@@ -6,13 +6,13 @@
  * memlabを使用して詳細なヒープ分析を行います。
  */
 
-import puppeteer from "puppeteer";
+import { chromium } from "playwright";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "./config";
 import { assertPerformanceThreshold, getMemoryUsage, shouldSkipPerformanceTest } from "./utils";
 
 describe("Memory Leak Detection", () => {
-  let browser: import("puppeteer").Browser | undefined;
+  let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;
   let serverUrl: string;
 
   beforeAll(async () => {
@@ -20,7 +20,7 @@ describe("Memory Leak Detection", () => {
 
     // CI環境でのみブラウザを起動
     if (TEST_ENVIRONMENT.isCI) {
-      browser = await puppeteer.launch({
+      browser = await chromium.launch({
         headless: TEST_ENVIRONMENT.headless,
         args: [
           "--no-sandbox",
@@ -43,10 +43,10 @@ describe("Memory Leak Detection", () => {
     test.skipIf(shouldSkipPerformanceTest("heavy") || !TEST_ENVIRONMENT.isCI)(
       "should not have memory leaks during navigation",
       async () => {
-        const page = await browser?.newPage();
-        if (!page) {
+        if (!browser) {
           throw new Error("Browser not available");
         }
+        const page = await browser.newPage();
 
         try {
           // 初期メモリ使用量を測定
@@ -64,7 +64,7 @@ describe("Memory Leak Detection", () => {
 
           for (const pagePath of pages) {
             await page.goto(`${serverUrl}${pagePath}`, {
-              waitUntil: "networkidle0",
+              waitUntil: "networkidle",
               timeout: 30000,
             });
 
@@ -122,7 +122,7 @@ describe("Memory Leak Detection", () => {
 
         try {
           await page.goto(`${serverUrl}/blog`, {
-            waitUntil: "networkidle0",
+            waitUntil: "networkidle",
             timeout: 30000,
           });
 
@@ -181,7 +181,7 @@ describe("Memory Leak Detection", () => {
 
         try {
           await page.goto(serverUrl, {
-            waitUntil: "networkidle0",
+            waitUntil: "networkidle",
             timeout: 30000,
           });
 
@@ -200,7 +200,7 @@ describe("Memory Leak Detection", () => {
           });
 
           // ページをリロード
-          await page.reload({ waitUntil: "networkidle0" });
+          await page.reload({ waitUntil: "networkidle" });
 
           // リロード後のイベントリスナー数を確認
           const afterReloadListeners = await page.evaluate(() => {
@@ -236,7 +236,7 @@ describe("Memory Leak Detection", () => {
 
         try {
           await page.goto(`${serverUrl}/blog`, {
-            waitUntil: "networkidle0",
+            waitUntil: "networkidle",
             timeout: 30000,
           });
 
@@ -317,7 +317,7 @@ describe("Memory Leak Detection", () => {
 
       try {
         await page.goto(serverUrl, {
-          waitUntil: "networkidle0",
+          waitUntil: "networkidle",
           timeout: 30000,
         });
 
@@ -342,7 +342,8 @@ describe("Memory Leak Detection", () => {
         await page.close();
 
         // ブラウザのページ数が減少していることを確認
-        const pages = await browser.pages();
+        const contexts = browser.contexts();
+        const pages = contexts.length > 0 ? contexts[0].pages() : [];
         expect(pages.length).toBeGreaterThanOrEqual(1); // デフォルトページは残る
       } catch (error) {
         // ページが既に閉じられている場合のエラーハンドリング

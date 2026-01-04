@@ -6,7 +6,7 @@
  */
 
 import lighthouse from "lighthouse";
-import puppeteer from "puppeteer";
+import { chromium } from "playwright";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { LIGHTHOUSE_CONFIG, TEST_ENVIRONMENT } from "./config";
 import {
@@ -16,7 +16,7 @@ import {
 } from "./utils";
 
 describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
-  let browser: import("puppeteer").Browser | undefined;
+  let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;
   let serverUrl: string;
 
   beforeAll(async () => {
@@ -25,7 +25,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
 
     // CI環境でのみブラウザを起動
     if (TEST_ENVIRONMENT.isCI && !TEST_ENVIRONMENT.headless) {
-      browser = await puppeteer.launch({
+      browser = await chromium.launch({
         headless: false,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
@@ -36,7 +36,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     if (browser && TEST_ENVIRONMENT.isCI) {
       await browser.close();
     }
-  });
+  }, TEST_ENVIRONMENT.timeout.puppeteer);
 
   describe("Homepage Performance", () => {
     test.skipIf(shouldSkipPerformanceTest("ci-only") || !TEST_ENVIRONMENT.isCI)(
@@ -76,16 +76,16 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test(
       "should load homepage within acceptable time",
       async () => {
-        const page = await browser?.newPage();
-        if (!page) {
+        if (!browser) {
           throw new Error("Browser not available");
         }
+        const page = await browser.newPage();
 
         try {
           const startTime = Date.now();
 
           await page.goto(serverUrl, {
-            waitUntil: "networkidle0",
+            waitUntil: "networkidle",
             timeout: 30000,
           });
 
@@ -141,16 +141,16 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test(
       "should load blog page efficiently",
       async () => {
-        const page = await browser?.newPage();
-        if (!page) {
+        if (!browser) {
           throw new Error("Browser not available");
         }
+        const page = await browser.newPage();
 
         try {
           const startTime = Date.now();
 
           await page.goto(`${serverUrl}/blog`, {
-            waitUntil: "networkidle0",
+            waitUntil: "networkidle",
             timeout: 30000,
           });
 
@@ -160,7 +160,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
           expect(loadTime).toBeLessThanOrEqual(4000);
 
           // ブログ記事が存在することを確認
-          const articles = await page.$$('[data-testid="post-card"]');
+          const articles = await page.locator('[data-testid="post-card"]').all();
           expect(articles.length).toBeGreaterThanOrEqual(0); // 記事が0件でもOK
         } finally {
           await page.close();
@@ -204,17 +204,17 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     test(
       "should handle dynamic content loading efficiently",
       async () => {
-        const page = await browser?.newPage();
-        if (!page) {
+        if (!browser) {
           throw new Error("Browser not available");
         }
+        const page = await browser.newPage();
 
         try {
           // 実際の記事が存在しない場合もあるので、404ページのテストに変更
           const startTime = Date.now();
 
           await page.goto(`${serverUrl}/posts/non-existent-post`, {
-            waitUntil: "networkidle0",
+            waitUntil: "networkidle",
             timeout: 30000,
           });
 
@@ -224,8 +224,8 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
           expect(loadTime).toBeLessThanOrEqual(2000);
 
           // エラーページが表示されていることを確認
-          const errorContent = await page.$('[data-testid="error-page"]');
-          expect(errorContent).toBeTruthy();
+          const errorContent = page.locator('[data-testid="error-page"]');
+          expect(await errorContent.count()).toBeGreaterThan(0);
         } finally {
           await page.close();
         }

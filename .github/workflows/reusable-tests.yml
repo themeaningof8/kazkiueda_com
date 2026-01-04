@@ -101,10 +101,6 @@ jobs:
         if: inputs.suite == 'performance'
         run: bun run build
 
-      - name: Install Chrome for Puppeteer
-        if: inputs.suite == 'performance'
-        run: bunx puppeteer browsers install chrome
-
       - name: Start Next.js server for performance tests
         if: inputs.suite == 'performance'
         run: |
