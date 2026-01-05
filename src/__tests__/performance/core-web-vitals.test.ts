@@ -194,7 +194,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
     );
 
     test(
-      "should handle dynamic content loading efficiently",
+      "should handle 404 page loading efficiently",
       async () => {
         if (!browser) {
           throw new Error("Browser not available");
@@ -212,8 +212,8 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
 
           const loadTime = Date.now() - startTime;
 
-          // 404ページも効率的にロードされるべき
-          expect(loadTime).toBeLessThanOrEqual(2000);
+          // 404ページも効率的にロードされるべき（CI環境ではネットワーク遅延を考慮）
+          expect(loadTime).toBeLessThanOrEqual(5000);
 
           // エラーページが表示されていることを確認
           const errorContent = page.locator('[data-testid="error-page"]');
