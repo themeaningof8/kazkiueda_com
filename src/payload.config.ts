@@ -1,7 +1,8 @@
-import { buildConfig } from 'payload'
+import { buildConfig, type Config } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { resendAdapter } from '@payloadcms/email-resend'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
@@ -71,7 +72,20 @@ const buildPlugins = (): ReturnType<typeof s3Storage>[] => {
   return plugins
 }
 
-export default buildConfig({
+// メールアダプターの設定（環境変数が設定されている場合のみ）
+function getEmailAdapter() {
+  if (env.RESEND_API_KEY) {
+    return resendAdapter({
+      defaultFromAddress: env.RESEND_FROM_EMAIL || 'noreply@yourdomain.com',
+      defaultFromName: env.RESEND_FROM_NAME || 'Your App',
+      apiKey: env.RESEND_API_KEY,
+    });
+  }
+  return undefined;
+}
+
+// ベース設定
+const baseConfig: Config = {
   // Rich Text Editor configuration
   editor: lexicalEditor({}),
   admin: {
@@ -105,16 +119,22 @@ export default buildConfig({
   sharp,
   onInit: async (payload) => {
     // 初回ユーザー作成の案内
-    const usersCount = await payload.count({ collection: 'users' })
+    const usersCount = await payload.count({ collection: 'users' });
     if (usersCount.totalDocs === 0) {
-      console.warn('No users found. Please create your first admin user at /admin')
+      console.warn('No users found. Please create your first admin user at /admin');
     }
     // ストレージ設定の確認
-    const storageConfig = buildStorageConfig()
+    const storageConfig = buildStorageConfig();
     if (storageConfig) {
-      console.info({ storageType: 'r2' }, 'Cloudflare R2 storage is configured')
+      console.info({ storageType: 'r2' }, 'Cloudflare R2 storage is configured');
     } else {
-      console.info({ storageType: 'local' }, 'Using local storage (set R2 environment variables to use Cloudflare R2)')
+      console.info({ storageType: 'local' }, 'Using local storage (set R2 environment variables to use Cloudflare R2)');
     }
   },
-})
+};
+
+// メールアダプターが設定されている場合のみ追加
+const emailAdapter = getEmailAdapter();
+const config: Config = emailAdapter ? { ...baseConfig, email: emailAdapter } : baseConfig;
+
+export default buildConfig(config);

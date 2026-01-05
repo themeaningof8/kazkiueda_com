@@ -47,6 +47,10 @@ const baseEnvSchema = v.object({
   S3_REGION: v.optional(v.string()),
   // Vercel環境変数（自動設定されるため検証のみ）
   VERCEL_URL: v.optional(v.string()),
+  // Resendメール設定（本番環境でのみ必須）
+  RESEND_API_KEY: v.optional(v.string()),
+  RESEND_FROM_EMAIL: v.optional(v.string()),
+  RESEND_FROM_NAME: v.optional(v.string()),
   // ログレベル（オプショナル）
   LOG_LEVEL: v.optional(
     v.picklist(
@@ -59,7 +63,7 @@ const baseEnvSchema = v.object({
 /**
  * R2設定の検証：全てセットか全て未設定かのどちらか
  */
-const envSchema = v.pipe(
+const envSchemaWithR2 = v.pipe(
   baseEnvSchema,
   v.check((data) => {
     const r2Keys = [
@@ -72,6 +76,24 @@ const envSchema = v.pipe(
     // 0個（全て未設定）または4個（全てセット）のみ許可
     return definedCount === 0 || definedCount === 4;
   }, "R2ストレージ設定は、すべての環境変数（S3_BUCKET, S3_ENDPOINT, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY）を設定するか、すべて未設定にする必要があります"),
+);
+
+/**
+ * Resend設定の検証：全てセットか全て未設定かのどちらか（本番環境のみ必須）
+ */
+const envSchema = v.pipe(
+  envSchemaWithR2,
+  v.check((data) => {
+    const resendKeys = [data.RESEND_API_KEY, data.RESEND_FROM_EMAIL, data.RESEND_FROM_NAME];
+    const definedCount = resendKeys.filter((key) => key !== undefined).length;
+
+    // 開発環境では未設定でもOK、本番環境では全て設定が必要
+    if (data.NODE_ENV === "production") {
+      return definedCount === 3; // 本番環境では全て必須
+    }
+    // 開発環境では0個（全て未設定）または3個（全てセット）
+    return definedCount === 0 || definedCount === 3;
+  }, "Resendメール設定は、本番環境では全ての環境変数（RESEND_API_KEY, RESEND_FROM_EMAIL, RESEND_FROM_NAME）を設定する必要があります。開発環境では全て設定するか全て未設定にしてください"),
 );
 
 /**
