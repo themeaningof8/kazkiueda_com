@@ -56,7 +56,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
         try {
           // Performance observerを設定して画像のロード時間を監視
           await page.addInitScript(() => {
-            (window as any).imageLoadTimes = [];
+            window.imageLoadTimes = [];
 
             const observer = new PerformanceObserver((list) => {
               for (const entry of list.getEntries()) {
@@ -67,7 +67,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
                   resourceEntry.name.includes(".webp") ||
                   resourceEntry.name.includes(".avif")
                 ) {
-                  (window as any).imageLoadTimes.push({
+                  window.imageLoadTimes.push({
                     url: resourceEntry.name,
                     loadTime: resourceEntry.responseEnd - resourceEntry.requestStart,
                     size: resourceEntry.transferSize,
@@ -89,7 +89,7 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Image Optimization Performance", () => 
 
           // 画像のロード時間を取得
           const imageLoadTimes = await page.evaluate(() => {
-            return (window as any).imageLoadTimes ?? [];
+            return window.imageLoadTimes ?? [];
           });
 
           // 各画像のロード時間を検証

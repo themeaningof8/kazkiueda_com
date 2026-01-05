@@ -26,7 +26,18 @@ export const test = base.extend<TestFixtures>({
   },
 
   testData: async ({ payload }, use) => {
-    // 各テストスイートで必要なデータを直接生成
+    // 既存のテストデータを確認（高速化のため）
+    const testDataPath = "tests/e2e/.test-data.json";
+    try {
+      const existingData = await fs.readFile(testDataPath, "utf-8");
+      const parsedData = JSON.parse(existingData) as E2ETestData;
+      console.log("✅ Using cached test data");
+      await use(parsedData);
+      return;
+    } catch {
+      // キャッシュが存在しない場合は新規作成
+      console.log("📝 Creating fresh test data...");
+    }
 
     try {
       // 既存の管理者ユーザーを検索、なければ作成

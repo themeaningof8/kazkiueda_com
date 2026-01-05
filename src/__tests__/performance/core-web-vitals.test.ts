@@ -9,11 +9,7 @@ import lighthouse from "lighthouse";
 import { chromium } from "playwright";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { LIGHTHOUSE_CONFIG, TEST_ENVIRONMENT } from "./config";
-import {
-  assertPerformanceThreshold,
-  extractCoreWebVitals,
-  shouldSkipPerformanceTest,
-} from "./utils";
+import { assertPerformanceThreshold, extractCoreWebVitals } from "./utils";
 
 describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
   let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;

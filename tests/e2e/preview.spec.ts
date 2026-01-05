@@ -117,6 +117,9 @@ test.describe("プレビュー機能", () => {
 
     // 認証されていない場合は403が返る
     expect(response?.status()).toBe(403);
-    await expect(page.locator("text=Unauthorized")).toBeVisible();
+
+    // APIレスポンスの内容を直接確認
+    const responseText = await response?.text();
+    expect(responseText).toBe("Unauthorized");
   });
 });

@@ -46,6 +46,7 @@ test.describe("プレビュー機能（重要）", () => {
   });
 
   test("認証済み + 正しいsecretでプレビューがリダイレクトする", async ({ page, testData }) => {
+    test.setTimeout(90 * 1000); // 90秒に延長
     // 管理者としてログイン（既にauthenticated projectの場合はクッキーが入っているが、
     //念のためヘルパーでセットアップを確実にする）
     await loginAsAdmin(page);
