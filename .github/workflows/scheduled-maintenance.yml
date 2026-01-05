@@ -121,7 +121,7 @@ jobs:
         run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts create
 
       - name: Update DATABASE_URL to use Neon branch
-        run: echo "DATABASE_URL=${{ env.NEON_DATABASE_URL }}" >> $GITHUB_ENV
+        run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
 
       - name: Run migrations
         run: bun run test:migrate
@@ -136,12 +136,7 @@ jobs:
 
       # カバレッジレポートをアップロード
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage/coverage-final.json
-          flags: scheduled
-          name: scheduled-coverage
-          token: ${{ secrets.CODECOV_TOKEN }}
+        run: bunx dotenvx run -- codecov --file ./coverage/coverage-final.json --flags scheduled --name scheduled-coverage
 
   # ==========================================
   # Performance benchmarks
@@ -179,7 +174,7 @@ jobs:
         run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts create
 
       - name: Update DATABASE_URL to use Neon branch
-        run: echo "DATABASE_URL=${{ env.NEON_DATABASE_URL }}" >> $GITHUB_ENV
+        run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
 
       - name: Run migrations
         run: bun run test:migrate
