@@ -7,7 +7,10 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-16 text-center">
+    <div
+      className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-16 text-center"
+      data-testid="error-page"
+    >
       <h1 className="mb-4 text-6xl font-bold text-gray-900 dark:text-gray-100">404</h1>
       <h2 className="mb-4 text-2xl font-semibold text-gray-700 dark:text-gray-300">
         記事が見つかりません

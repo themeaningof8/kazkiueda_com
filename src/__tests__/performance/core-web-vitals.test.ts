@@ -192,7 +192,9 @@ describe.skipIf(!TEST_ENVIRONMENT.isCI)("Core Web Vitals", () => {
       },
       TEST_ENVIRONMENT.timeout.lighthouse,
     );
+  });
 
+  describe("Error Handling Performance", () => {
     test(
       "should handle 404 page loading efficiently",
       async () => {
