@@ -85,7 +85,7 @@ jobs:
           echo "Building Next.js for bundle size tests..."
           bunx dotenvx run -f projects/.env.development -- bun next build
           # ユニットテスト実行（bundle-size.test.ts以外）
-          output=$(dotenvx run -f projects/.env.development -f projects/.env -- bun vitest run src/__tests__/unit --coverage.enabled=false --exclude src/__tests__/unit/bundle-size.test.ts 2>&1)
+          output=$(bunx dotenvx run -f projects/.env.development -f projects/.env -- bun vitest run src/__tests__/unit --coverage.enabled=false --exclude src/__tests__/unit/bundle-size.test.ts 2>&1)
           echo "TEST_UNIT_RESULT=$output" >> $GITHUB_ENV
           echo "$output"
           # bundle-sizeテスト実行（CI環境ではスキップ）
