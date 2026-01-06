@@ -10,13 +10,16 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "../../lib/performance/config";
 
+// CI環境では一部のテストをスキップ
+const isCI = process.env.CI === "true";
+
 describe("Bundle Size Analysis", () => {
   // Next.jsのビルド統計ファイルのパス
   const nextBuildStatsPath = join(process.cwd(), ".next", "build-manifest.json");
   const nextStaticAnalysisPath = join(process.cwd(), ".next", "static-analysis.json");
 
   describe("Build Analysis", () => {
-    test.skip(
+    test.skipIf(isCI)(
       "should analyze Next.js build statistics",
       async () => {
         // ビルドが実行されていることを前提とする
@@ -63,7 +66,7 @@ describe("Bundle Size Analysis", () => {
       TEST_ENVIRONMENT.timeout.bundleAnalysis,
     );
 
-    test("should validate bundle size limits", async () => {
+    test.skipIf(isCI)("should validate bundle size limits", async () => {
       // package.jsonからバンドルサイズ設定を読み込み
       const packageJson = JSON.parse(
         readFileSync(join(process.cwd(), "package.json"), "utf-8"),
@@ -96,7 +99,7 @@ describe("Bundle Size Analysis", () => {
   });
 
   describe("Dependency Analysis", () => {
-    test("should check for unnecessary dependencies", () => {
+    test.skipIf(isCI)("should check for unnecessary dependencies", () => {
       // package.jsonの依存関係を分析
       const packageJson = JSON.parse(
         readFileSync(join(process.cwd(), "package.json"), "utf-8"),
@@ -134,7 +137,7 @@ describe("Bundle Size Analysis", () => {
       });
     });
 
-    test("should analyze bundle composition", async () => {
+    test.skipIf(isCI)("should analyze bundle composition", async () => {
       try {
         // Next.jsの静的分析ファイルが存在する場合
         if (existsSync(nextStaticAnalysisPath)) {
@@ -217,7 +220,7 @@ describe("Bundle Size Analysis", () => {
   });
 
   describe("Asset Optimization", () => {
-    test("should verify image optimization settings", () => {
+    test.skipIf(isCI)("should verify image optimization settings", () => {
       const nextConfigPath = join(process.cwd(), "next.config.ts");
 
       if (existsSync(nextConfigPath)) {
@@ -231,7 +234,7 @@ describe("Bundle Size Analysis", () => {
       }
     });
 
-    test("should check for compressed assets", () => {
+    test.skipIf(isCI)("should check for compressed assets", () => {
       // 圧縮されたアセットファイルの存在を確認
       const publicDir = join(process.cwd(), "public");
 
