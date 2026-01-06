@@ -67,6 +67,9 @@ jobs:
         with:
           playwright: ${{ inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full' }}
 
+      - name: Verify Bun setup
+        run: bun --version
+
       # ---------- Static ----------
       - name: Run static checks
         if: inputs.suite == 'static'
