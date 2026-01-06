@@ -31,24 +31,26 @@ describe("payload-client public API", () => {
 
       // モックを設定
       const mockResult = {
-        docs: [{
-          id: 1,
-          title: "Test Post",
-          slug: "test-post",
-          content: {
-            root: {
-              type: "root",
-              children: [],
-              direction: null,
-              format: "" as const,
-              indent: 0,
-              version: 1,
+        docs: [
+          {
+            id: 1,
+            title: "Test Post",
+            slug: "test-post",
+            content: {
+              root: {
+                type: "root",
+                children: [],
+                direction: null,
+                format: "" as const,
+                indent: 0,
+                version: 1,
+              },
             },
+            author: 1,
+            updatedAt: "2024-01-15T00:00:00.000Z",
+            createdAt: "2024-01-15T00:00:00.000Z",
           },
-          author: 1,
-          updatedAt: "2024-01-15T00:00:00.000Z",
-          createdAt: "2024-01-15T00:00:00.000Z",
-        }],
+        ],
         totalDocs: 1,
       };
 
@@ -60,24 +62,26 @@ describe("payload-client public API", () => {
       const result = await findPostBySlug("test-post");
 
       expect(result).toEqual({
-        docs: [{
-          id: 1,
-          title: "Test Post",
-          slug: "test-post",
-          content: {
-            root: {
-              type: "root",
-              children: [],
-              direction: null,
-              format: "" as const,
-              indent: 0,
-              version: 1,
+        docs: [
+          {
+            id: 1,
+            title: "Test Post",
+            slug: "test-post",
+            content: {
+              root: {
+                type: "root",
+                children: [],
+                direction: null,
+                format: "" as const,
+                indent: 0,
+                version: 1,
+              },
             },
+            author: 1,
+            updatedAt: "2024-01-15T00:00:00.000Z",
+            createdAt: "2024-01-15T00:00:00.000Z",
           },
-          author: 1,
-          updatedAt: "2024-01-15T00:00:00.000Z",
-          createdAt: "2024-01-15T00:00:00.000Z",
-        }],
+        ],
         totalDocs: 1,
       });
       expect(findPayloadSpy).toHaveBeenCalledWith({
@@ -114,23 +118,25 @@ describe("payload-client public API", () => {
       const { findPosts } = await import("@/lib/api/payload-client");
 
       const mockResult = {
-        docs: [{
-          id: 1,
-          title: "Test Post",
-          content: {
-            root: {
-              type: "root",
-              children: [],
-              direction: null,
-              format: "" as const,
-              indent: 0,
-              version: 1,
+        docs: [
+          {
+            id: 1,
+            title: "Test Post",
+            content: {
+              root: {
+                type: "root",
+                children: [],
+                direction: null,
+                format: "" as const,
+                indent: 0,
+                version: 1,
+              },
             },
+            author: 1,
+            updatedAt: "2024-01-15T00:00:00.000Z",
+            createdAt: "2024-01-15T00:00:00.000Z",
           },
-          author: 1,
-          updatedAt: "2024-01-15T00:00:00.000Z",
-          createdAt: "2024-01-15T00:00:00.000Z",
-        }],
+        ],
         totalDocs: 1,
         totalPages: 1,
         hasNextPage: false,
@@ -144,23 +150,25 @@ describe("payload-client public API", () => {
       const result = await findPosts({ limit: 10, page: 1 });
 
       expect(result).toEqual({
-        docs: [{
-          id: 1,
-          title: "Test Post",
-          content: {
-            root: {
-              type: "root",
-              children: [],
-              direction: null,
-              format: "" as const,
-              indent: 0,
-              version: 1,
+        docs: [
+          {
+            id: 1,
+            title: "Test Post",
+            content: {
+              root: {
+                type: "root",
+                children: [],
+                direction: null,
+                format: "" as const,
+                indent: 0,
+                version: 1,
+              },
             },
+            author: 1,
+            updatedAt: "2024-01-15T00:00:00.000Z",
+            createdAt: "2024-01-15T00:00:00.000Z",
           },
-          author: 1,
-          updatedAt: "2024-01-15T00:00:00.000Z",
-          createdAt: "2024-01-15T00:00:00.000Z",
-        }],
+        ],
         totalDocs: 1,
         totalPages: 1,
         hasNextPage: false,

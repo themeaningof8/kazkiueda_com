@@ -138,7 +138,7 @@ describe("posts", () => {
               type: "root",
               children: [],
               direction: null,
-              format: "",
+              format: "" as const,
               indent: 0,
               version: 1,
             },
@@ -155,7 +155,7 @@ describe("posts", () => {
               type: "root",
               children: [],
               direction: null,
-              format: "",
+              format: "" as const,
               indent: 0,
               version: 1,
             },
@@ -241,7 +241,9 @@ describe("posts", () => {
       const result = await getPosts();
 
       expect(result.success).toBe(true);
-      expect(result.data?.totalPages).toBe(0);
+      if (result.success) {
+        expect(result.data.totalPages).toBe(0);
+      }
     });
   });
 
@@ -277,5 +279,4 @@ describe("posts", () => {
       });
     });
   });
-
 });
