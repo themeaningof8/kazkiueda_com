@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import { test as base, type TestInfo } from "@playwright/test";
 import type { Payload } from "payload";
 import { chromium } from "playwright";
-import type { Post, User } from "@/payload-types";
+import type { Post, User } from "../../../src/payload-types";
 import {
   createBulkTestPosts,
   createTestPost,

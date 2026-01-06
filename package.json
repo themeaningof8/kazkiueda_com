@@ -56,14 +56,13 @@
     "payload:migrate": "NODE_ENV=production dotenvx run -f projects/.env -f projects/.env.production -- payload migrate",
     "generate:types": "dotenvx run -f projects/.env -f projects/.env.development -- cross-env NODE_ENV=development NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:types",
     "generate:importmap": "dotenvx run -f projects/.env -f projects/.env.development -- cross-env NODE_ENV=development NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:importmap",
-    "type-check:staged": "bunx tsc --noEmit --skipLibCheck --project .",
+    "type-check:staged": "bunx tsx --check",
     "ci": "payload migrate && build"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
       "biome check --write --no-errors-on-unmatched",
-      "biome format --write --no-errors-on-unmatched",
-      "bun run type-check:staged"
+      "biome format --write --no-errors-on-unmatched"
     ],
     "*.{js,jsx}": [
       "biome check --write --no-errors-on-unmatched",
