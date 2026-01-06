@@ -3,6 +3,12 @@ import { withPayload } from "@payloadcms/next/withPayload";
 
 const nextConfig: NextConfig = {
   reactCompiler: false,
+  // ビルドキャッシュの設定（CI環境での高速化）
+  outputFileTracingRoot: process.cwd(),
+  generateBuildId: async () => {
+    // ビルドIDを安定化してキャッシュを有効活用
+    return 'build-cache-' + process.env.NODE_ENV || 'development';
+  },
   images: {
     // WebP形式を優先的に使用（ブラウザ対応状況に応じて自動選択）
     formats: ["image/webp", "image/avif"],
