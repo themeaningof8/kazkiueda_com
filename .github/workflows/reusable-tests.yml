@@ -141,12 +141,10 @@ jobs:
           if [ -n "${{ inputs.integration-script }}" ]; then
             # Extract test file path from script name (e.g., test:integration:payload-client -> payload-client.test.ts)
             test_file=$(echo "${{ inputs.integration-script }}" | sed 's/test:integration://').test.ts
-            output=$(bunx dotenvx run -f projects/.env.development -- bunx vitest run "src/__tests__/integration/${test_file}" 2>&1)
+            bunx dotenvx run -f projects/.env.development -- bunx vitest run "src/__tests__/integration/${test_file}"
           else
-            output=$(bun run test:integration:posts && bun run test:integration:collections-posts && bun run test:integration:performance 2>&1)
+            bun run test:integration:posts && bun run test:integration:collections-posts && bun run test:integration:performance
           fi
-          echo "TEST_INTEGRATION_RESULT=$output" >> $GITHUB_ENV
-          echo "$output"
         env:
           ALLOW_NON_TEST_DATABASE_URL: true
 
@@ -170,14 +168,12 @@ jobs:
           PAYLOAD_SECRET: ci-test-secret-key-for-e2e-testing-only
         run: |
           if [ "${{ inputs.e2e-file }}" != "" ]; then
-            output=$(bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test "${{ inputs.e2e-file }}" --reporter=github 2>&1)
+            bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
           elif [ "${{ inputs.suite }}" = "e2e-essential" ]; then
-            output=$(bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github 2>&1)
+            bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github
           else
-            output=$(bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e --reporter=github 2>&1)
+            bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e --reporter=github
           fi
-          echo "TEST_E2E_RESULT=$output" >> $GITHUB_ENV
-          echo "$output"
 
       - name: Upload Playwright report
         if: always() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
