@@ -95,6 +95,10 @@ jobs:
           key: ${{ runner.os }}-nextjs-build-${{ hashFiles('**/package.json', '**/next.config.ts', 'src/**/*.{ts,tsx,js,jsx}') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-build-
+
+      - name: Run unit tests
+        if: inputs.suite == 'unit'
+        run: |
           # ユニットテスト実行（bundle-size.test.ts以外）
           echo "Running unit tests (excluding bundle-size tests)..."
           bunx dotenvx run -f projects/.env.development -f projects/.env -- bun vitest run src/__tests__/unit --coverage.enabled=false --exclude src/__tests__/unit/bundle-size.test.ts
