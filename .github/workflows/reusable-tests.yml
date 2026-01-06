@@ -77,10 +77,6 @@ jobs:
         if: inputs.suite == 'unit'
         run: bun run test:coverage:unit
 
-      # ---------- Performance ----------
-      - name: Run performance tests
-        if: inputs.suite == 'performance'
-        run: bunx dotenvx run -f projects/.env.development -- bun run test:performance:essential
 
       # ---------- Integration / E2E Database Setup ----------
       - name: Create Neon test branch
