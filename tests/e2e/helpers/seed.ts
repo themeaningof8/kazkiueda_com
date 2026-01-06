@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { Payload } from "payload";
-import type { Post, User } from "@/payload-types";
+import type { CollectionSlug, Payload } from "payload";
+import type { Post, User } from "../../../src/payload-types";
 import type { E2ETestData } from "./test-data";
 
 type SeedData = {
@@ -26,6 +26,35 @@ const getSeedData = async (): Promise<SeedData> => {
   return JSON.parse(content) as SeedData;
 };
 
+// コレクションの全レコードをページネーションしながら削除するヘルパー関数
+async function deleteAllRecords(
+  payload: Payload,
+  collection: CollectionSlug,
+  where?: Record<string, any>,
+  limit: number = 50,
+) {
+  let page = 1;
+  let hasMore = true;
+
+  while (hasMore) {
+    const result = await payload.find({
+      collection,
+      where,
+      limit,
+      page,
+    });
+
+    // このページの全レコードを削除
+    for (const doc of result.docs) {
+      await payload.delete({ collection, id: doc.id });
+    }
+
+    // 次のページがあるかチェック
+    hasMore = result.hasNextPage || false;
+    page++;
+  }
+}
+
 export async function cleanDatabase(
   payload: Payload,
   options?: {
@@ -34,10 +63,7 @@ export async function cleanDatabase(
 ) {
   // 投稿を順次削除（デッドロック回避のため）
   try {
-    const posts = await payload.find({ collection: "posts", limit: 100 });
-    for (const post of posts.docs) {
-      await payload.delete({ collection: "posts", id: post.id });
-    }
+    await deleteAllRecords(payload, "posts", undefined, 50);
   } catch (error) {
     console.warn("投稿削除でエラーが発生しましたが続行:", error);
   }
@@ -45,14 +71,7 @@ export async function cleanDatabase(
   // ユーザーは必要に応じて削除（E2Eテスト用のみ）
   if (!options?.keepUsers) {
     try {
-      const users = await payload.find({
-        collection: "users",
-        where: { email: { contains: "e2e-" } },
-        limit: 10,
-      });
-      for (const user of users.docs) {
-        await payload.delete({ collection: "users", id: user.id });
-      }
+      await deleteAllRecords(payload, "users", { email: { contains: "e2e-" } }, 50);
     } catch (error) {
       console.warn("ユーザー削除でエラーが発生しましたが続行:", error);
     }

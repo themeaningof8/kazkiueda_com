@@ -9,12 +9,11 @@ test.describe("アクセシビリティ（重要）", () => {
       .withTags(["wcag2a", "wcag2aa"]) // WCAG 2.0 AA準拠
       .analyze();
 
-    expect(accessibilityScanResults.violations).toEqual([]);
-
-    // より詳細なチェックが必要な場合
     if (accessibilityScanResults.violations.length > 0) {
       console.log("アクセシビリティ違反:", accessibilityScanResults.violations);
     }
+
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 
   test("記事詳細ページのアクセシビリティ", async ({ page }) => {
@@ -44,10 +43,10 @@ test.describe("アクセシビリティ（重要）", () => {
       .withTags(["wcag2a", "wcag2aa"])
       .analyze();
 
-    expect(accessibilityScanResults.violations).toEqual([]);
-
     if (accessibilityScanResults.violations.length > 0) {
       console.log("アクセシビリティ違反:", accessibilityScanResults.violations);
     }
+
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 });

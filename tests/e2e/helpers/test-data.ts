@@ -43,10 +43,11 @@ export async function getE2ETestData(): Promise<E2ETestData | null> {
     }
 
     return data;
-  } catch (_error) {
+  } catch (error) {
     // テストデータファイルが存在しない場合はnullを返す
     console.warn(
       "テストデータファイルが見つかりません。グローバルセットアップが実行されていない可能性があります。",
+      error,
     );
     return null;
   }

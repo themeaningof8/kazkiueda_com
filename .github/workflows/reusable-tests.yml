@@ -65,7 +65,7 @@ jobs:
       - name: Setup (with Playwright when needed)
         uses: ./.github/actions/setup
         with:
-          playwright: ${{ inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full' || inputs.suite == 'performance' }}
+          playwright: ${{ inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full' }}
 
       # ---------- Static ----------
       - name: Run static checks
@@ -77,54 +77,6 @@ jobs:
         if: inputs.suite == 'unit'
         run: bun run test:coverage:unit
 
-      # ---------- Performance ----------
-      - name: Create Neon test branch for performance tests
-        if: inputs.suite == 'performance'
-        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts create
-
-      - name: Update DATABASE_URL for performance tests
-        if: inputs.suite == 'performance'
-        run: echo "DATABASE_URL=${{ env.NEON_DATABASE_URL }}" >> $GITHUB_ENV
-
-      - name: Run migrations for performance tests
-        if: inputs.suite == 'performance'
-        run: |
-          # Use environment variables directly instead of dotenvx
-          # Use migrate:fresh for clean test database setup
-          bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
-            PAYLOAD_CONFIG_PATH=src/payload.config.ts \
-            payload migrate:fresh --force-accept-warning
-        env:
-          PAYLOAD_SECRET: ci-test-secret-key-for-testing-only
-
-      - name: Build Next.js for performance tests
-        if: inputs.suite == 'performance'
-        run: bun run build
-
-      - name: Start Next.js server for performance tests
-        if: inputs.suite == 'performance'
-        run: |
-          bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next dev --port 3001 > /tmp/next-dev.log 2>&1 &
-          bunx wait-on http://localhost:3001 -t 60000
-        env:
-          # Required for Next.js/Payload to start
-          NEXT_PUBLIC_SITE_URL: http://localhost:3001
-          PAYLOAD_SECRET: ci-test-secret-key-for-performance-testing-only
-
-      - name: Run performance tests
-        if: inputs.suite == 'performance'
-        run: bun run test:performance:ci
-        env:
-          NEXT_PUBLIC_SITE_URL: http://localhost:3001
-          PAYLOAD_SECRET: ci-test-secret-key-for-performance-testing-only
-
-      - name: Stop Next.js server after performance tests
-        if: always() && inputs.suite == 'performance'
-        run: pkill -f 'next dev' || true
-
-      - name: Delete Neon test branch after performance tests
-        if: always() && inputs.suite == 'performance'
-        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts delete
 
       # ---------- Integration / E2E Database Setup ----------
       - name: Create Neon test branch
@@ -156,6 +108,7 @@ jobs:
           else
             bun run test:integration:posts
             bun run test:integration:collections-posts
+            bun run test:integration:performance
           fi
         env:
           ALLOW_NON_TEST_DATABASE_URL: true

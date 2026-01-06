@@ -11,7 +11,7 @@ describe("getSiteUrl", () => {
   const originalExit = process.exit;
 
   beforeEach(() => {
-    process.exit = vi.fn() as unknown as (code?: string | number | null | undefined) => never;
+    process.exit = vi.fn() as unknown as (code?: number | undefined) => never;
     vi.unstubAllEnvs();
     vi.resetModules(); // モジュールキャッシュをクリア
     setupMinimalEnv(); // 共通環境変数を設定

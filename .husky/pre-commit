@@ -1,2 +1,2 @@
 bunx lint-staged
-bunx tsc --noEmit --skipLibCheck
+bunx tsc --noEmit

@@ -11,7 +11,7 @@
     "prepare": "husky",
     "start": "NODE_ENV=production dotenvx run -f projects/.env -f projects/.env.production -- bun next start",
     "test": "bun run test:ci",
-    "test:ci": "bun run test:static && bun run test:unit && bun run test:integration:all && bun run test:performance:essential && bun run test:e2e:essential",
+    "test:ci": "bun run test:static && bun run test:unit && bun run test:integration:all && bun run test:e2e:essential",
     "test:static": "bunx tsc --noEmit && bun run lint && bun run check && bun run analyze:circular && bun run analyze:duplication && bun run analyze:unused",
     "test:unit": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit",
     "test:coverage:unit": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run --coverage src/__tests__/unit",
@@ -20,14 +20,14 @@
     "test:integration:collections-posts": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/integration/collections-posts.test.ts",
     "test:integration:collections-users": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/integration/collections-users.test.ts",
     "test:integration:collections-media": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/integration/collections-media.test.ts",
+    "test:integration:performance": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/integration/performance.test.ts",
     "test:integration:all": "bun run test:db:up && bun run test:migrate && dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/integration; EXIT=$?; bun run test:db:down; exit $EXIT",
-    "test:coverage:integration": "bun run test:integration:payload-client && bun run test:integration:posts && bun run test:integration:collections-posts && bun run test:integration:collections-users && bun run test:integration:collections-media",
+    "test:coverage:integration": "bun run test:integration:payload-client && bun run test:integration:posts && bun run test:integration:collections-posts && bun run test:integration:collections-users && bun run test:integration:collections-media && bun run test:integration:performance",
     "test:coverage:all": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run --coverage",
     "test:coverage:report": "vitest run --coverage --reporter=html",
     "test:performance": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/performance",
     "test:performance:essential": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/performance --reporter=verbose",
     "test:performance:full": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/performance --reporter=verbose",
-    "test:performance:ci": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/performance --reporter=verbose",
     "test:e2e:essential": "dotenvx run -f projects/.env.development -f projects/.env -- bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github",
     "test:e2e:full": "dotenvx run -f projects/.env.development -f projects/.env -- bunx playwright test tests/e2e --reporter=github",
     "test:e2e:install": "bunx playwright install chromium --with-deps",
@@ -56,12 +56,14 @@
     "payload:migrate": "NODE_ENV=production dotenvx run -f projects/.env -f projects/.env.production -- payload migrate",
     "generate:types": "dotenvx run -f projects/.env -f projects/.env.development -- cross-env NODE_ENV=development NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:types",
     "generate:importmap": "dotenvx run -f projects/.env -f projects/.env.development -- cross-env NODE_ENV=development NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:importmap",
+    "type-check:staged": "bunx tsc --noEmit --skipLibCheck --project .",
     "ci": "payload migrate && build"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
       "biome check --write --no-errors-on-unmatched",
-      "biome format --write --no-errors-on-unmatched"
+      "biome format --write --no-errors-on-unmatched",
+      "bun run type-check:staged"
     ],
     "*.{js,jsx}": [
       "biome check --write --no-errors-on-unmatched",
