@@ -66,7 +66,8 @@ describe("formatDate", () => {
     });
 
     test("未来の日付を処理", () => {
-      const futureDate = new Date("2100-12-31T23:59:59.999Z");
+      // UTCで指定するとタイムゾーン変換されるため、ローカル時刻で指定
+      const futureDate = new Date("2100-12-31T00:00:00");
       const result = formatDate(futureDate);
       expect(result).toBe("2100年12月31日");
     });
@@ -90,7 +91,8 @@ describe("formatDate", () => {
     });
 
     test("年の最後の日を処理", () => {
-      const lastDay = new Date("2024-12-31T23:59:59.999Z");
+      // UTCで指定するとタイムゾーン変換されるため、ローカル時刻で指定
+      const lastDay = new Date("2024-12-31T00:00:00");
       const result = formatDate(lastDay);
       expect(result).toBe("2024年12月31日");
     });
@@ -131,10 +133,12 @@ describe("formatDate", () => {
     });
 
     test("Dateオブジェクトの時刻部分は無視される", () => {
-      const morning = new Date("2024-01-15T00:00:00Z");
-      const evening = new Date("2024-01-15T23:59:59Z");
+      // ローカル時刻で同じ日付を指定
+      const morning = new Date("2024-01-15T00:00:00");
+      const evening = new Date("2024-01-15T23:59:59");
 
       expect(formatDate(morning)).toBe(formatDate(evening));
+      expect(formatDate(morning)).toBe("2024年1月15日");
     });
   });
 });
