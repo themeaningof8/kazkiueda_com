@@ -85,7 +85,7 @@ jobs:
 
       - name: Update DATABASE_URL to use Neon branch
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
-        run: echo "DATABASE_URL=${{ env.NEON_DATABASE_URL }}" >> $GITHUB_ENV
+        run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
 
       - name: Run migrations
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
