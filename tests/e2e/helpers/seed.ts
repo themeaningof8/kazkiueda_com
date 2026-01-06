@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { CollectionSlug, Payload } from "payload";
+import type { CollectionSlug, Payload, Where } from "payload";
 import type { Post, User } from "../../../src/payload-types";
 import type { E2ETestData } from "./test-data";
 
@@ -30,7 +30,7 @@ const getSeedData = async (): Promise<SeedData> => {
 async function deleteAllRecords(
   payload: Payload,
   collection: CollectionSlug,
-  where?: Record<string, any>,
+  where?: Where,
   limit: number = 50,
 ) {
   let page = 1;

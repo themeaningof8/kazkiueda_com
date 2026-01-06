@@ -1,6 +1,14 @@
 import { expect, test } from "@playwright/test";
 
 /**
+ * LayoutShift entry type for Cumulative Layout Shift (CLS) measurement
+ */
+interface LayoutShift extends PerformanceEntry {
+  value: number;
+  hadRecentInput: boolean;
+}
+
+/**
  * Core Web Vitals Essential Tests
  *
  * E2E Essentialテストに含める軽量なCore Web Vitalsチェック
@@ -63,12 +71,13 @@ test.describe("Core Web Vitals - Essential", () => {
 
     // CLS (Cumulative Layout Shift) の監視
     const cls = await page.evaluate(() => {
-      return new Promise((resolve) => {
+      return new Promise<number>((resolve) => {
         let clsValue = 0;
         const observer = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (!(entry as any).hadRecentInput) {
-              clsValue += (entry as any).value;
+            const layoutShiftEntry = entry as LayoutShift;
+            if (!layoutShiftEntry.hadRecentInput) {
+              clsValue += layoutShiftEntry.value;
             }
           }
         });

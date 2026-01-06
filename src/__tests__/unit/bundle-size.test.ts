@@ -9,7 +9,6 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "../../lib/performance/config";
-import { shouldSkipPerformanceTest } from "../../lib/performance/utils";
 
 describe("Bundle Size Analysis", () => {
   // Next.jsのビルド統計ファイルのパス
