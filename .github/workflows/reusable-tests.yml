@@ -80,7 +80,7 @@ jobs:
         run: |
           # パフォーマンステストのためにNext.jsをビルド
           echo "Building Next.js for bundle size tests..."
-          bunx dotenvx run -f projects/.env.development -- bun next build --no-lint
+          bunx dotenvx run -f projects/.env.development -- bun next build
           # ユニットテスト実行（bundle-size.test.ts以外）
           output=$(dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit --coverage.enabled=false --exclude src/__tests__/unit/bundle-size.test.ts 2>&1)
           echo "TEST_UNIT_RESULT=$output" >> $GITHUB_ENV
