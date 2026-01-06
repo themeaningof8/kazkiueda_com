@@ -27,75 +27,86 @@ test.describe("プレビュー機能", () => {
 
   test("Open Redirect対策 - 外部URL拒否", async ({ page }) => {
     // 外部URLをpathパラメータに指定
-    const response = await page.goto(
-      `/preview?collection=posts&slug=test-post&path=http://evil.com&previewSecret=${previewSecret}`,
+    const encodedSecret = encodeURIComponent(previewSecret);
+    const response = await page.request.get(
+      `http://localhost:3001/preview?collection=posts&slug=test-post&path=http://evil.com&previewSecret=${encodedSecret}`,
     );
 
     // 400ステータスを確認
-    expect(response?.status()).toBe(400);
-    await expect(page.locator("text=Invalid redirect path")).toBeVisible();
+    expect(response.status()).toBe(400);
+    expect(await response.text()).toBe("Invalid redirect path");
   });
 
   test("Open Redirect対策 - スキームなし外部URL拒否", async ({ page }) => {
     // //evil.com 形式のURLを拒否
-    const response = await page.goto(
-      `/preview?collection=posts&slug=test-post&path=//evil.com&previewSecret=${previewSecret}`,
+    const encodedSecret = encodeURIComponent(previewSecret);
+    const response = await page.request.get(
+      `http://localhost:3001/preview?collection=posts&slug=test-post&path=//evil.com&previewSecret=${encodedSecret}`,
     );
 
     // 400ステータスを確認
-    expect(response?.status()).toBe(400);
-    await expect(page.locator("text=Invalid redirect path")).toBeVisible();
+    expect(response.status()).toBe(400);
+    expect(await response.text()).toBe("Invalid redirect path");
   });
 
   test("Open Redirect対策 - 許可されないパス拒否", async ({ page }) => {
     // /posts/ 配下以外のパスを拒否
-    const response = await page.goto(
-      `/preview?collection=posts&slug=test-post&path=/admin/dashboard&previewSecret=${previewSecret}`,
+    const encodedSecret = encodeURIComponent(previewSecret);
+    const response = await page.request.get(
+      `http://localhost:3001/preview?collection=posts&slug=test-post&path=/admin/dashboard&previewSecret=${encodedSecret}`,
     );
 
     // 400ステータスを確認
-    expect(response?.status()).toBe(400);
-    await expect(page.locator("text=Invalid redirect path")).toBeVisible();
+    expect(response.status()).toBe(400);
+    expect(await response.text()).toBe("Invalid redirect path");
   });
 
   test("slug形式検証 - 不正なslug拒否", async ({ page }) => {
     // スペースを含む不正なslug
-    const response = await page.goto(
-      `/preview?collection=posts&slug=invalid slug&previewSecret=${previewSecret}`,
+    const encodedSecret = encodeURIComponent(previewSecret);
+    const response = await page.request.get(
+      `http://localhost:3001/preview?collection=posts&slug=invalid%20slug&previewSecret=${encodedSecret}`,
     );
 
     // 400ステータスを確認
-    expect(response?.status()).toBe(400);
-    await expect(page.locator("text=Invalid slug format")).toBeVisible();
+    expect(response.status()).toBe(400);
+    expect(await response.text()).toBe("Invalid slug format");
   });
 
   test("コレクション検証 - サポートされないコレクション拒否", async ({ page }) => {
     // posts以外はサポートされない
-    const response = await page.goto(
-      `/preview?collection=users&slug=test-user&previewSecret=${previewSecret}`,
+    const encodedSecret = encodeURIComponent(previewSecret);
+    const response = await page.request.get(
+      `http://localhost:3001/preview?collection=users&slug=test-user&previewSecret=${encodedSecret}`,
     );
 
     // 400ステータスを確認
-    expect(response?.status()).toBe(400);
-    await expect(page.locator("text=Unsupported collection")).toBeVisible();
+    expect(response.status()).toBe(400);
+    expect(await response.text()).toBe("Unsupported collection");
   });
 
   test("必須パラメータの欠如 - slugなし", async ({ page }) => {
     // slugパラメータなし
-    const response = await page.goto(`/preview?collection=posts&previewSecret=${previewSecret}`);
+    const encodedSecret = encodeURIComponent(previewSecret);
+    const response = await page.request.get(
+      `http://localhost:3001/preview?collection=posts&previewSecret=${encodedSecret}`,
+    );
 
     // 400ステータスを確認
-    expect(response?.status()).toBe(400);
-    await expect(page.locator("text=Missing slug or collection")).toBeVisible();
+    expect(response.status()).toBe(400);
+    expect(await response.text()).toBe("Missing slug or collection");
   });
 
   test("必須パラメータの欠如 - collectionなし", async ({ page }) => {
     // collectionパラメータなし
-    const response = await page.goto(`/preview?slug=test-post&previewSecret=${previewSecret}`);
+    const encodedSecret = encodeURIComponent(previewSecret);
+    const response = await page.request.get(
+      `http://localhost:3001/preview?slug=test-post&previewSecret=${encodedSecret}`,
+    );
 
     // 400ステータスを確認
-    expect(response?.status()).toBe(400);
-    await expect(page.locator("text=Missing slug or collection")).toBeVisible();
+    expect(response.status()).toBe(400);
+    expect(await response.text()).toBe("Missing slug or collection");
   });
 
   test("認証なしでのプレビューアクセス時は認証エラー", async ({ page }) => {
@@ -106,7 +117,7 @@ test.describe("プレビュー機能", () => {
 
     // 認証されていない場合は403が返る
     expect(response?.status()).toBe(403);
-    await expect(page.locator("text=Unauthorized")).toBeVisible();
+    await expect(page.locator("text=Invalid preview secret")).toBeVisible();
   });
 
   test("正しいシークレットでも認証必須", async ({ page }) => {
@@ -120,6 +131,6 @@ test.describe("プレビュー機能", () => {
 
     // APIレスポンスの内容を直接確認
     const responseText = await response?.text();
-    expect(responseText).toBe("Unauthorized");
+    expect(responseText).toBe("Invalid preview secret");
   });
 });

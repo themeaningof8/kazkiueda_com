@@ -209,7 +209,7 @@ jobs:
           echo "Checking database connectivity..."
           # 実際のヘルスチェックスクリプトを実行
         env:
-          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       # データベースバックアップ確認など追加可能
       # - name: Verify recent backups

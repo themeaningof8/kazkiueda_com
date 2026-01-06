@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { getPreviewSecret } from "./helpers/auth";
 
 /**
  * エラーハンドリングテスト
@@ -88,16 +89,19 @@ test.describe("エラーハンドリング", () => {
   });
 
   test("必須パラメータなしでプレビューにアクセスすると400", async ({ page }) => {
-    const previewSecret = "test-preview-secret-123456789012345678901234567890";
+    const previewSecret = getPreviewSecret();
+    const encodedSecret = encodeURIComponent(previewSecret);
 
     // slugなしでアクセス
-    const response = await page.goto(`/preview?collection=posts&previewSecret=${previewSecret}`);
+    const response = await page.request.get(
+      `http://localhost:3001/preview?collection=posts&previewSecret=${encodedSecret}`,
+    );
 
     // 400ステータスを確認
-    expect(response?.status()).toBe(400);
+    expect(response.status()).toBe(400);
 
-    // エラーメッセージの表示を確認
-    await expect(page.locator("text=Missing slug or collection")).toBeVisible();
+    // レスポンス内容を確認
+    expect(await response.text()).toBe("Missing slug or collection");
   });
 
   test("ページが正常にロードされることを確認", async ({ page }) => {
