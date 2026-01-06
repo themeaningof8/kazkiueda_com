@@ -55,9 +55,9 @@ describe("payload-client public API", () => {
       };
 
       // findPayload関数をモック
-      const module = await import("@/lib/api/payload-client");
+      const { findPayload } = await import("@/lib/api/payload-client");
       const findPayloadSpy = vi.fn().mockResolvedValue(mockResult);
-      (module as any).findPayload = findPayloadSpy;
+      vi.mocked(findPayload).mockImplementation(findPayloadSpy);
 
       const result = await findPostBySlug("test-post");
 
@@ -143,9 +143,9 @@ describe("payload-client public API", () => {
         hasPrevPage: false,
       };
 
-      const module = await import("@/lib/api/payload-client");
+      const { findPayload } = await import("@/lib/api/payload-client");
       const findPayloadSpy = vi.fn().mockResolvedValue(mockResult);
-      (module as any).findPayload = findPayloadSpy;
+      vi.mocked(findPayload).mockImplementation(findPayloadSpy);
 
       const result = await findPosts({ limit: 10, page: 1 });
 

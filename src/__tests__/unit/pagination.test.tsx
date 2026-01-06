@@ -94,7 +94,7 @@ describe("Pagination", () => {
     const link = screen.getByRole("link", { name: /ページ2へ移動/i });
     expect(link).toHaveAttribute("href", "/2");
     expect(link).not.toHaveAttribute("aria-current");
-    expect(link).toHaveAttribute("data-active", false);
+    expect(link).toHaveAttribute("data-active", "false");
     expect(link).toHaveClass("hover:bg-accent"); // ghost variant
   });
 

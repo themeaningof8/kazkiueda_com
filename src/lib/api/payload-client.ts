@@ -96,7 +96,7 @@ type CollectionDataType = {
 /**
  * Payload APIのラッパー（リトライ機能付き）
  */
-async function findPayload<T extends "posts" | "media" | "users">(
+export async function findPayload<T extends "posts" | "media" | "users">(
   options: PayloadFindOptions<T>,
 ): Promise<PayloadFindResult<CollectionDataType[T]>> {
   const maxRetries = 2;
