@@ -195,7 +195,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     # 本番DBに接続するため注意
-    environment: production
 
     steps:
       - uses: actions/checkout@v4
@@ -208,8 +207,6 @@ jobs:
         run: |
           echo "Checking database connectivity..."
           # 実際のヘルスチェックスクリプトを実行
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       # データベースバックアップ確認など追加可能
       # - name: Verify recent backups
