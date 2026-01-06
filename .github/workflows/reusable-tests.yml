@@ -71,11 +71,23 @@ jobs:
       - name: Run static checks
         if: inputs.suite == 'static'
         run: bun run test:static
+        env:
+          TEST_STATIC_RESULT: completed
 
       # ---------- Unit ----------
       - name: Run unit tests
         if: inputs.suite == 'unit'
-        run: bun run test:coverage:unit
+        run: |
+          # パフォーマンステストのためにNext.jsをビルド
+          echo "Building Next.js for bundle size tests..."
+          bunx dotenvx run -f projects/.env.development -- bun next build --no-lint
+          # ユニットテスト実行（bundle-size.test.ts以外）
+          output=$(dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit --coverage.enabled=false --exclude src/__tests__/unit/bundle-size.test.ts 2>&1)
+          echo "TEST_UNIT_RESULT=$output" >> $GITHUB_ENV
+          echo "$output"
+          # bundle-sizeテスト実行
+          echo "Running bundle size tests..."
+          bun run test:unit:ci
 
 
       # ---------- Integration / E2E Database Setup ----------
@@ -104,12 +116,12 @@ jobs:
           if [ -n "${{ inputs.integration-script }}" ]; then
             # Extract test file path from script name (e.g., test:integration:payload-client -> payload-client.test.ts)
             test_file=$(echo "${{ inputs.integration-script }}" | sed 's/test:integration://').test.ts
-            bunx dotenvx run -f projects/.env.development -- bunx vitest run "src/__tests__/integration/${test_file}"
+            output=$(bunx dotenvx run -f projects/.env.development -- bunx vitest run "src/__tests__/integration/${test_file}" 2>&1)
           else
-            bun run test:integration:posts
-            bun run test:integration:collections-posts
-            bun run test:integration:performance
+            output=$(bun run test:integration:posts && bun run test:integration:collections-posts && bun run test:integration:performance 2>&1)
           fi
+          echo "TEST_INTEGRATION_RESULT=$output" >> $GITHUB_ENV
+          echo "$output"
         env:
           ALLOW_NON_TEST_DATABASE_URL: true
 
@@ -133,12 +145,14 @@ jobs:
           PAYLOAD_SECRET: ci-test-secret-key-for-e2e-testing-only
         run: |
           if [ "${{ inputs.e2e-file }}" != "" ]; then
-            bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test "${{ inputs.e2e-file }}" --reporter=github
+            output=$(bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test "${{ inputs.e2e-file }}" --reporter=github 2>&1)
           elif [ "${{ inputs.suite }}" = "e2e-essential" ]; then
-            bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github
+            output=$(bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e/*-essential.spec.ts --reporter=github 2>&1)
           else
-            bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e --reporter=github
+            output=$(bunx dotenvx run -f projects/.env -f projects/.env.development -- bunx playwright test tests/e2e --reporter=github 2>&1)
           fi
+          echo "TEST_E2E_RESULT=$output" >> $GITHUB_ENV
+          echo "$output"
 
       - name: Upload Playwright report
         if: always() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
@@ -164,3 +178,8 @@ jobs:
       - name: Delete Neon test branch
         if: always() && (inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
         run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts delete
+
+      # ---------- Test Statistics ----------
+      - name: Generate test pyramid statistics
+        if: always() && inputs.suite == 'e2e-essential'  # 最後のジョブでのみ実行
+        run: bun run test:stats

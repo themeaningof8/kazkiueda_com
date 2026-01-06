@@ -16,6 +16,14 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html", "lcov"],
       reportsDirectory: "reports/coverage",
+      exclude: [
+        // UIコンポーネントはアクセシビリティテストとして別管理
+        "src/components/ui/**",
+        // テストファイル自体
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        "**/*.config.{ts,js}",
+      ],
       thresholds: {
         // Week 3目標: Collections層テスト実装完了
         lines: 75,      // 62.39% → 75% (Collections層強化)

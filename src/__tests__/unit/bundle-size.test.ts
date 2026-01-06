@@ -16,7 +16,6 @@ describe("Bundle Size Analysis", () => {
   const nextStaticAnalysisPath = join(process.cwd(), ".next", "static-analysis.json");
 
   describe("Build Analysis", () => {
-    // CI環境ではビルドが存在しないためスキップ
     test.skip(
       "should analyze Next.js build statistics",
       async () => {
@@ -161,7 +160,7 @@ describe("Bundle Size Analysis", () => {
   });
 
   describe("Code Splitting Verification", () => {
-    test.skipIf(!TEST_ENVIRONMENT.isCI)("should verify code splitting is working", () => {
+    test("should verify code splitting is working", () => {
       // .nextディレクトリ内のファイル構造をチェック
       const nextDir = join(process.cwd(), ".next");
 
