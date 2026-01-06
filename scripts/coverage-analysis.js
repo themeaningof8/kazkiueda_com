@@ -5,8 +5,8 @@
  * Testing Trophyの観点から各層のカバレッジを評価
  */
 
-import { existsSync, readFileSync } from "fs";
-import { join } from "path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
 const COVERAGE_THRESHOLDS = {
   static: { lines: 100, functions: 100, branches: 100, statements: 100 },
@@ -157,7 +157,7 @@ function generateCoverageReport(layers) {
       12,
   );
 
-  lines.push("🎯 Overall Coverage Score: " + overallScore + "/100");
+  lines.push(`🎯 Overall Coverage Score: ${overallScore}/100`);
   lines.push("");
 
   if (overallScore >= 85) {

@@ -5,8 +5,8 @@
  * Testing Trophyの観点からテストピラミッドを可視化
  */
 
-import { existsSync, readFileSync } from "fs";
-import { join } from "path";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 const TEST_TYPES = {
   static: {
@@ -39,9 +39,9 @@ function parseVitestResults(results) {
     const skippedMatch = results.match(/(\d+)\s+skipped/);
 
     return {
-      passed: testMatch ? parseInt(testMatch[1]) : 0,
-      failed: failedMatch ? parseInt(failedMatch[1]) : 0,
-      skipped: skippedMatch ? parseInt(skippedMatch[1]) : 0,
+      passed: testMatch ? parseInt(testMatch[1], 10) : 0,
+      failed: failedMatch ? parseInt(failedMatch[1], 10) : 0,
+      skipped: skippedMatch ? parseInt(skippedMatch[1], 10) : 0,
     };
   } catch (error) {
     console.warn("Failed to parse Vitest results:", error.message);
@@ -54,7 +54,7 @@ function parsePlaywrightResults(results) {
     // Playwrightの結果をパース（例: "5 passed (2.3s)"）
     const passedMatch = results.match(/(\d+)\s+passed/);
     return {
-      passed: passedMatch ? parseInt(passedMatch[1]) : 0,
+      passed: passedMatch ? parseInt(passedMatch[1], 10) : 0,
       failed: 0,
       skipped: 0,
     };
@@ -77,7 +77,7 @@ function getTestFilesCount(type) {
       const unitDir = join(baseDir, "unit");
       if (!existsSync(unitDir)) return { files: 0, description: "files" };
 
-      const files = require("fs")
+      const files = require("node:fs")
         .readdirSync(unitDir)
         .filter((file) => file.endsWith(".test.ts") || file.endsWith(".test.tsx")).length;
       return { files, description: "files" };
@@ -91,7 +91,7 @@ function getTestFilesCount(type) {
       const integrationDir = join(baseDir, "integration");
       if (!existsSync(integrationDir)) return { files: 0, description: "files" };
 
-      const files = require("fs")
+      const files = require("node:fs")
         .readdirSync(integrationDir)
         .filter((file) => file.endsWith(".test.ts")).length;
       return { files, description: "files" };
@@ -105,7 +105,7 @@ function getTestFilesCount(type) {
       const e2eDir = join(process.cwd(), "tests", "e2e");
       if (!existsSync(e2eDir)) return { files: 0, description: "specs" };
 
-      const files = require("fs")
+      const files = require("node:fs")
         .readdirSync(e2eDir)
         .filter((file) => file.endsWith(".spec.ts")).length;
       return { files, description: "specs" };
@@ -119,7 +119,7 @@ function getTestFilesCount(type) {
 
 function generatePyramid(stats) {
   const lines = [];
-  const maxWidth = 50;
+  const _maxWidth = 50;
 
   // Testing Trophyの構造をテキストで表現
   lines.push("        🏆 Testing Trophy 🏆");
