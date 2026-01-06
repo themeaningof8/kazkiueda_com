@@ -4,7 +4,7 @@ import { getPosts } from "@/lib/posts";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
 import { createBulkTestPosts, createTestUser } from "@/test/helpers/factories";
 import { destroyTestPayload, getTestPayload } from "@/test/payload";
-import { TEST_ENVIRONMENT } from "../performance/config";
+import { TEST_ENVIRONMENT } from "../../lib/performance/config";
 
 describe.skipIf(!TEST_ENVIRONMENT.isCI)("Performance Tests", () => {
   const pool = createTestDbPool();

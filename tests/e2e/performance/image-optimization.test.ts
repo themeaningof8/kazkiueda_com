@@ -9,8 +9,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "./config";
-import { shouldSkipPerformanceTest } from "./utils";
+import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "../../../src/lib/performance/config";
+import { shouldSkipPerformanceTest } from "../../../src/lib/performance/utils";
 
 declare global {
   interface Window {

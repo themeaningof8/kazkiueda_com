@@ -8,8 +8,12 @@
 
 import { chromium } from "playwright";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "./config";
-import { assertPerformanceThreshold, getMemoryUsage, shouldSkipPerformanceTest } from "./utils";
+import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "../../../src/lib/performance/config";
+import {
+  assertPerformanceThreshold,
+  getMemoryUsage,
+  shouldSkipPerformanceTest,
+} from "../../../src/lib/performance/utils";
 
 describe("Memory Leak Detection", () => {
   let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;

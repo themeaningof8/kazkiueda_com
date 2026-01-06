@@ -41,6 +41,7 @@ jobs:
           - test:integration:collections-posts
           - test:integration:collections-users
           - test:integration:collections-media
+          - test:integration:performance
     uses: ./.github/workflows/reusable-tests.yml
     secrets: inherit
     with:
@@ -48,18 +49,9 @@ jobs:
       dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
       integration-script: ${{ matrix.integration-script }}
 
-  performance:
-    name: Performance Tests
-    needs: integration
-    uses: ./.github/workflows/reusable-tests.yml
-    secrets: inherit
-    with:
-      suite: performance
-      dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
-
   e2e-essential:
     name: E2E Essential
-    needs: performance
+    needs: integration
     uses: ./.github/workflows/reusable-tests.yml
     secrets: inherit
     with:
