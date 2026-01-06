@@ -102,6 +102,7 @@ describe("payload-client public API", () => {
 
       // findPayloadがエラーを投げるようにモック
       const module = await import("@/lib/api/payload-client");
+      // biome-ignore lint/suspicious/noExplicitAny: モックのためにanyが必要
       (module as any).findPayload = vi.fn().mockRejectedValue(new Error("test error"));
 
       const result = await findPostBySlug("test-post");

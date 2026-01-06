@@ -25,11 +25,11 @@ export default defineConfig({
         "**/*.config.{ts,js}",
       ],
       thresholds: {
-        // Week 3目標: Collections層テスト実装完了
-        lines: 75,      // 62.39% → 75% (Collections層強化)
-        functions: 80,  // 64.17% → 80% (Collections層強化)
-        branches: 62,   // 46.03% → 62% (Collections層強化)
-        statements: 75, // 59.7% → 75% (Collections層強化)
+        // Phase 2目標: エッジケース・境界値テスト追加後
+        lines: 80,      // 75% → 80% (エッジケース追加)
+        functions: 85,  // 80% → 85% (境界値テスト追加)
+        branches: 70,   // 62% → 70% (エラーハンドリング強化)
+        statements: 80, // 75% → 80% (全体的な網羅性向上)
       },
     },
   },

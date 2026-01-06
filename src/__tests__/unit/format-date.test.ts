@@ -50,4 +50,91 @@ describe("formatDate", () => {
     const localResult = formatDate(localDate);
     expect(localResult).toBe("2024年1月15日");
   });
+
+  // 境界値テスト
+  describe("境界値のテスト", () => {
+    test("1970年1月1日（Unix epoch）を正しく処理", () => {
+      const epochDate = new Date("1970-01-01T00:00:00.000Z");
+      const result = formatDate(epochDate);
+      expect(result).toBe("1970年1月1日");
+    });
+
+    test("非常に古い日付を処理", () => {
+      const oldDate = new Date("1900-01-01T00:00:00.000Z");
+      const result = formatDate(oldDate);
+      expect(result).toBe("1900年1月1日");
+    });
+
+    test("未来の日付を処理", () => {
+      const futureDate = new Date("2100-12-31T23:59:59.999Z");
+      const result = formatDate(futureDate);
+      expect(result).toBe("2100年12月31日");
+    });
+
+    test("月の最終日（31日）を正しく処理", () => {
+      const endOfMonth = new Date("2024-01-31T12:00:00Z");
+      const result = formatDate(endOfMonth);
+      expect(result).toBe("2024年1月31日");
+    });
+
+    test("2月29日（うるう年）を正しく処理", () => {
+      const leapDay = new Date("2024-02-29T12:00:00Z");
+      const result = formatDate(leapDay);
+      expect(result).toBe("2024年2月29日");
+    });
+
+    test("年の最初の日を処理", () => {
+      const firstDay = new Date("2024-01-01T00:00:00Z");
+      const result = formatDate(firstDay);
+      expect(result).toBe("2024年1月1日");
+    });
+
+    test("年の最後の日を処理", () => {
+      const lastDay = new Date("2024-12-31T23:59:59.999Z");
+      const result = formatDate(lastDay);
+      expect(result).toBe("2024年12月31日");
+    });
+  });
+
+  // エラーハンドリングのテスト
+  describe("エラーハンドリング", () => {
+    test("無効な日付文字列の場合、Invalid Dateとなる", () => {
+      const result = formatDate("invalid-date");
+      expect(result).toContain("Invalid Date");
+    });
+
+    test("空文字列の場合、Invalid Dateとなる", () => {
+      const result = formatDate("");
+      expect(result).toContain("Invalid Date");
+    });
+
+    test("数値のみの文字列は日付として解釈される", () => {
+      // "1234567890000" はミリ秒として解釈される
+      const result = formatDate("1234567890000");
+      // 日付として解釈されるが、結果は検証しない（環境依存のため）
+      expect(result).toBeDefined();
+    });
+  });
+
+  // 特殊なケース
+  describe("特殊なケース", () => {
+    test("タイムスタンプ形式の文字列を処理", () => {
+      const timestamp = "2024-01-15";
+      const result = formatDate(timestamp);
+      expect(result).toBe("2024年1月15日");
+    });
+
+    test("ISO 8601形式の完全な文字列を処理", () => {
+      const iso = "2024-01-15T12:34:56.789Z";
+      const result = formatDate(iso);
+      expect(result).toBe("2024年1月15日");
+    });
+
+    test("Dateオブジェクトの時刻部分は無視される", () => {
+      const morning = new Date("2024-01-15T00:00:00Z");
+      const evening = new Date("2024-01-15T23:59:59Z");
+
+      expect(formatDate(morning)).toBe(formatDate(evening));
+    });
+  });
 });

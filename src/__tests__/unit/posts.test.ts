@@ -233,7 +233,7 @@ describe("posts", () => {
       vi.mocked(findPosts).mockResolvedValue({
         docs: [],
         totalDocs: 0,
-        totalPages: null as any,
+        totalPages: undefined,
         hasNextPage: false,
         hasPrevPage: false,
       });
