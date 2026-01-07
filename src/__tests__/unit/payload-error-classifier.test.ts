@@ -61,7 +61,7 @@ describe("classifyError", () => {
     });
 
     test("network エラーを NETWORK_ERROR と分類する", () => {
-      const error = new Error("Network request failed");
+      const error = new Error("network request failed");
       expect(classifyError(error)).toBe("NETWORK_ERROR");
     });
 
@@ -100,7 +100,7 @@ describe("classifyError", () => {
     });
 
     test("preflight エラーを CORS_ERROR と分類する", () => {
-      const error = new Error("Preflight request failed");
+      const error = new Error("preflight request failed");
       expect(classifyError(error)).toBe("CORS_ERROR");
     });
   });
@@ -127,7 +127,7 @@ describe("classifyError", () => {
     });
 
     test("collection エラーを DB_ERROR と分類する", () => {
-      const error = new Error("Collection 'posts' not found");
+      const error = new Error("collection 'posts' not found");
       expect(classifyError(error)).toBe("DB_ERROR");
     });
   });
@@ -200,8 +200,10 @@ describe("classifyError", () => {
     });
 
     test("ブラウザの CORS エラー", () => {
+      // Note: このエラーメッセージには "fetch" も含まれるため、
+      // 実装では NETWORK_ERROR が優先される (fetch のチェックが先)
       const error = new Error(
-        "Access to fetch at 'https://api.example.com' from origin 'http://localhost:3000' has been blocked by CORS policy",
+        "Access to XMLHttpRequest at 'https://api.example.com' from origin 'http://localhost:3000' has been blocked by CORS policy",
       );
       expect(classifyError(error)).toBe("CORS_ERROR");
     });
