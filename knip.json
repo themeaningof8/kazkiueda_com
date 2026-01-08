@@ -2,16 +2,24 @@
   "$schema": "https://unpkg.com/knip@latest/schema.json",
   "entry": ["src/app/**/*.{ts,tsx}", "src/payload.config.ts"],
   "project": ["src/**/*.{ts,tsx}"],
-  "ignore": ["src/payload-types.ts", "src/migrations/**/*.ts", "**/*.d.ts"],
+  "ignore": [
+    "src/payload-types.ts",
+    "src/migrations/**/*.ts",
+    "**/*.d.ts",
+    "src/__tests__/helpers/**",
+    "src/__tests__/fixtures/**"
+  ],
   "ignoreDependencies": [
     "tailwindcss",
     "tw-animate-css",
-    "tsx",
     "bundlesize",
     "memlab",
-    "webpack-bundle-analyzer"
+    "webpack-bundle-analyzer",
+    "lighthouse",
+    "@stryker-mutator/api",
+    "@codecov/vite-plugin"
   ],
-  "ignoreBinaries": ["build"],
+  "ignoreBinaries": ["build", "open"],
   "ignoreExportsUsedInFile": true,
   "next": {
     "entry": ["src/app/**/*.{ts,tsx}", "next.config.ts"]
