@@ -100,48 +100,83 @@ describe("performance/utils", () => {
   });
 
   describe("shouldSkipPerformanceTest", () => {
-    test("CI環境ではスキップしない", () => {
-      const ciStub = vi.stubEnv("CI", "true");
-      const envStub = vi.stubEnv("NODE_ENV", "development");
+    const originalEnv = { ...process.env };
 
-      expect(shouldSkipPerformanceTest("ci-only")).toBe(false);
-      expect(shouldSkipPerformanceTest("heavy")).toBe(false);
+    beforeEach(() => {
+      (process.env as any) = { ...originalEnv };
     });
 
-    test("CI環境以外ではci-onlyテストをスキップ", () => {
-      const ciStub = vi.stubEnv("CI", undefined);
-      const envStub = vi.stubEnv("NODE_ENV", "development");
-
-      expect(shouldSkipPerformanceTest("ci-only")).toBe(true);
+    afterEach(() => {
+      (process.env as any) = { ...originalEnv };
     });
 
-    test("ローカル環境ではheavyテストをスキップ", () => {
-      const ciStub = vi.stubEnv("CI", undefined);
-      const envStub = vi.stubEnv("NODE_ENV", "development");
+    test("CI環境ではスキップしない", async () => {
+      process.env.CI = "true";
+      process.env.NODE_ENV = "development";
 
-      expect(shouldSkipPerformanceTest("heavy")).toBe(true);
+      // モジュールを再importして環境変数の変更を反映
+      const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
+        "@/lib/performance/utils"
+      );
+
+      expect(freshShouldSkip("ci-only")).toBe(false);
+      expect(freshShouldSkip("heavy")).toBe(false);
     });
 
-    test("CI環境ではheavyテストも実行", () => {
-      const ciStub = vi.stubEnv("CI", "true");
-      const envStub = vi.stubEnv("NODE_ENV", "development");
+    test("CI環境以外ではci-onlyテストをスキップ", async () => {
+      process.env.CI = undefined;
+      process.env.NODE_ENV = "development";
 
-      expect(shouldSkipPerformanceTest("heavy")).toBe(false);
+      const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
+        "@/lib/performance/utils"
+      );
+
+      expect(freshShouldSkip("ci-only")).toBe(true);
     });
 
-    test("reasonが指定されていない場合はスキップしない", () => {
-      const ciStub = vi.stubEnv("CI", undefined);
-      const envStub = vi.stubEnv("NODE_ENV", "development");
+    test("ローカル環境ではheavyテストをスキップ", async () => {
+      process.env.CI = undefined;
+      process.env.NODE_ENV = "development";
 
-      expect(shouldSkipPerformanceTest()).toBe(false);
+      const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
+        "@/lib/performance/utils"
+      );
+
+      expect(freshShouldSkip("heavy")).toBe(true);
     });
 
-    test("本番環境ではスキップ条件に関わらず実行", () => {
-      const ciStub = vi.stubEnv("CI", undefined);
-      const envStub = vi.stubEnv("NODE_ENV", "production");
+    test("CI環境ではheavyテストも実行", async () => {
+      process.env.CI = "true";
+      process.env.NODE_ENV = "development";
 
-      expect(shouldSkipPerformanceTest("ci-only")).toBe(false);
-      expect(shouldSkipPerformanceTest("heavy")).toBe(false);
+      const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
+        "@/lib/performance/utils"
+      );
+
+      expect(freshShouldSkip("heavy")).toBe(false);
+    });
+
+    test("reasonが指定されていない場合はスキップしない", async () => {
+      process.env.CI = undefined;
+      process.env.NODE_ENV = "development";
+
+      const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
+        "@/lib/performance/utils"
+      );
+
+      expect(freshShouldSkip()).toBe(false);
+    });
+
+    test("本番環境ではスキップ条件に関わらず実行", async () => {
+      process.env.CI = "true";
+      process.env.NODE_ENV = "production";
+
+      const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
+        "@/lib/performance/utils"
+      );
+
+      expect(freshShouldSkip("ci-only")).toBe(false);
+      expect(freshShouldSkip("heavy")).toBe(false);
     });
   });
 });

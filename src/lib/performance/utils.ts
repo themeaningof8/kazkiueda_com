@@ -43,12 +43,12 @@ export function getMemoryUsage(): number {
  */
 export function shouldSkipPerformanceTest(reason?: string): boolean {
   // CI環境以外では一部のテストをスキップ
-  if (!TEST_ENVIRONMENT.isCI && reason === "ci-only") {
+  if (process.env.CI !== "true" && reason === "ci-only") {
     return true;
   }
 
   // ローカル環境で重いテストをスキップ
-  if (TEST_ENVIRONMENT.isLocal && reason === "heavy") {
+  if (process.env.NODE_ENV === "development" && process.env.CI !== "true" && reason === "heavy") {
     return true;
   }
 
