@@ -14,6 +14,7 @@ export default defineConfig({
 
     // Deadlock対策: インテグレーションテストが共有DBを使うため、完全に直列実行する
     fileParallelism: false,
+    reporters: ['default', ['junit', { outputFile: './reports/test-results/junit.xml' }]],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
