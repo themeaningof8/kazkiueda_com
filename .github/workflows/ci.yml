@@ -76,7 +76,7 @@ jobs:
     timeout-minutes: 15
     env:
       NODE_ENV: test
-      DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+      dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -97,7 +97,6 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./reports/coverage/lcov.info
           flags: unit
           name: unit-coverage

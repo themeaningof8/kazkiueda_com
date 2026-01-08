@@ -15,7 +15,7 @@
     "test:static": "bunx tsc --noEmit && bun run lint && bun run check && bun run analyze:circular && bun run analyze:duplication && bun run analyze:unused",
     "test:unit": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit --exclude src/__tests__/unit/bundle-size.test.ts --exclude src/__tests__/unit/payload-client.test.ts --exclude src/__tests__/unit/pagination.test.tsx",
     "test:unit:extended": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit/bundle-size.test.ts src/__tests__/unit/pagination.test.tsx",
-    "test:coverage:unit": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run --coverage src/__tests__/unit",
+    "test:coverage:unit": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run --coverage --exclude 'src/__tests__/unit/payload-client.test.ts' --exclude 'src/__tests__/unit/bundle-size.test.ts' --exclude 'src/__tests__/unit/pagination.test.tsx' src/__tests__/unit",
     "test:integration:payload-client": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/integration/payload-client.test.ts",
     "test:integration:posts": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/integration/posts.test.ts",
     "test:integration:collections-posts": "dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/integration/collections-posts.test.ts",

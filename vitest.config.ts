@@ -23,6 +23,8 @@ export default defineConfig({
         "**/*.test.{ts,tsx}",
         "**/*.spec.{ts,tsx}",
         "**/*.config.{ts,js}",
+        // Payloadコレクション設定ファイル（設定ファイルなのでテスト不要）
+        "src/collections/**",
       ],
       thresholds: {
         // Phase 2目標: エッジケース・境界値テスト追加後
