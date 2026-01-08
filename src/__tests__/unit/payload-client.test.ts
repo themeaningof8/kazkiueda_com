@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { clearPayloadCache } from "@/lib/api/payload-client";
+import { clearPayloadCache, findPostBySlug, findPosts } from "@/lib/api/payload-client";
 
 // payload-client.tsの内部関数をテストするためにモック化
 vi.mock("@payload-config", () => ({}));
@@ -16,20 +16,31 @@ vi.mock("@/lib/api/payload-filters", () => ({
   buildSlugFilter: vi.fn(),
 }));
 
+// findPayload関数をモックするための準備
+
+// モックを保存するための変数
+let originalFindPayload: any;
+
 describe("payload-client public API", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     clearPayloadCache();
+    // モックの元の関数を保存
+    const module = await import("@/lib/api/payload-client");
+    originalFindPayload = module.findPayload;
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     clearPayloadCache();
+    // モックを元に戻す
+    if (originalFindPayload) {
+      const module = await import("@/lib/api/payload-client");
+      (module as any).findPayload = originalFindPayload;
+    }
   });
 
   describe("findPostBySlug", () => {
     test("正常に記事を取得できる", async () => {
-      const { findPostBySlug } = await import("@/lib/api/payload-client");
-
-      // モックを設定
+      // モックを設定してからインポート
       const mockResult = {
         docs: [
           {
@@ -54,10 +65,13 @@ describe("payload-client public API", () => {
         totalDocs: 1,
       };
 
-      // findPayload関数をモック
-      const { findPayload } = await import("@/lib/api/payload-client");
+      // findPayload関数をモック - より安全な方法
+      const module = await import("@/lib/api/payload-client");
+      const originalFindPayload = module.findPayload;
       const findPayloadSpy = vi.fn().mockResolvedValue(mockResult);
-      vi.mocked(findPayload).mockImplementation(findPayloadSpy);
+
+      // 一時的に置き換え
+      (module as any).findPayload = findPayloadSpy;
 
       const result = await findPostBySlug("test-post");
 
@@ -102,8 +116,9 @@ describe("payload-client public API", () => {
 
       // findPayloadがエラーを投げるようにモック
       const module = await import("@/lib/api/payload-client");
-      // biome-ignore lint/suspicious/noExplicitAny: モックのためにanyが必要
-      (module as any).findPayload = vi.fn().mockRejectedValue(new Error("test error"));
+      const originalFindPayload = module.findPayload;
+      const findPayloadSpy = vi.fn().mockRejectedValue(new Error("test error"));
+      (module as any).findPayload = findPayloadSpy;
 
       const result = await findPostBySlug("test-post");
 
@@ -144,9 +159,10 @@ describe("payload-client public API", () => {
         hasPrevPage: false,
       };
 
-      const { findPayload } = await import("@/lib/api/payload-client");
+      const module = await import("@/lib/api/payload-client");
+      const originalFindPayload = module.findPayload;
       const findPayloadSpy = vi.fn().mockResolvedValue(mockResult);
-      vi.mocked(findPayload).mockImplementation(findPayloadSpy);
+      (module as any).findPayload = findPayloadSpy;
 
       const result = await findPosts({ limit: 10, page: 1 });
 

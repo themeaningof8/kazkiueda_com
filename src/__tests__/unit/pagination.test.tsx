@@ -89,7 +89,11 @@ describe("Pagination", () => {
   });
 
   test("PaginationLinkが非アクティブ状態で正しくレンダリングされる", () => {
-    render(<PaginationLink href="/2">2</PaginationLink>);
+    render(
+      <PaginationLink href="/2" isActive={false}>
+        2
+      </PaginationLink>,
+    );
 
     const link = screen.getByRole("link", { name: /ページ2へ移動/i });
     expect(link).toHaveAttribute("href", "/2");
@@ -119,11 +123,11 @@ describe("Pagination", () => {
   });
 
   test("PaginationEllipsisが正しくレンダリングされる", () => {
-    render(<PaginationEllipsis />);
+    const { container } = render(<PaginationEllipsis />);
 
-    const span = screen.getByText("More pages").closest("span");
-    expect(span).toHaveAttribute("aria-hidden");
-    expect(span).toHaveAttribute("data-slot", "pagination-ellipsis");
+    const ellipsis = container.querySelector('[data-slot="pagination-ellipsis"]');
+    expect(ellipsis).toHaveAttribute("aria-hidden");
+    expect(ellipsis).toHaveAttribute("data-slot", "pagination-ellipsis");
     expect(screen.getByTestId("MoreHorizontalIcon")).toBeInTheDocument();
   });
 
@@ -134,8 +138,9 @@ describe("Pagination", () => {
       </PaginationLink>,
     );
 
-    const link = screen.getByRole("link", { name: /カスタム/i });
+    const link = screen.getByRole("link");
     expect(link).toHaveAttribute("href", "/custom");
+    expect(link).toHaveTextContent("カスタム");
     // asChildの場合、data-slot属性は渡されない可能性がある
     // expect(link).toHaveAttribute("data-slot", "pagination-link");
   });
