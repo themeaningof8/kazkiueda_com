@@ -76,6 +76,7 @@ jobs:
     timeout-minutes: 15
     env:
       NODE_ENV: test
+      DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
       DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
     steps:
       - name: Checkout
@@ -96,7 +97,7 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         run: |
-          bunx dotenvx run -f projects/.env.development -f projects/.env -- bunx codecov --file ./reports/coverage/lcov.info --flags unit --name unit-coverage || echo "Codecov upload failed, continuing..."
+          bunx dotenvx run -f projects/.env.development -f projects/.env -- npx codecov -f ./reports/coverage/lcov.info -F unit || echo "Codecov upload failed, continuing..."
 
       - name: Generate coverage summary
         run: |
