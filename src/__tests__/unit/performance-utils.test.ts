@@ -111,8 +111,8 @@ describe("performance/utils", () => {
     });
 
     test("CI環境ではスキップしない", async () => {
-      process.env.CI = "true";
-      process.env.NODE_ENV = "development";
+      (process.env as any).CI = "true";
+      (process.env as any).NODE_ENV = "development";
 
       // モジュールを再importして環境変数の変更を反映
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
@@ -124,8 +124,8 @@ describe("performance/utils", () => {
     });
 
     test("CI環境以外ではci-onlyテストをスキップ", async () => {
-      process.env.CI = undefined;
-      process.env.NODE_ENV = "development";
+      (process.env as any).CI = undefined;
+      (process.env as any).NODE_ENV = "development";
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"
@@ -135,8 +135,8 @@ describe("performance/utils", () => {
     });
 
     test("ローカル環境ではheavyテストをスキップ", async () => {
-      process.env.CI = undefined;
-      process.env.NODE_ENV = "development";
+      (process.env as any).CI = undefined;
+      (process.env as any).NODE_ENV = "development";
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"
@@ -146,8 +146,8 @@ describe("performance/utils", () => {
     });
 
     test("CI環境ではheavyテストも実行", async () => {
-      process.env.CI = "true";
-      process.env.NODE_ENV = "development";
+      (process.env as any).CI = "true";
+      (process.env as any).NODE_ENV = "development";
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"
@@ -157,8 +157,8 @@ describe("performance/utils", () => {
     });
 
     test("reasonが指定されていない場合はスキップしない", async () => {
-      process.env.CI = undefined;
-      process.env.NODE_ENV = "development";
+      (process.env as any).CI = undefined;
+      (process.env as any).NODE_ENV = "development";
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"
@@ -168,8 +168,8 @@ describe("performance/utils", () => {
     });
 
     test("本番環境ではスキップ条件に関わらず実行", async () => {
-      process.env.CI = "true";
-      process.env.NODE_ENV = "production";
+      (process.env as any).CI = "true";
+      (process.env as any).NODE_ENV = "production";
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"
