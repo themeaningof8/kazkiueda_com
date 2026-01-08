@@ -1,4 +1,9 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import {
+  createMockDraftPost,
+  createMockPayloadResponse,
+  createMockPost,
+} from "@/__tests__/fixtures";
 
 vi.mock("@/lib/api/payload-client", () => ({
   findPostBySlug: vi.fn(),
@@ -22,24 +27,7 @@ describe("posts", () => {
       const { getPostBySlug } = await import("@/lib/posts");
       const { findPostBySlug } = await import("@/lib/api/payload-client");
 
-      const mockPost = {
-        id: 1,
-        title: "Test Post",
-        slug: "test-post",
-        content: {
-          root: {
-            type: "root",
-            children: [],
-            direction: null,
-            format: "" as const,
-            indent: 0,
-            version: 1,
-          },
-        },
-        author: 1,
-        updatedAt: "2024-01-15T00:00:00.000Z",
-        createdAt: "2024-01-15T00:00:00.000Z",
-      };
+      const mockPost = createMockPost();
       vi.mocked(findPostBySlug).mockResolvedValue({
         docs: [mockPost],
         totalDocs: 1,
@@ -92,24 +80,7 @@ describe("posts", () => {
       const { getPostBySlug } = await import("@/lib/posts");
       const { findPostBySlug } = await import("@/lib/api/payload-client");
 
-      const mockPost = {
-        id: 1,
-        title: "Draft Post",
-        slug: "draft-post",
-        content: {
-          root: {
-            type: "root",
-            children: [],
-            direction: null,
-            format: "" as const,
-            indent: 0,
-            version: 1,
-          },
-        },
-        author: 1,
-        updatedAt: "2024-01-15T00:00:00.000Z",
-        createdAt: "2024-01-15T00:00:00.000Z",
-      };
+      const mockPost = createMockDraftPost();
       vi.mocked(findPostBySlug).mockResolvedValue({
         docs: [mockPost],
         totalDocs: 1,
@@ -130,49 +101,11 @@ describe("posts", () => {
       const { findPosts } = await import("@/lib/api/payload-client");
 
       const mockPosts = [
-        {
-          id: 1,
-          title: "Post 1",
-          content: {
-            root: {
-              type: "root",
-              children: [],
-              direction: null,
-              format: "" as const,
-              indent: 0,
-              version: 1,
-            },
-          },
-          author: 1,
-          updatedAt: "2024-01-15T00:00:00.000Z",
-          createdAt: "2024-01-15T00:00:00.000Z",
-        },
-        {
-          id: 2,
-          title: "Post 2",
-          content: {
-            root: {
-              type: "root",
-              children: [],
-              direction: null,
-              format: "" as const,
-              indent: 0,
-              version: 1,
-            },
-          },
-          author: 1,
-          updatedAt: "2024-01-15T00:00:00.000Z",
-          createdAt: "2024-01-15T00:00:00.000Z",
-        },
+        createMockPost({ id: 1, title: "Post 1", slug: "post-1" }),
+        createMockPost({ id: 2, title: "Post 2", slug: "post-2" }),
       ];
 
-      vi.mocked(findPosts).mockResolvedValue({
-        docs: mockPosts,
-        totalDocs: 2,
-        totalPages: 1,
-        hasNextPage: false,
-        hasPrevPage: false,
-      });
+      vi.mocked(findPosts).mockResolvedValue(createMockPayloadResponse(mockPosts, 1, 10));
 
       const result = await getPosts(1, 10);
 

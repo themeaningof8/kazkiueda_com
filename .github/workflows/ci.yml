@@ -69,6 +69,52 @@ jobs:
       suite: e2e-essential
       dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
 
+  coverage:
+    name: Coverage Report
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NODE_ENV: test
+      DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build Next.js for performance tests
+        run: |
+          echo "Building Next.js for bundle size tests..."
+          bunx dotenvx run -f projects/.env.development -- bun next build
+
+      - name: Run unit tests with coverage
+        run: |
+          echo "Running unit tests with coverage..."
+          bunx dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit --coverage --exclude src/__tests__/unit/bundle-size.test.ts --exclude src/__tests__/unit/payload-client.test.ts --exclude src/__tests__/unit/pagination.test.tsx
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./reports/coverage/lcov.info
+          flags: unit
+          name: unit-coverage
+          fail_ci_if_error: false
+
+      - name: Generate coverage summary
+        run: |
+          echo "# Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f "reports/coverage/coverage-summary.json" ]; then
+            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+            cat reports/coverage/coverage-summary.json >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Coverage summary not found" >> $GITHUB_STEP_SUMMARY
+          fi
+
   # Note: Vercel handles all deployments automatically via GitHub integration
   # - Production: main branch pushes
   # - Preview: Pull requests
