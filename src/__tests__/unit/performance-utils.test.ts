@@ -1,12 +1,28 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import {
-  assertPerformanceThreshold,
-  getMemoryUsage,
-  shouldSkipPerformanceTest,
-} from "@/lib/performance/utils";
+import { assertPerformanceThreshold, getMemoryUsage } from "@/lib/performance/utils";
+
+// Node.js memoryUsageの戻り値型
+type MemoryUsage = {
+  rss: number;
+  heapTotal: number;
+  heapUsed: number;
+  external: number;
+  arrayBuffers?: number;
+};
 
 describe("performance/utils", () => {
-  const memoryUsageMock = vi.fn();
+  const memoryUsageMock = vi.fn(() => ({}) as MemoryUsage);
+
+  // 型安全な環境変数設定ヘルパー関数
+  const setEnv = (env: Record<string, string | undefined>) => {
+    // 環境変数をリセットしてから新しい値を設定
+    Object.keys(process.env).forEach((key) => {
+      if (!(key in env)) {
+        delete process.env[key];
+      }
+    });
+    Object.assign(process.env, env);
+  };
 
   beforeEach(() => {
     // process.memoryUsageをモック
@@ -15,7 +31,7 @@ describe("performance/utils", () => {
       heapTotal: 100 * 1024 * 1024, // 100MB
       external: 10 * 1024 * 1024, // 10MB
       rss: 150 * 1024 * 1024, // 150MB
-    });
+    } satisfies MemoryUsage);
     vi.stubGlobal("process", {
       ...process,
       memoryUsage: memoryUsageMock,
@@ -48,6 +64,8 @@ describe("performance/utils", () => {
 
     test("無効なメトリック名の場合エラー", () => {
       expect(() => {
+        // 意図的に無効なメトリック名を渡してエラーハンドリングをテスト
+        // biome-ignore lint/suspicious/noExplicitAny: 意図的に無効なメトリック名をテスト
         assertPerformanceThreshold("coreWebVitals", "invalidMetric" as any, 100);
       }).toThrow("Invalid threshold configuration for coreWebVitals.invalidMetric");
     });
@@ -74,12 +92,12 @@ describe("performance/utils", () => {
 
     test("メモリ使用量の計算が正しい", () => {
       // 75MBのheapUsedを設定
-      (process.memoryUsage as any).mockReturnValue({
+      memoryUsageMock.mockReturnValue({
         heapUsed: 75 * 1024 * 1024, // 75MB
         heapTotal: 100 * 1024 * 1024,
         external: 10 * 1024 * 1024,
         rss: 150 * 1024 * 1024,
-      });
+      } satisfies MemoryUsage);
 
       const result = getMemoryUsage();
       expect(result).toBe(75);
@@ -87,12 +105,12 @@ describe("performance/utils", () => {
 
     test("小数点以下の値が正しく丸められる", () => {
       // 12.345MBのheapUsedを設定
-      (process.memoryUsage as any).mockReturnValue({
+      memoryUsageMock.mockReturnValue({
         heapUsed: 12.345 * 1024 * 1024,
         heapTotal: 100 * 1024 * 1024,
         external: 10 * 1024 * 1024,
         rss: 150 * 1024 * 1024,
-      });
+      } satisfies MemoryUsage);
 
       const result = getMemoryUsage();
       expect(result).toBe(12.35); // 小数点2桁で丸め
@@ -103,16 +121,18 @@ describe("performance/utils", () => {
     const originalEnv = { ...process.env };
 
     beforeEach(() => {
-      (process.env as any) = { ...originalEnv };
+      setEnv(originalEnv);
     });
 
     afterEach(() => {
-      (process.env as any) = { ...originalEnv };
+      setEnv(originalEnv);
     });
 
     test("CI環境ではスキップしない", async () => {
-      (process.env as any).CI = "true";
-      (process.env as any).NODE_ENV = "development";
+      setEnv({
+        CI: "true",
+        NODE_ENV: "development",
+      });
 
       // モジュールを再importして環境変数の変更を反映
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
@@ -124,8 +144,10 @@ describe("performance/utils", () => {
     });
 
     test("CI環境以外ではci-onlyテストをスキップ", async () => {
-      (process.env as any).CI = undefined;
-      (process.env as any).NODE_ENV = "development";
+      setEnv({
+        CI: undefined,
+        NODE_ENV: "development",
+      });
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"
@@ -135,8 +157,10 @@ describe("performance/utils", () => {
     });
 
     test("ローカル環境ではheavyテストをスキップ", async () => {
-      (process.env as any).CI = undefined;
-      (process.env as any).NODE_ENV = "development";
+      setEnv({
+        CI: undefined,
+        NODE_ENV: "development",
+      });
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"
@@ -146,8 +170,10 @@ describe("performance/utils", () => {
     });
 
     test("CI環境ではheavyテストも実行", async () => {
-      (process.env as any).CI = "true";
-      (process.env as any).NODE_ENV = "development";
+      setEnv({
+        CI: "true",
+        NODE_ENV: "development",
+      });
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"
@@ -157,8 +183,10 @@ describe("performance/utils", () => {
     });
 
     test("reasonが指定されていない場合はスキップしない", async () => {
-      (process.env as any).CI = undefined;
-      (process.env as any).NODE_ENV = "development";
+      setEnv({
+        CI: undefined,
+        NODE_ENV: "development",
+      });
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"
@@ -168,8 +196,10 @@ describe("performance/utils", () => {
     });
 
     test("本番環境ではスキップ条件に関わらず実行", async () => {
-      (process.env as any).CI = "true";
-      (process.env as any).NODE_ENV = "production";
+      setEnv({
+        CI: "true",
+        NODE_ENV: "production",
+      });
 
       const { shouldSkipPerformanceTest: freshShouldSkip } = await import(
         "@/lib/performance/utils"

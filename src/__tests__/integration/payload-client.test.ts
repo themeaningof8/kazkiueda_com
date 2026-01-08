@@ -9,6 +9,7 @@ import {
 import { BLOG_CONFIG } from "@/lib/constants";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
 import { createBulkTestPosts, createTestPost, createTestUser } from "@/test/helpers/factories";
+import { makeLexicalContent } from "@/test/helpers/lexical";
 import { destroyTestPayload, getTestPayload } from "@/test/payload";
 
 describe("payload-client integration", () => {
@@ -42,7 +43,7 @@ describe("payload-client integration", () => {
       // 大量データ作成（createBulkTestPostsを使用）
       const _posts = await createBulkTestPosts(payload, user.id, totalPosts, {
         status: "published",
-        content: "minimal", // 本文を最小化して作成を高速化
+        content: makeLexicalContent("minimal"), // 本文を最小化して作成を高速化
       });
       const slugs = _posts
         .map((p) => p.slug)
@@ -249,7 +250,7 @@ describe("payload-client integration", () => {
       const totalPosts = 100; // 250件から100件に削減（テスト時間短縮）
       const _posts = await createBulkTestPosts(payload, user.id, totalPosts, {
         status: "published",
-        content: "minimal", // 本文を最小化して作成を高速化
+        content: makeLexicalContent("minimal"), // 本文を最小化して作成を高速化
       });
 
       const result = await findPublishedPostSlugs();

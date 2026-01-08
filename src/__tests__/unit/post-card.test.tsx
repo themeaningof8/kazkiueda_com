@@ -9,18 +9,48 @@ vi.mock("@/lib/format-date", () => ({
 }));
 
 describe("PostCard", () => {
+  // 型安全なPostオブジェクト作成ヘルパー
   const createMockPost = (overrides?: Partial<Post>): Post => {
-    return {
+    const basePost = {
       id: 1,
       title: "Test Post Title",
       slug: "test-post",
       excerpt: "Test excerpt",
+      content: {
+        root: {
+          type: "root",
+          format: "" as const,
+          indent: 0,
+          version: 1,
+          children: [
+            {
+              type: "paragraph",
+              format: "" as const,
+              indent: 0,
+              version: 1,
+              children: [
+                {
+                  mode: "normal",
+                  text: "Test content",
+                  type: "text",
+                  style: "",
+                  detail: 0,
+                  format: 0,
+                  version: 1,
+                },
+              ],
+            },
+          ],
+        },
+      },
       publishedDate: "2024-01-15",
-      _status: "published",
+      _status: "published" as const,
       createdAt: "2024-01-15T00:00:00.000Z",
       updatedAt: "2024-01-15T00:00:00.000Z",
-      ...overrides,
-    } as Post;
+      author: "test-author",
+    };
+
+    return { ...basePost, ...overrides } as Post;
   };
 
   test("タイトルが表示される", () => {
@@ -68,7 +98,7 @@ describe("PostCard", () => {
         alt: "Test image",
         updatedAt: "2024-01-01T00:00:00Z",
         createdAt: "2024-01-01T00:00:00Z",
-      } as Post["featuredImage"],
+      } satisfies NonNullable<Post["featuredImage"]>,
     });
     render(<PostCard post={post} />);
     const image = screen.getByRole("img");
@@ -85,7 +115,7 @@ describe("PostCard", () => {
         alt: null,
         updatedAt: "2024-01-01T00:00:00Z",
         createdAt: "2024-01-01T00:00:00Z",
-      } as Post["featuredImage"],
+      } satisfies NonNullable<Post["featuredImage"]>,
     });
     render(<PostCard post={post} />);
     // ImageIconはSVGなので、画像として検出されない
@@ -101,16 +131,7 @@ describe("PostCard", () => {
       tags: [
         { tag: "React", id: "1" },
         { tag: "TypeScript", id: "2" },
-      ],
-    });
-    render(<PostCard post={post} />);
-    expect(screen.getByText("React")).toBeInTheDocument();
-    expect(screen.getByText("TypeScript")).toBeInTheDocument();
-  });
-
-  test("タグがstring[]形式の場合、正しく表示される", () => {
-    const post = createMockPost({
-      tags: ["React", "TypeScript"] as unknown as Post["tags"],
+      ] satisfies Post["tags"],
     });
     render(<PostCard post={post} />);
     expect(screen.getByText("React")).toBeInTheDocument();

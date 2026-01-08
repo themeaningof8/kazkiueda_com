@@ -15,12 +15,7 @@ interface TagObject {
 
 // タグオブジェクトの型ガード関数
 function isTagObject(item: unknown): item is TagObject {
-  return (
-    typeof item === "object" &&
-    item !== null &&
-    "tag" in item &&
-    typeof (item as TagObject).tag === "string"
-  );
+  return typeof item === "object" && item !== null && "tag" in item && typeof item.tag === "string";
 }
 
 export function PostCard({ post }: PostCardProps) {

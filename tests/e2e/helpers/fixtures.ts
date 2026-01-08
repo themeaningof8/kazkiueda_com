@@ -30,7 +30,88 @@ export const test = base.extend<TestFixtures>({
     const testDataPath = "tests/e2e/.test-data.json";
     try {
       const existingData = await fs.readFile(testDataPath, "utf-8");
-      const parsedData = JSON.parse(existingData) as E2ETestData;
+      const parsedData: unknown = JSON.parse(existingData);
+
+      // ヘルパー関数：オブジェクトのプロパティを型安全にチェック
+      function hasStringProperty(
+        obj: unknown,
+        prop: string,
+      ): obj is Record<string, unknown> & Record<typeof prop, string> {
+        return (
+          typeof obj === "object" &&
+          obj !== null &&
+          typeof (obj as Record<string, unknown>)[prop] === "string"
+        );
+      }
+
+      function hasNumberProperty(
+        obj: unknown,
+        prop: string,
+      ): obj is Record<string, unknown> & Record<typeof prop, number> {
+        return (
+          typeof obj === "object" &&
+          obj !== null &&
+          typeof (obj as Record<string, unknown>)[prop] === "number"
+        );
+      }
+
+      function hasObjectProperty(
+        obj: unknown,
+        prop: string,
+      ): obj is Record<string, unknown> & Record<typeof prop, Record<string, unknown>> {
+        const value =
+          typeof obj === "object" && obj !== null
+            ? (obj as Record<string, unknown>)[prop]
+            : undefined;
+        return typeof value === "object" && value !== null;
+      }
+
+      // E2ETestData の型ガード（型アサーションなし）
+      function isE2ETestData(obj: unknown): obj is E2ETestData {
+        if (!hasStringProperty(obj, "version")) return false;
+        if (!hasObjectProperty(obj, "adminUser")) return false;
+        if (!hasObjectProperty(obj, "draftPost")) return false;
+
+        const data = obj as Record<string, unknown>;
+
+        // adminUser の検証
+        const adminUser = data.adminUser as Record<string, unknown>;
+        if (
+          !hasNumberProperty(adminUser, "id") ||
+          !hasStringProperty(adminUser, "email") ||
+          !hasStringProperty(adminUser, "password")
+        ) {
+          return false;
+        }
+
+        // publishedPosts の検証
+        if (!Array.isArray(data.publishedPosts)) return false;
+        if (
+          !data.publishedPosts.every(
+            (post: unknown) =>
+              typeof post === "object" &&
+              post !== null &&
+              hasNumberProperty(post, "id") &&
+              hasStringProperty(post, "slug") &&
+              hasStringProperty(post, "title"),
+          )
+        ) {
+          return false;
+        }
+
+        // draftPost の検証
+        const draftPost = data.draftPost as Record<string, unknown>;
+        if (!hasNumberProperty(draftPost, "id") || !hasStringProperty(draftPost, "slug")) {
+          return false;
+        }
+
+        return true;
+      }
+
+      if (!isE2ETestData(parsedData)) {
+        throw new Error("Invalid test data structure");
+      }
+
       console.log("✅ Using cached test data");
       await use(parsedData);
       return;

@@ -135,6 +135,18 @@ describe("エラーの型判定", () => {
   });
 });
 
+// 型ガード関数：Errorオブジェクトの構造を検証
+function isErrorObject(obj: unknown): obj is { name: string; message: string } {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    "name" in obj &&
+    "message" in obj &&
+    typeof obj.name === "string" &&
+    typeof obj.message === "string"
+  );
+}
+
 describe("エラーのシリアライゼーション", () => {
   test("NotFoundErrorをJSON化できる", () => {
     const error = new NotFoundError("Test message");
@@ -143,7 +155,11 @@ describe("エラーのシリアライゼーション", () => {
       message: error.message,
     });
 
-    const parsed = JSON.parse(json) as { name: string; message: string };
+    const parsed = JSON.parse(json);
+    if (!isErrorObject(parsed)) {
+      throw new Error("Parsed object is not a valid error object");
+    }
+
     expect(parsed.name).toBe("NotFoundError");
     expect(parsed.message).toBe("Test message");
   });
@@ -155,7 +171,11 @@ describe("エラーのシリアライゼーション", () => {
       message: error.message,
     });
 
-    const parsed = JSON.parse(json) as { name: string; message: string };
+    const parsed = JSON.parse(json);
+    if (!isErrorObject(parsed)) {
+      throw new Error("Parsed object is not a valid error object");
+    }
+
     expect(parsed.name).toBe("DatabaseError");
     expect(parsed.message).toBe("Connection timeout");
   });

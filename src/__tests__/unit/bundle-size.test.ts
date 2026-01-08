@@ -74,11 +74,7 @@ describe("Bundle Size Analysis", () => {
       // package.jsonからバンドルサイズ設定を読み込み
       const packageJson = JSON.parse(
         readFileSync(join(process.cwd(), "package.json"), "utf-8"),
-      ) as {
-        bundlesize?: unknown;
-        dependencies?: Record<string, string>;
-        devDependencies?: Record<string, string>;
-      };
+      ) as Record<string, unknown>;
 
       // bundlesize設定が存在する場合の検証
       if (packageJson.bundlesize) {

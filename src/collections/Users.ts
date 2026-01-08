@@ -11,10 +11,7 @@ export const USER_ROLES = {
 // Payload認証コンテキストのユーザーが適切な型を持つことを確認する型ガード
 function hasRole(user: unknown): user is User {
   return (
-    typeof user === "object" &&
-    user !== null &&
-    "role" in user &&
-    typeof (user as User).role === "string"
+    typeof user === "object" && user !== null && "role" in user && typeof user.role === "string"
   );
 }
 

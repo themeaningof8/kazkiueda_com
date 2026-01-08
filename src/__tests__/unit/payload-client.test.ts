@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { clearPayloadCache, findPostBySlug, findPosts } from "@/lib/api/payload-client";
+import { clearPayloadCache, findPostBySlug, type findPosts } from "@/lib/api/payload-client";
 
 // payload-client.tsの内部関数をテストするためにモック化
 vi.mock("@payload-config", () => ({}));
@@ -19,7 +19,14 @@ vi.mock("@/lib/api/payload-filters", () => ({
 // findPayload関数をモックするための準備
 
 // モックを保存するための変数
-let originalFindPayload: any;
+let originalFindPayload: unknown;
+
+// payload-client モジュールの型
+type PayloadClientModule = {
+  findPayload: unknown;
+  findPostBySlug: typeof findPostBySlug;
+  findPosts: typeof findPosts;
+};
 
 describe("payload-client public API", () => {
   beforeEach(async () => {
@@ -33,8 +40,8 @@ describe("payload-client public API", () => {
     clearPayloadCache();
     // モックを元に戻す
     if (originalFindPayload) {
-      const module = await import("@/lib/api/payload-client");
-      (module as any).findPayload = originalFindPayload;
+      const module = (await import("@/lib/api/payload-client")) as PayloadClientModule;
+      module.findPayload = originalFindPayload;
     }
   });
 
@@ -66,12 +73,12 @@ describe("payload-client public API", () => {
       };
 
       // findPayload関数をモック - より安全な方法
-      const module = await import("@/lib/api/payload-client");
-      const originalFindPayload = module.findPayload;
+      const module = (await import("@/lib/api/payload-client")) as PayloadClientModule;
+      const _originalFindPayload = module.findPayload;
       const findPayloadSpy = vi.fn().mockResolvedValue(mockResult);
 
       // 一時的に置き換え
-      (module as any).findPayload = findPayloadSpy;
+      module.findPayload = findPayloadSpy;
 
       const result = await findPostBySlug("test-post");
 
@@ -115,10 +122,10 @@ describe("payload-client public API", () => {
       const { findPostBySlug } = await import("@/lib/api/payload-client");
 
       // findPayloadがエラーを投げるようにモック
-      const module = await import("@/lib/api/payload-client");
-      const originalFindPayload = module.findPayload;
+      const module = (await import("@/lib/api/payload-client")) as PayloadClientModule;
+      const _originalFindPayload = module.findPayload;
       const findPayloadSpy = vi.fn().mockRejectedValue(new Error("test error"));
-      (module as any).findPayload = findPayloadSpy;
+      module.findPayload = findPayloadSpy;
 
       const result = await findPostBySlug("test-post");
 
@@ -159,10 +166,10 @@ describe("payload-client public API", () => {
         hasPrevPage: false,
       };
 
-      const module = await import("@/lib/api/payload-client");
-      const originalFindPayload = module.findPayload;
+      const module = (await import("@/lib/api/payload-client")) as PayloadClientModule;
+      const _originalFindPayload = module.findPayload;
       const findPayloadSpy = vi.fn().mockResolvedValue(mockResult);
-      (module as any).findPayload = findPayloadSpy;
+      module.findPayload = findPayloadSpy;
 
       const result = await findPosts({ limit: 10, page: 1 });
 

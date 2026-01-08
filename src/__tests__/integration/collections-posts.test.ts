@@ -1,9 +1,17 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import type { Post } from "@/payload-types";
 import { createTestDbPool, destroyTestDbPool, truncateAllTables } from "@/test/db";
 import { findAsUnauthenticated } from "@/test/helpers/auth";
 import { createTestPost, createTestUser } from "@/test/helpers/factories";
 import { makeLexicalContent } from "@/test/helpers/lexical";
 import { destroyTestPayload, getTestPayload } from "@/test/payload";
+
+// Postオブジェクトの型ガード
+function isPost(obj: unknown): obj is Post {
+  return (
+    typeof obj === "object" && obj !== null && "_status" in obj && typeof obj._status === "string"
+  );
+}
 
 /**
  * Posts Collection の統合テスト（最小限の煙テスト）
@@ -106,7 +114,12 @@ describe("collections/Posts.ts Integration Tests (Minimal Smoke Tests)", () => {
 
       // 公開記事のみ返される
       expect(result.docs).toHaveLength(1);
-      expect((result.docs[0] as unknown as Record<string, unknown>)._status).toBe("published");
+
+      const firstDoc = result.docs[0];
+      if (!isPost(firstDoc)) {
+        throw new Error("First document is not a valid Post");
+      }
+      expect(firstDoc._status).toBe("published");
     });
 
     test("未認証ユーザーは記事を作成できない", async () => {

@@ -43,7 +43,7 @@ export async function createTestPost(
   overrides?: Partial<{
     title: string;
     slug: string | null;
-    content?: unknown;
+    content?: Post["content"];
     status: "draft" | "published";
     publishedDate?: string;
     excerpt?: string;
@@ -59,9 +59,10 @@ export async function createTestPost(
           ? null
           : (overrides?.slug ?? `post-${faker.string.alphanumeric(12).toLowerCase()}`),
       author: authorId,
-      content: (typeof overrides?.content === "string"
-        ? makeLexicalContent(overrides.content)
-        : (overrides?.content ?? makeLexicalContent(faker.lorem.paragraph()))) as Post["content"],
+      content:
+        typeof overrides?.content === "string"
+          ? makeLexicalContent(overrides.content)
+          : (overrides?.content ?? makeLexicalContent(faker.lorem.paragraph())),
       tags: overrides?.tags ?? [{ tag: "test" }],
       _status: overrides?.status ?? "published",
       ...(overrides?.publishedDate && { publishedDate: overrides.publishedDate }),
@@ -89,7 +90,7 @@ export async function createBulkTestPosts(
     status: "draft" | "published";
     publishedDate?: string;
     excerpt?: string;
-    content?: unknown;
+    content?: Post["content"];
     tags?: { tag: string }[];
   }>,
 ): Promise<Post[]> {

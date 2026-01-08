@@ -6,7 +6,7 @@
 
 // knip: ignore
 
-import { PERFORMANCE_THRESHOLDS, TEST_ENVIRONMENT } from "./config";
+import { PERFORMANCE_THRESHOLDS } from "./config";
 
 /**
  * パフォーマンス指標を検証し、閾値を超えている場合はエラーを投げる
@@ -17,7 +17,7 @@ export function assertPerformanceThreshold<T extends keyof typeof PERFORMANCE_TH
   actualValue: number,
   unit: string = "",
 ): void {
-  const threshold = PERFORMANCE_THRESHOLDS[category][metric] as number;
+  const threshold = PERFORMANCE_THRESHOLDS[category][metric];
 
   if (typeof threshold !== "number") {
     throw new Error(`Invalid threshold configuration for ${category}.${String(metric)}`);
