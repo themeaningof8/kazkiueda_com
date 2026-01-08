@@ -1,0 +1,84 @@
+name: Mutation Testing (Scheduled)
+
+on:
+  schedule:
+    - cron: "0 17 * * 1" # 月曜日 02:00 JST (毎週)
+  workflow_dispatch: # 手動実行も可能
+
+env:
+  NODE_ENV: test
+
+jobs:
+  mutation:
+    name: Mutation Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup environment keys
+        run: |
+          # DOTENV_PRIVATE_KEY_DEVELOPMENT を環境変数に設定
+          key_value="${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}"
+          echo "DOTENV_PRIVATE_KEY_DEVELOPMENT=$key_value" >> $GITHUB_ENV
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Verify Bun setup
+        run: bun --version
+
+      - name: Create Neon test branch
+        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts create
+
+      - name: Update DATABASE_URL to use Neon branch
+        run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
+
+      - name: Run migrations
+        run: |
+          bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
+            PAYLOAD_CONFIG_PATH=src/payload.config.ts \
+            payload migrate:fresh --force-accept-warning
+        env:
+          PAYLOAD_SECRET: ci-test-secret-key-for-mutation-testing-only
+
+      - name: Run Mutation Tests (format-date)
+        run: bun run test:mutation:format-date
+
+      - name: Run Mutation Tests (errors)
+        run: bun run test:mutation:errors
+
+      - name: Upload Mutation Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-reports
+          path: reports/mutation/
+          retention-days: 30
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "# Mutation Testing Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## format-date" >> $GITHUB_STEP_SUMMARY
+          if [ -f "reports/mutation/format-date/mutation-report.json" ]; then
+            # JSONから簡単なスコアを抽出
+            score=$(node -p "const r=require('./reports/mutation/format-date/mutation-report.json'); const m=r.files||{}; let killed=0,total=0;for(const f of Object.values(m)){for(const mut of f.mutants||[]){total++;if(mut.status==='Killed')killed++;}} total>0 ? ((killed/total)*100).toFixed(1) : 0" 2>/dev/null || echo "N/A")
+            echo "Mutation Score: ${score}%" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## errors" >> $GITHUB_STEP_SUMMARY
+          if [ -f "reports/mutation/errors/mutation-report.json" ]; then
+            score=$(node -p "const r=require('./reports/mutation/errors/mutation-report.json'); const m=r.files||{}; let killed=0,total=0;for(const f of Object.values(m)){for(const mut of f.mutants||[]){total++;if(mut.status==='Killed')killed++;}} total>0 ? ((killed/total)*100).toFixed(1) : 0" 2>/dev/null || echo "N/A")
+            echo "Mutation Score: ${score}%" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 [View Full Reports](https://github.com/themeaningof8/kazkiueda_com/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+
+      # ---------- Cleanup ----------
+      - name: Delete Neon test branch
+        if: always()
+        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts delete

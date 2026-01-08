@@ -29,6 +29,17 @@ jobs:
       suite: unit
       dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
 
+  unit-extended:
+    name: Unit Tests Extended
+    needs: static
+    # mainブランチのpush時のみ実行（PR時はスキップ）
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    uses: ./.github/workflows/reusable-tests.yml
+    secrets: inherit
+    with:
+      suite: unit-extended
+      dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
+
   integration:
     name: Integration Tests
     needs: unit

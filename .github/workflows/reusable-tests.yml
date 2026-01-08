@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       suite:
-        description: "Test preset: static | unit | integration | performance | e2e-essential | e2e-full"
+        description: "Test preset: static | unit | unit-extended | integration | performance | e2e-essential | e2e-full"
         required: true
         type: string
       env-file:
@@ -99,20 +99,16 @@ jobs:
       - name: Run unit tests
         if: inputs.suite == 'unit'
         run: |
-          # ユニットテスト実行（bundle-size.test.ts以外、CI環境では複雑なモックを使うテストも除外）
-          echo "Running unit tests (excluding bundle-size tests and complex mocking tests in CI)..."
-          bunx dotenvx run -f projects/.env.development -f projects/.env -- bun vitest run src/__tests__/unit \
-            --coverage.enabled=false \
-            --exclude src/__tests__/unit/bundle-size.test.ts \
-            --exclude src/__tests__/unit/payload-client.test.ts \
-            --exclude src/__tests__/unit/pagination.test.tsx
-          # bundle-sizeテスト実行（CI環境ではスキップ）
-          echo "Running bundle size tests..."
-          if [ "$CI" != "true" ]; then
-            bun run test:unit:ci
-          else
-            echo "Skipping bundle size tests in CI environment (file system access issues)"
-          fi
+          # ユニットテスト実行（CI除外テストを除いた安定したテストのみ）
+          echo "Running stable unit tests..."
+          bun run test:unit
+
+      - name: Run extended unit tests
+        if: inputs.suite == 'unit-extended'
+        run: |
+          # 拡張ユニットテスト実行（不安定/重いテスト）
+          echo "Running extended unit tests (heavy/unstable tests)..."
+          bun run test:unit:extended
 
 
       # ---------- Integration / E2E Database Setup ----------
@@ -149,10 +145,21 @@ jobs:
           ALLOW_NON_TEST_DATABASE_URL: true
 
       # ---------- E2E ----------
-      - name: Start Next.js server
+      - name: Build Next.js for production
         if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
         run: |
-          bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next dev --port 3001 > /tmp/next-dev.log 2>&1 &
+          echo "Building Next.js for production (E2E tests)..."
+          bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next build > /tmp/next-build.log 2>&1
+        env:
+          # Required for Next.js/Payload to build
+          NEXT_PUBLIC_SERVER_URL: http://localhost:3001
+          PAYLOAD_SECRET: ci-test-secret-key-for-e2e-testing-only
+
+      - name: Start Next.js server (production)
+        if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
+        run: |
+          echo "Starting Next.js server in production mode..."
+          bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next start --port 3001 > /tmp/next-start.log 2>&1 &
           bunx wait-on http://localhost:3001 -t 60000
         env:
           # Required for Next.js/Payload to start
@@ -183,18 +190,26 @@ jobs:
           path: playwright-report/
           retention-days: 14
 
+      - name: Upload build logs
+        if: failure() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ inputs.suite }}
+          path: /tmp/next-build.log
+          retention-days: 7
+
       - name: Upload server logs
         if: failure() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
         uses: actions/upload-artifact@v4
         with:
           name: server-logs-${{ inputs.suite }}
-          path: /tmp/next-dev.log
+          path: /tmp/next-start.log
           retention-days: 7
 
       # ---------- Cleanup ----------
       - name: Stop Next.js server
         if: always() && (inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
-        run: pkill -f 'next dev' || true
+        run: pkill -f 'next start' || true
 
       - name: Delete Neon test branch
         if: always() && (inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
