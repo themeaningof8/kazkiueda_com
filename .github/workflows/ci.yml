@@ -76,7 +76,7 @@ jobs:
     timeout-minutes: 15
     env:
       NODE_ENV: test
-      dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
+      DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -95,12 +95,8 @@ jobs:
           bunx dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit --coverage --exclude src/__tests__/unit/bundle-size.test.ts --exclude src/__tests__/unit/payload-client.test.ts --exclude src/__tests__/unit/pagination.test.tsx
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./reports/coverage/lcov.info
-          flags: unit
-          name: unit-coverage
-          fail_ci_if_error: false
+        run: |
+          bunx dotenvx run -f projects/.env.development -f projects/.env -- bunx codecov --file ./reports/coverage/lcov.info --flags unit --name unit-coverage || echo "Codecov upload failed, continuing..."
 
       - name: Generate coverage summary
         run: |
