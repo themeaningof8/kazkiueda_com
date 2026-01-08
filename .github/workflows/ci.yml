@@ -96,8 +96,12 @@ jobs:
           bunx dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit --coverage --exclude src/__tests__/unit/bundle-size.test.ts --exclude src/__tests__/unit/payload-client.test.ts --exclude src/__tests__/unit/pagination.test.tsx
 
       - name: Upload coverage reports to Codecov
-        run: |
-          bunx dotenvx run -f projects/.env.development -f projects/.env -- npx codecov -f ./reports/coverage/lcov.info -F unit || echo "Codecov upload failed, continuing..."
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./reports/coverage/lcov.info
+          flags: unit
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Generate coverage summary
         run: |
