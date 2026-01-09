@@ -95,19 +95,25 @@ jobs:
           echo "Running unit tests with coverage..."
           bunx dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit --coverage --exclude src/__tests__/unit/bundle-size.test.ts --exclude src/__tests__/unit/payload-client.test.ts --exclude src/__tests__/unit/pagination.test.tsx
 
+      - name: Load environment variables
+        id: dotenv
+        run: |
+          CODECOV_TOKEN=$(bunx dotenvx get CODECOV_TOKEN -f projects/.env)
+          echo "::add-mask::$CODECOV_TOKEN"
+          echo "CODECOV_TOKEN=$CODECOV_TOKEN" >> $GITHUB_ENV
+
       - name: Upload coverage reports to Codecov
+        if: always()
         uses: codecov/codecov-action@v5
         with:
           files: ./reports/coverage/lcov.info
           flags: unit
           fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./reports/test-results/junit.xml
 
       - name: Generate coverage summary
