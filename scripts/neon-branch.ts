@@ -5,7 +5,7 @@
  *
  * Usage:
  *   bun scripts/neon-branch.ts create [prefix]   # Create a new test branch (optional custom prefix)
- *   bun scripts/neon-branch.ts delete [name]     # Delete a test branch (optional custom name)
+ *   bun scripts/neon-branch.ts delete [prefix]   # Delete test branches matching prefix (optional custom prefix)
  */
 
 export {};
@@ -229,6 +229,10 @@ async function deleteBranch(): Promise<void> {
         console.log(`   No branch found with prefix ${customName}, skipping deletion`);
         return;
       }
+    } else {
+      const error = await listResponse.text();
+      console.error("❌ Failed to list branches:", error);
+      return;
     }
   }
 

@@ -32,7 +32,7 @@ jobs:
   unit-extended:
     name: Unit Tests Extended
     needs: static
-    # mainブランチのpush時のみ実行（PR時はスキップ）
+    # Only run on main branch pushes (skip on PRs)
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     uses: ./.github/workflows/reusable-tests.yml
     secrets: inherit
@@ -131,7 +131,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     needs: [e2e-essential]
-    # mainブランチのpush時のみ実行（PR時はスキップ）
+    # Only run on main branch pushes (skip on PRs)
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     uses: ./.github/workflows/deploy-staging.yml
     secrets: inherit

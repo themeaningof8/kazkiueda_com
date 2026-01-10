@@ -50,8 +50,14 @@ jobs:
           DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
         run: |
           VERCEL_TOKEN=$(bunx dotenvx get VERCEL_TOKEN -f projects/.env)
+          VERCEL_ORG_ID=$(bunx dotenvx get VERCEL_ORG_ID -f projects/.env)
+          VERCEL_PROJECT_ID=$(bunx dotenvx get VERCEL_PROJECT_ID -f projects/.env)
           echo "::add-mask::$VERCEL_TOKEN"
+          echo "::add-mask::$VERCEL_ORG_ID"
+          echo "::add-mask::$VERCEL_PROJECT_ID"
           echo "VERCEL_TOKEN=$VERCEL_TOKEN" >> $GITHUB_ENV
+          echo "VERCEL_ORG_ID=$VERCEL_ORG_ID" >> $GITHUB_ENV
+          echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID" >> $GITHUB_ENV
 
       - name: Create Neon staging branch
         env:
@@ -70,17 +76,17 @@ jobs:
           DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
         run: |
           bunx dotenvx run -f projects/.env -- \
-            bunx cross-env NODE_ENV=production NODE_OPTIONS="--no-deprecation --import tsx" \
+            bunx cross-env DATABASE_URL=$DATABASE_URL NODE_ENV=production NODE_OPTIONS="--no-deprecation --import tsx" \
             PAYLOAD_CONFIG_PATH=src/payload.config.ts \
             payload migrate
 
       - name: Build Project Artifacts
-        run: vercel build --token=${{ env.VERCEL_TOKEN }}
+        run: vercel build --token=${{ env.VERCEL_TOKEN }} --env DATABASE_URL=$DATABASE_URL
 
       - name: Deploy to Vercel (Staging)
         id: deploy
         run: |
-          url=$(vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }})
+          url=$(vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }} --env DATABASE_URL=$DATABASE_URL)
           echo "url=$url" >> $GITHUB_OUTPUT
           echo "## Staging Deployment" >> $GITHUB_STEP_SUMMARY
           echo "- URL: $url" >> $GITHUB_STEP_SUMMARY
@@ -89,19 +95,24 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin staging || git branch staging
-          git checkout staging || git checkout -b staging
+          git fetch origin staging || true
+          if git show-ref --verify --quiet refs/remotes/origin/staging; then
+            git checkout -B staging origin/staging
+          else
+            git checkout -B staging main
+            git push -u origin staging
+          fi
           git merge --ff-only main || git merge --no-ff -m "Auto-merge main to staging" main
           git push origin staging
 
       - name: Staging smoke test (homepage)
         run: |
           sleep 10
-          curl -f "${{ steps.deploy.outputs.url }}" || exit 1
+          curl -f --max-time 30 "${{ steps.deploy.outputs.url }}" || exit 1
 
       - name: Staging smoke test (blog)
         run: |
-          curl -f "${{ steps.deploy.outputs.url }}/blog" || exit 1
+          curl -f --max-time 30 "${{ steps.deploy.outputs.url }}/blog" || exit 1
 
       - name: Cleanup Neon staging branch
         if: always()

@@ -63,11 +63,18 @@ jobs:
       - name: Load Vercel configuration from dotenvx
         id: load-vercel-config
         env:
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
           DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
         run: |
-          VERCEL_TOKEN=$(bunx dotenvx get VERCEL_TOKEN -f projects/.env.production)
+          VERCEL_TOKEN=$(bunx dotenvx get VERCEL_TOKEN -f projects/.env)
+          VERCEL_ORG_ID=$(bunx dotenvx get VERCEL_ORG_ID -f projects/.env)
+          VERCEL_PROJECT_ID=$(bunx dotenvx get VERCEL_PROJECT_ID -f projects/.env)
           echo "::add-mask::$VERCEL_TOKEN"
+          echo "::add-mask::$VERCEL_ORG_ID"
+          echo "::add-mask::$VERCEL_PROJECT_ID"
           echo "VERCEL_TOKEN=$VERCEL_TOKEN" >> $GITHUB_ENV
+          echo "VERCEL_ORG_ID=$VERCEL_ORG_ID" >> $GITHUB_ENV
+          echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID" >> $GITHUB_ENV
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ env.VERCEL_TOKEN }}
@@ -96,9 +103,9 @@ jobs:
         run: |
           sleep 10
           url="${{ steps.deploy.outputs.url }}"
-          curl -f "$url" || exit 1
+          curl -f --max-time 30 "$url" || exit 1
 
       - name: Production smoke test (blog)
         run: |
           url="${{ steps.deploy.outputs.url }}"
-          curl -f "$url/blog" || exit 1
+          curl -f --max-time 30 "$url/blog" || exit 1
