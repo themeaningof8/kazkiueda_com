@@ -89,6 +89,9 @@ jobs:
             payload migrate
 
       - name: Build Project Artifacts
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
+          DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
         run: vercel build --prod --token=${{ env.VERCEL_TOKEN }}
 
       - name: Deploy to Vercel (Production)

@@ -81,6 +81,8 @@ jobs:
             payload migrate
 
       - name: Build Project Artifacts
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
         run: |
           export DATABASE_URL=$DATABASE_URL
           vercel build --token=${{ env.VERCEL_TOKEN }}
@@ -98,15 +100,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin staging || true
-          if git show-ref --verify --quiet refs/remotes/origin/staging; then
-            git checkout -B staging origin/staging
-          else
-            git checkout -B staging main
-            git push -u origin staging
-          fi
-          git merge --ff-only main || git merge --no-ff -m "Auto-merge main to staging" main
-          git push origin staging
+          git checkout -B staging main
+          git push -f origin staging
 
       - name: Staging smoke test (homepage)
         run: |
