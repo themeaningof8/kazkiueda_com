@@ -208,10 +208,19 @@ jobs:
             ls -la .vercel/ || echo "No .vercel directory"
           fi
 
-          bunx dotenvx run -f projects/.env.production -f projects/.env -- \
+          # Run migrations with environment variables from dotenvx and Vercel
+          # Validate DATABASE_URL is set before running migrations
+          bunx dotenvx run -f projects/.env.production -f projects/.env -- bash -c '
+            if [ -z "${DATABASE_URL:-}" ]; then
+              echo "Error: DATABASE_URL is not set. Cannot run database migrations."
+              echo "DATABASE_URL must be provided either via Vercel environment variables or encrypted .env files."
+              exit 1
+            fi
+            echo "✓ DATABASE_URL is configured"
             bunx cross-env NODE_ENV=production NODE_OPTIONS="--no-deprecation --import tsx" \
-            PAYLOAD_CONFIG_PATH=src/payload.config.ts \
-            payload migrate
+              PAYLOAD_CONFIG_PATH=src/payload.config.ts \
+              payload migrate
+          '
 
       - name: Build Project Artifacts
         env:
