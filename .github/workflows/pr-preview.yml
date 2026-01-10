@@ -71,10 +71,23 @@ jobs:
               gitBranch: $branch
             }')
 
-          curl -X POST "https://api.vercel.com/v10/projects/${{ env.VERCEL_PROJECT_ID }}/env" \
+          # Use -f to fail on HTTP errors and capture response for error handling
+          HTTP_CODE=$(curl -f -s -w "%{http_code}" -o /tmp/vercel_response.json \
+            -X POST "https://api.vercel.com/v10/projects/${{ env.VERCEL_PROJECT_ID }}/env" \
             -H "Authorization: Bearer ${{ env.VERCEL_TOKEN }}" \
             -H "Content-Type: application/json" \
-            -d "$JSON_PAYLOAD"
+            -d "$JSON_PAYLOAD")
+          
+          if [ $? -ne 0 ] || [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "Error: Failed to set Vercel environment variable (HTTP $HTTP_CODE)"
+            if [ -f /tmp/vercel_response.json ]; then
+              echo "Response:"
+              cat /tmp/vercel_response.json
+            fi
+            exit 1
+          fi
+          
+          echo "Successfully set DATABASE_URL environment variable (HTTP $HTTP_CODE)"
 
       - name: Run database migrations on preview branch
         env:
