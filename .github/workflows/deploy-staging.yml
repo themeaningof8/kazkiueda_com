@@ -20,12 +20,15 @@ jobs:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     environment: staging
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
           ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Show deployment target
         run: |
