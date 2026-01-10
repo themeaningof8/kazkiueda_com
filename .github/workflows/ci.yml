@@ -133,5 +133,7 @@ jobs:
     needs: [e2e-essential]
     # Only run on main branch pushes (skip on PRs)
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
     uses: ./.github/workflows/deploy-staging.yml
     secrets: inherit
