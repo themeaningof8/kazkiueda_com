@@ -56,18 +56,25 @@ jobs:
           echo "VERCEL_PROJECT_ID=$VERCEL_PROJECT_ID" >> $GITHUB_ENV
 
       - name: Set DATABASE_URL for this preview deployment
+        env:
+          GIT_BRANCH: ${{ github.head_ref }}
         run: |
           # Create or update environment variable for this specific git branch
+          JSON_PAYLOAD=$(jq -n \
+            --arg db "$NEON_DATABASE_URL" \
+            --arg branch "$GIT_BRANCH" \
+            '{
+              key: "DATABASE_URL",
+              value: $db,
+              type: "encrypted",
+              target: ["preview"],
+              gitBranch: $branch
+            }')
+
           curl -X POST "https://api.vercel.com/v10/projects/${{ env.VERCEL_PROJECT_ID }}/env" \
             -H "Authorization: Bearer ${{ env.VERCEL_TOKEN }}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "key": "DATABASE_URL",
-              "value": "'"$NEON_DATABASE_URL"'",
-              "type": "encrypted",
-              "target": ["preview"],
-              "gitBranch": "${{ github.head_ref }}"
-            }'
+            -d "$JSON_PAYLOAD"
 
       - name: Run database migrations on preview branch
         env:
