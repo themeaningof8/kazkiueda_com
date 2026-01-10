@@ -8,6 +8,7 @@
     "dev": "NODE_ENV=development dotenvx run -f projects/.env.development -f projects/.env -- bun next dev",
     "generate:importmap:production": "NODE_ENV=production bunx dotenvx run -f projects/.env -f projects/.env.production -- cross-env NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:importmap",
     "build": "bun run generate:importmap:production && NODE_ENV=production dotenvx run -f projects/.env -f projects/.env.production -- bun next build",
+    "vercel-build": "bun run build",
     "prepare": "husky",
     "start": "NODE_ENV=production dotenvx run -f projects/.env -f projects/.env.production -- bun next start",
     "test": "bun run test:ci",
