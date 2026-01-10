@@ -78,14 +78,9 @@ jobs:
           TEST_STATIC_RESULT: completed
 
       # ---------- Unit ----------
-      - name: Build Next.js for performance tests
-        if: inputs.suite == 'unit'
-        run: |
-          # パフォーマンステストのためにNext.jsをビルド
-          echo "Building Next.js for bundle size tests..."
-          bunx dotenvx run -f projects/.env.development -- bun next build
       - name: Cache Next.js build
         if: inputs.suite == 'unit'
+        id: nextjs-cache
         uses: actions/cache@v4
         with:
           path: |
@@ -95,6 +90,21 @@ jobs:
           key: ${{ runner.os }}-nextjs-build-${{ hashFiles('**/package.json', '**/next.config.ts', 'src/**/*.{ts,tsx,js,jsx}') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-build-
+
+      - name: Build Next.js for performance tests
+        if: inputs.suite == 'unit'
+        run: |
+          # パフォーマンステストのためにNext.jsをビルド
+          echo "Building Next.js for bundle size tests..."
+          bunx dotenvx run -f projects/.env.development -- bun next build
+
+      - name: Upload Next.js build artifacts
+        if: inputs.suite == 'unit'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          path: .next/
+          retention-days: 1
 
       - name: Run unit tests
         if: inputs.suite == 'unit'
@@ -112,9 +122,25 @@ jobs:
 
 
       # ---------- Integration / E2E Database Setup ----------
+      # Note: For integration matrix jobs, create branch with unique name to avoid conflicts
+      - name: Cleanup old Neon branches
+        if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
+        env:
+          DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts cleanup || echo "Cleanup completed with warnings"
+
       - name: Create Neon test branch
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
-        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts create
+        env:
+          DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+        run: |
+          # Use unique branch name for integration matrix to avoid conflicts
+          if [ "${{ inputs.suite }}" = "integration" ] && [ -n "${{ inputs.integration-script }}" ]; then
+            script_name=$(echo "${{ inputs.integration-script }}" | sed 's/test:integration://' | sed 's/:/-/g')
+            bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts create "ci-integration-${script_name}-${{ github.run_id }}"
+          else
+            bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts create "ci-${{ inputs.suite }}-${{ github.run_id }}"
+          fi
 
       - name: Update DATABASE_URL to use Neon branch
         if: inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
@@ -145,11 +171,23 @@ jobs:
           ALLOW_NON_TEST_DATABASE_URL: true
 
       # ---------- E2E ----------
+      - name: Download Next.js build artifacts (if available)
+        if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: nextjs-build
+          path: .next/
+
       - name: Build Next.js for production
         if: inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full'
         run: |
-          echo "Building Next.js for production (E2E tests)..."
-          bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next build > /tmp/next-build.log 2>&1
+          if [ -d ".next" ] && [ -f ".next/build-manifest.json" ]; then
+            echo "Using cached Next.js build..."
+          else
+            echo "Building Next.js for production (E2E tests)..."
+            bunx dotenvx run -f projects/.env -f projects/.env.development -- bun next build > /tmp/next-build.log 2>&1
+          fi
         env:
           # Required for Next.js/Payload to build
           NEXT_PUBLIC_SERVER_URL: http://localhost:3001
@@ -213,7 +251,16 @@ jobs:
 
       - name: Delete Neon test branch
         if: always() && (inputs.suite == 'integration' || inputs.suite == 'e2e-essential' || inputs.suite == 'e2e-full')
-        run: bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts delete
+        env:
+          DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+        run: |
+          # Delete the same branch name that was created
+          if [ "${{ inputs.suite }}" = "integration" ] && [ -n "${{ inputs.integration-script }}" ]; then
+            script_name=$(echo "${{ inputs.integration-script }}" | sed 's/test:integration://' | sed 's/:/-/g')
+            bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts delete "ci-integration-${script_name}-${{ github.run_id }}"
+          else
+            bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts delete "ci-${{ inputs.suite }}-${{ github.run_id }}"
+          fi
 
       # ---------- Test Statistics ----------
       - name: Generate test pyramid statistics

@@ -290,6 +290,67 @@ async function listBranches(): Promise<void> {
   console.log(`Total: ${data.branches.length} branches`);
 }
 
+async function cleanupOldBranches(): Promise<void> {
+  console.log("🧹 Cleaning up old CI/PR branches...\n");
+
+  const response = await fetch(`${API_BASE}/projects/${NEON_PROJECT_ID}/branches`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${NEON_API_KEY}`,
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error("❌ Failed to list branches:", error);
+    process.exit(1);
+  }
+
+  const data = (await response.json()) as { branches: NeonBranch[] };
+
+  // Find branches that match CI/PR patterns and are older than 1 hour
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const branchesToDelete = data.branches.filter((branch) => {
+    const isTestBranch = branch.name.startsWith("ci-") || branch.name.startsWith("pr-");
+    const isOld = new Date(branch.created_at) < oneHourAgo;
+    return isTestBranch && isOld;
+  });
+
+  console.log(`Found ${branchesToDelete.length} old test branches to delete`);
+
+  if (branchesToDelete.length === 0) {
+    console.log("✅ No old branches to clean up");
+    return;
+  }
+
+  for (const branch of branchesToDelete) {
+    console.log(
+      `  Deleting: ${branch.name} (created ${new Date(branch.created_at).toLocaleString()})`,
+    );
+
+    const deleteResponse = await fetch(
+      `${API_BASE}/projects/${NEON_PROJECT_ID}/branches/${branch.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${NEON_API_KEY}`,
+          Accept: "application/json",
+        },
+      },
+    );
+
+    if (deleteResponse.ok) {
+      console.log(`    ✅ Deleted ${branch.name}`);
+    } else {
+      const error = await deleteResponse.text();
+      console.warn(`    ⚠️  Failed to delete ${branch.name}:`, error);
+    }
+  }
+
+  console.log(`\n✅ Cleanup complete. Deleted ${branchesToDelete.length} branches`);
+}
+
 // Main
 const command = process.argv[2];
 
@@ -303,7 +364,10 @@ switch (command) {
   case "list":
     await listBranches();
     break;
+  case "cleanup":
+    await cleanupOldBranches();
+    break;
   default:
-    console.error("Usage: bun scripts/neon-branch.ts <create|delete|list>");
+    console.error("Usage: bun scripts/neon-branch.ts <create|delete|list|cleanup>");
     process.exit(1);
 }

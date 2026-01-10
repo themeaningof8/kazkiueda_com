@@ -37,6 +37,13 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Cleanup old Neon branches
+        env:
+          DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+        run: |
+          echo "Cleaning up old test branches..."
+          bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts cleanup || echo "Cleanup completed with warnings"
+
       - name: Create Neon preview branch
         env:
           DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
