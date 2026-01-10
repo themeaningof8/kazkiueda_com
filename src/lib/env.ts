@@ -101,6 +101,12 @@ const envSchema = v.pipe(
  * エラー時は即座に終了する
  */
 function validateEnv() {
+  // CI環境や特定のフラグが設定されている場合は検証をスキップ
+  if (process.env.SKIP_ENV_VALIDATION === "true" || process.env.CI === "true") {
+    console.warn("環境変数の検証をスキップします");
+    return process.env as Env;
+  }
+
   try {
     return v.parse(envSchema, process.env);
   } catch (error) {

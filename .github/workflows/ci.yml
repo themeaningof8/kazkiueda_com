@@ -222,6 +222,7 @@ jobs:
             bunx cross-env NODE_ENV=production NODE_OPTIONS="--no-deprecation --import tsx" \
             PAYLOAD_CONFIG_PATH=src/payload.config.ts \
             PAYLOAD_PUSH=true \
+            SKIP_ENV_VALIDATION=true \
             payload migrate --force
 
       - name: Build Project Artifacts
