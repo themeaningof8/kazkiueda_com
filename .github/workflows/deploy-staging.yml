@@ -81,12 +81,15 @@ jobs:
             payload migrate
 
       - name: Build Project Artifacts
-        run: vercel build --token=${{ env.VERCEL_TOKEN }} --env DATABASE_URL=$DATABASE_URL
+        run: |
+          export DATABASE_URL=$DATABASE_URL
+          vercel build --token=${{ env.VERCEL_TOKEN }}
 
       - name: Deploy to Vercel (Staging)
         id: deploy
         run: |
-          url=$(vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }} --env DATABASE_URL=$DATABASE_URL)
+          export DATABASE_URL=$DATABASE_URL
+          url=$(vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }})
           echo "url=$url" >> $GITHUB_OUTPUT
           echo "## Staging Deployment" >> $GITHUB_STEP_SUMMARY
           echo "- URL: $url" >> $GITHUB_STEP_SUMMARY
