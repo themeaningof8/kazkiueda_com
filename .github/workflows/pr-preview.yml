@@ -181,12 +181,45 @@ jobs:
           curl -X DELETE "https://api.vercel.com/v9/projects/${{ env.VERCEL_PROJECT_ID }}/env/${{ steps.get-env-id.outputs.env_id }}" \
             -H "Authorization: Bearer ${{ env.VERCEL_TOKEN }}"
 
-      - name: Delete Neon preview branch
+      - name: Delete Neon preview branches
         env:
           DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
         run: |
-          bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts delete pr-${{ github.event.pull_request.number }} || true
+          set -e
 
+          # PR-specific branch name prefix (matches pr-NUMBER-RUNID-ATTEMPT-RANDOM)
+          BRANCH_PREFIX="pr-${{ github.event.pull_request.number }}-"
+
+          # Load Neon API credentials from .env.development
+          NEON_API_KEY=$(bunx dotenvx get NEON_API_KEY -f projects/.env.development)
+          NEON_PROJECT_ID=$(bunx dotenvx get NEON_PROJECT_ID -f projects/.env.development)
+
+          # Mask secrets in logs
+          echo "::add-mask::$NEON_API_KEY"
+          echo "::add-mask::$NEON_PROJECT_ID"
+
+          if [ -z "$NEON_API_KEY" ] || [ -z "$NEON_PROJECT_ID" ]; then
+            echo "Neon API credentials (NEON_API_KEY/NEON_PROJECT_ID) are not set; skipping Neon branch cleanup."
+            exit 0
+          fi
+
+          echo "Fetching Neon branches for project $NEON_PROJECT_ID..."
+          BRANCHES_JSON=$(curl -sS -H "Authorization: Bearer $NEON_API_KEY" \
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches") || BRANCHES_JSON=""
+
+          if [ -z "$BRANCHES_JSON" ]; then
+            echo "No branch data returned from Neon API; skipping Neon branch cleanup."
+            exit 0
+          fi
+
+          # Extract branch IDs and names, then delete all that match the PR prefix
+          echo "$BRANCHES_JSON" | jq -r '.branches[] | "\(.id) \(.name)"' | while read -r BRANCH_ID BRANCH_NAME; do
+            if [ -n "$BRANCH_NAME" ] && [[ "$BRANCH_NAME" == "$BRANCH_PREFIX"* ]]; then
+              echo "Deleting Neon branch '$BRANCH_NAME' (id: $BRANCH_ID)..."
+              curl -sS -X DELETE -H "Authorization: Bearer $NEON_API_KEY" \
+                "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$BRANCH_ID" || true
+            fi
+          done
       - name: Comment on PR
         uses: actions/github-script@v7
         with:
