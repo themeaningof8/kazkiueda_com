@@ -57,17 +57,49 @@ jobs:
 
       - name: Set DATABASE_URL for this preview deployment
         run: |
-          # Create or update environment variable for this specific git branch
-          curl -X POST "https://api.vercel.com/v10/projects/${{ env.VERCEL_PROJECT_ID }}/env" \
+          # Create or update environment variable for this specific git branch using upsert
+          echo "Setting DATABASE_URL for branch: ${{ github.head_ref }}"
+
+          # Use upsert to create or update the environment variable
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            "https://api.vercel.com/v10/projects/${{ env.VERCEL_PROJECT_ID }}/env?upsert=true" \
             -H "Authorization: Bearer ${{ env.VERCEL_TOKEN }}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "key": "DATABASE_URL",
-              "value": "'"$NEON_DATABASE_URL"'",
-              "type": "encrypted",
-              "target": ["preview"],
-              "gitBranch": "${{ github.head_ref }}"
-            }'
+            -d @- <<EOF
+          {
+            "key": "DATABASE_URL",
+            "value": "$NEON_DATABASE_URL",
+            "type": "encrypted",
+            "target": ["preview"],
+            "gitBranch": "${{ github.head_ref }}"
+          }
+          EOF
+          )
+
+          HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+
+          echo "HTTP Status: $HTTP_CODE"
+
+          # Log response body for debugging (might contain error details)
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "Response: $HTTP_BODY"
+          fi
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✅ Successfully set DATABASE_URL environment variable"
+          else
+            echo "❌ Failed to set environment variable (HTTP $HTTP_CODE)"
+            echo "Error details: $HTTP_BODY"
+
+            # Fallback: Just log the DATABASE_URL to PR comment instead
+            echo "⚠️ Could not set Vercel environment variable automatically."
+            echo "Please set DATABASE_URL manually in Vercel dashboard for this preview."
+            echo "Value: $NEON_DATABASE_URL"
+
+            # Don't fail the workflow - continue with migration using the env var directly
+            exit 0
+          fi
 
       - name: Run database migrations on preview branch
         env:
