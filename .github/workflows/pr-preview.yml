@@ -92,17 +92,46 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
             const branchName = context.payload.pull_request.head.ref;
-            github.rest.issues.createComment({
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const body =
+              `🌿 Preview environment setup complete!\n\n` +
+              `✅ Database branch created: \`pr-${prNumber}\`\n` +
+              `✅ Database migrations applied\n` +
+              `✅ Environment variable set for branch: \`${branchName}\`\n\n` +
+              `Vercel will automatically deploy the preview environment.`;
+
+            // Look for an existing preview-setup comment to avoid duplicates
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
               issue_number: prNumber,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `🌿 Preview environment setup complete!\n\n` +
-                    `✅ Database branch created: \`pr-${prNumber}\`\n` +
-                    `✅ Database migrations applied\n` +
-                    `✅ Environment variable set for branch: \`${branchName}\`\n\n` +
-                    `Vercel will automatically deploy the preview environment.`
+              per_page: 100,
             });
 
+            const existingComment = comments.find(
+              (comment) =>
+                comment.user?.type === "Bot" &&
+                typeof comment.body === "string" &&
+                comment.body.includes("🌿 Preview environment setup complete!")
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: prNumber,
+                owner,
+                repo,
+                body,
+              });
+            }
   cleanup-preview-db:
     name: Cleanup Preview Database
     if: github.event.action == 'closed'
