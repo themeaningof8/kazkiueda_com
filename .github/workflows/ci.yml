@@ -189,12 +189,19 @@ jobs:
           DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
         run: |
           # Load environment variables from Vercel and encrypted .env files
-          # Vercel pull creates .vercel/.env.production.local with DATABASE_URL
+          # Vercel pull is expected to create .vercel/.env.production.local with DATABASE_URL
           if [ -f .vercel/.env.production.local ]; then
             echo "Loading Vercel environment variables..."
             set -a
             source .vercel/.env.production.local
             set +a
+
+            # Validate that DATABASE_URL is available after loading Vercel environment variables
+            if [ -z "${DATABASE_URL:-}" ]; then
+              echo "Error: DATABASE_URL is not set after loading Vercel environment variables."
+              echo "Ensure DATABASE_URL is configured as a Production Environment Variable in your Vercel project."
+              exit 1
+            fi
           else
             echo "Warning: .vercel/.env.production.local not found"
             echo "Available .vercel files:"
