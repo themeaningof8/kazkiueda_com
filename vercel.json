@@ -1,0 +1,12 @@
+{
+  "buildCommand": "bun run build",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "src/app/(payload)/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "crons": []
+}
