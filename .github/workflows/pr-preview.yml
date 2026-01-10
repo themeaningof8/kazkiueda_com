@@ -43,6 +43,15 @@ jobs:
         run: |
           bunx dotenvx run -f projects/.env.development -- bun scripts/neon-branch.ts create pr-${{ github.event.pull_request.number }}
 
+      - name: Verify NEON_DATABASE_URL is set
+        run: |
+          if [ -z "$NEON_DATABASE_URL" ]; then
+            echo "❌ Error: NEON_DATABASE_URL was not set by neon-branch.ts script"
+            echo "This indicates the database branch creation or connection failed"
+            exit 1
+          fi
+          echo "✅ NEON_DATABASE_URL is set and ready for use"
+
       - name: Load Vercel configuration
         id: load-vercel-config
         env:
