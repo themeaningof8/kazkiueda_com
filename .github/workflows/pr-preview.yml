@@ -166,7 +166,7 @@ jobs:
           # Get all environment variables for this project
           ENV_ID=$(curl -s "https://api.vercel.com/v9/projects/${{ env.VERCEL_PROJECT_ID }}/env" \
             -H "Authorization: Bearer ${{ env.VERCEL_TOKEN }}" | \
-            jq -r '.envs[] | select(.key == "DATABASE_URL" and .gitBranch == "${{ github.head_ref }}") | .id' | head -n 1)
+            jq -r --arg branch "${{ github.head_ref }}" '.envs[] | select(.key == "DATABASE_URL" and .gitBranch == $branch) | .id' | head -n 1)
 
           if [ -n "$ENV_ID" ]; then
             echo "env_id=$ENV_ID" >> $GITHUB_OUTPUT
