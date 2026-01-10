@@ -203,9 +203,11 @@ jobs:
               exit 1
             fi
           else
-            echo "Warning: .vercel/.env.production.local not found"
+            echo "Error: .vercel/.env.production.local not found"
+            echo "DATABASE_URL is required for production migrations."
             echo "Available .vercel files:"
             ls -la .vercel/ || echo "No .vercel directory"
+            exit 1
           fi
 
           bunx dotenvx run -f projects/.env.production -f projects/.env -- \
