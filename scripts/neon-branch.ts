@@ -4,8 +4,8 @@
  * Neon Database Branch Management for CI/CD
  *
  * Usage:
- *   bun scripts/neon-branch.ts create   # Create a new test branch
- *   bun scripts/neon-branch.ts delete   # Delete a test branch
+ *   bun scripts/neon-branch.ts create [prefix]   # Create a new test branch (optional custom prefix)
+ *   bun scripts/neon-branch.ts delete [name]     # Delete a test branch (optional custom name)
  */
 
 export {};
@@ -17,7 +17,8 @@ const RUN_ID = process.env.GITHUB_RUN_ID || Date.now();
 const RUN_ATTEMPT = process.env.GITHUB_RUN_ATTEMPT ? `-${process.env.GITHUB_RUN_ATTEMPT}` : "";
 // Add random suffix to ensure uniqueness even on manual retries or overlaps
 const RANDOM_SUFFIX = Math.random().toString(36).substring(2, 7);
-const BRANCH_NAME = `ci-${RUN_ID}${RUN_ATTEMPT}-${RANDOM_SUFFIX}`;
+const CUSTOM_PREFIX = process.argv[3] || "ci";
+const BRANCH_NAME = `${CUSTOM_PREFIX}-${RUN_ID}${RUN_ATTEMPT}-${RANDOM_SUFFIX}`;
 
 if (!NEON_API_KEY || !NEON_PROJECT_ID || !NEON_PARENT_BRANCH_ID) {
   console.error("❌ Missing required environment variables:");
@@ -200,10 +201,39 @@ async function _deleteExistingBranch(branchId: string): Promise<void> {
 }
 
 async function deleteBranch(): Promise<void> {
-  const branchId = process.env.NEON_BRANCH_ID;
+  const customName = process.argv[3];
+  let branchId = process.env.NEON_BRANCH_ID;
+
+  // If custom name is provided, find the branch by name pattern
+  if (customName) {
+    console.log(`🔍 Looking for branch with prefix: ${customName}`);
+    const listResponse = await fetch(`${API_BASE}/projects/${NEON_PROJECT_ID}/branches`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${NEON_API_KEY}`,
+        Accept: "application/json",
+      },
+    });
+
+    if (listResponse.ok) {
+      const data = (await listResponse.json()) as { branches: NeonBranch[] };
+      // Find the most recent branch matching the prefix
+      const matchingBranches = data.branches
+        .filter((b) => b.name.startsWith(`${customName}-`))
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      if (matchingBranches.length > 0) {
+        branchId = matchingBranches[0].id;
+        console.log(`   Found branch: ${matchingBranches[0].name} (${branchId})`);
+      } else {
+        console.log(`   No branch found with prefix ${customName}, skipping deletion`);
+        return;
+      }
+    }
+  }
 
   if (!branchId) {
-    console.error("❌ NEON_BRANCH_ID not set. Cannot delete branch.");
+    console.error("❌ NEON_BRANCH_ID not set and no custom name provided. Cannot delete branch.");
     process.exit(1);
   }
 

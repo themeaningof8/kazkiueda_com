@@ -128,7 +128,10 @@ jobs:
             echo "Coverage summary not found" >> $GITHUB_STEP_SUMMARY
           fi
 
-  # Note: Vercel handles all deployments automatically via GitHub integration
-  # - Production: main branch pushes
-  # - Preview: Pull requests
-  # No manual staging deployment needed
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [e2e-essential]
+    # mainブランチのpush時のみ実行（PR時はスキップ）
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    uses: ./.github/workflows/deploy-staging.yml
+    secrets: inherit

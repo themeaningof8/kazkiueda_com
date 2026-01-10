@@ -79,3 +79,4 @@ payload-types.ts
 # media uploads
 /media
 .stryker-tmp/
+.env*.local
