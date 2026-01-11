@@ -100,6 +100,13 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Load environment variables
+        id: dotenv
+        run: |
+          CODECOV_TOKEN=$(bunx dotenvx get CODECOV_TOKEN -f projects/.env)
+          echo "::add-mask::$CODECOV_TOKEN"
+          echo "CODECOV_TOKEN=$CODECOV_TOKEN" >> $GITHUB_ENV
+
       - name: Build Next.js for performance tests
         run: |
           echo "Building Next.js for bundle size tests..."
@@ -109,13 +116,6 @@ jobs:
         run: |
           echo "Running unit tests with coverage..."
           bunx dotenvx run -f projects/.env.development -f projects/.env -- vitest run src/__tests__/unit --coverage --exclude src/__tests__/unit/bundle-size.test.ts --exclude src/__tests__/unit/payload-client.test.ts --exclude src/__tests__/unit/pagination.test.tsx
-
-      - name: Load environment variables
-        id: dotenv
-        run: |
-          CODECOV_TOKEN=$(bunx dotenvx get CODECOV_TOKEN -f projects/.env)
-          echo "::add-mask::$CODECOV_TOKEN"
-          echo "CODECOV_TOKEN=$CODECOV_TOKEN" >> $GITHUB_ENV
 
       - name: Upload coverage reports to Codecov
         if: always()

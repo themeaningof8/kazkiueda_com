@@ -10,7 +10,7 @@
     "src/__tests__/fixtures/**"
   ],
   "ignoreDependencies": [
-    "@codecov/vite-plugin",
+    "@codecov/nextjs-webpack-plugin",
     "@stryker-mutator/api",
     "bundlesize",
     "lighthouse",
