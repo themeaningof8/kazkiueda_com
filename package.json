@@ -63,7 +63,9 @@
     "generate:types": "dotenvx run -f projects/.env -f projects/.env.development -- cross-env NODE_ENV=development NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:types",
     "generate:importmap": "dotenvx run -f projects/.env -f projects/.env.development -- cross-env NODE_ENV=development NODE_OPTIONS=\"--no-deprecation --import tsx\" PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:importmap",
     "type-check:staged": "bunx tsx --check",
-    "ci": "payload migrate && build"
+    "ci": "payload migrate && build",
+    "renovate:validate": "bunx tsx scripts/validate-renovate-config.ts",
+    "renovate:setup-labels": "./scripts/setup-renovate-labels.sh"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -87,7 +89,6 @@
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cross-env": "^10.1.0",
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "next-themes": "^0.4.6",
@@ -120,6 +121,7 @@
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^4.0.16",
     "bundlesize": "^0.18.2",
+    "cross-env": "^10.1.0",
     "happy-dom": "^20.0.11",
     "husky": "^9.1.7",
     "jscpd": "^4.0.5",

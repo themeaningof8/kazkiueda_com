@@ -10,14 +10,14 @@
     "src/__tests__/fixtures/**"
   ],
   "ignoreDependencies": [
+    "@codecov/vite-plugin",
+    "@stryker-mutator/api",
+    "bundlesize",
+    "lighthouse",
+    "memlab",
     "tailwindcss",
     "tw-animate-css",
-    "bundlesize",
-    "memlab",
-    "webpack-bundle-analyzer",
-    "lighthouse",
-    "@stryker-mutator/api",
-    "@codecov/vite-plugin"
+    "webpack-bundle-analyzer"
   ],
   "ignoreBinaries": ["build", "open"],
   "ignoreExportsUsedInFile": true,

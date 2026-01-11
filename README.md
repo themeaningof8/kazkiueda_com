@@ -1,3 +1,8 @@
+# kazkiueda_com
+
+[![CI Pipeline](https://github.com/themeaningof8/kazkiueda_com/actions/workflows/ci.yml/badge.svg)](https://github.com/themeaningof8/kazkiueda_com/actions/workflows/ci.yml)
+[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -99,6 +104,68 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## 開発ツール
+
+### 依存関係の自動更新（Renovate）
+
+このプロジェクトでは [Renovate](https://docs.renovatebot.com/) を使用して依存関係を自動的に更新しています。
+
+**セットアップ:**
+
+```bash
+# 1. Renovate設定の検証
+bun run renovate:validate
+
+# 2. GitHubラベルの作成
+bun run renovate:setup-labels
+
+# 3. Renovate GitHub Appをインストール
+# https://github.com/apps/renovate
+```
+
+詳細は [.github/RENOVATE_SETUP.md](.github/RENOVATE_SETUP.md) を参照してください。
+
+**自動マージ対象:**
+- 型定義（`@types/*`）
+- 開発ツールのパッチ更新
+
+**手動レビュー対象:**
+- Payload CMS、Next.js、React
+- 本番依存関係のメジャー・マイナー更新
+- セキュリティ更新
+
+### テスト
+
+```bash
+# すべてのテストを実行
+bun run test
+
+# 個別のテスト
+bun run test:static       # 静的解析
+bun run test:unit         # 単体テスト
+bun run test:integration  # 統合テスト
+bun run test:e2e:essential # E2Eテスト（必須）
+```
+
+### コード品質チェック
+
+```bash
+# リント
+bun run lint
+
+# フォーマット
+bun run format
+
+# 循環依存チェック
+bun run analyze:circular
+
+# 重複コードチェック
+bun run analyze:duplication
+
+# 未使用コードチェック
+bun run analyze:unused
+```
 
 ## Learn More
 
