@@ -1,11 +1,19 @@
 #!/usr/bin/env bun
 
 /**
- * Neon Database Branch Management for CI/CD
+ * Neon Database Branch Management for GitHub Actions CI/CD
+ *
+ * Note: This script is used ONLY for GitHub Actions workflows (CI/E2E/Mutation tests).
+ * Vercel Preview environments use Neon Vercel Integration for automatic DB branching.
  *
  * Usage:
  *   bun scripts/neon-branch.ts create   # Create a new test branch
  *   bun scripts/neon-branch.ts delete   # Delete a test branch
+ *   bun scripts/neon-branch.ts list     # List all branches
+ *
+ * DB Branch Naming:
+ *   - GitHub Actions: ci-<run-id>-<attempt>-<random>
+ *   - Vercel Preview: preview/<git-branch-name> (managed by Vercel Integration)
  */
 
 export {};
