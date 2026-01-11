@@ -1,10 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Renovate configuration for kazkiueda_com - Phase 2: Balanced automation",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
   "timezone": "Asia/Tokyo",
-  "schedule": ["before 6am on Monday"],
-  "labels": ["dependencies"],
+  "schedule": [
+    "before 6am on Monday"
+  ],
+  "labels": [
+    "dependencies"
+  ],
   "prConcurrentLimit": 3,
   "prHourlyLimit": 1,
   "prCreation": "not-pending",
@@ -14,112 +20,202 @@
     {
       "description": "Payload CMS - グループ化、手動レビュー必須",
       "groupName": "Payload CMS",
-      "matchPackagePatterns": ["^@payloadcms/", "^payload$"],
-      "schedule": ["before 6am on Monday"],
+      "schedule": [
+        "before 6am on Monday"
+      ],
       "automerge": false,
-      "labels": ["dependencies", "payload"],
-      "reviewers": ["themeaningof8"]
+      "labels": [
+        "dependencies",
+        "payload"
+      ],
+      "reviewers": [
+        "themeaningof8"
+      ],
+      "matchPackageNames": [
+        "/^@payloadcms//",
+        "/^payload$/"
+      ]
     },
     {
       "description": "Next.js & React - グループ化、手動レビュー必須",
       "groupName": "Next.js ecosystem",
-      "matchPackageNames": ["next", "react", "react-dom"],
+      "matchPackageNames": [
+        "next",
+        "react",
+        "react-dom"
+      ],
       "automerge": false,
-      "labels": ["dependencies", "nextjs"],
-      "reviewers": ["themeaningof8"]
+      "labels": [
+        "dependencies",
+        "nextjs"
+      ],
+      "reviewers": [
+        "themeaningof8"
+      ]
     },
     {
       "description": "AWS SDK - グループ化",
       "groupName": "AWS SDK",
-      "matchPackagePatterns": ["^@aws-sdk/", "^@aws-crypto/"],
       "automerge": false,
-      "labels": ["dependencies", "aws"]
+      "labels": [
+        "dependencies",
+        "aws"
+      ],
+      "matchPackageNames": [
+        "/^@aws-sdk//",
+        "/^@aws-crypto//"
+      ]
     },
     {
       "description": "型定義 - 完全自動マージ",
       "groupName": "Type definitions",
-      "matchPackagePatterns": ["^@types/"],
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash",
-      "labels": ["types", "automerge"]
+      "labels": [
+        "types",
+        "automerge"
+      ],
+      "matchPackageNames": [
+        "/^@types//"
+      ]
     },
     {
       "description": "開発ツール（パッチのみ自動マージ）",
       "groupName": "Development tools (patch)",
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["patch"],
-      "excludePackageNames": ["@biomejs/biome", "typescript"],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash",
-      "labels": ["devDependencies", "automerge"]
+      "labels": [
+        "devDependencies",
+        "automerge"
+      ],
+      "matchPackageNames": [
+        "!@biomejs/biome",
+        "!typescript"
+      ]
     },
     {
       "description": "テストツール - グループ化、マイナーは手動",
       "groupName": "Testing tools",
-      "matchPackagePatterns": [
-        "^vitest",
-        "^@vitest/",
-        "^playwright",
-        "^@playwright/",
-        "^@testing-library/",
-        "^@stryker-mutator/"
+      "matchUpdateTypes": [
+        "minor",
+        "major"
       ],
-      "matchUpdateTypes": ["minor", "major"],
       "automerge": false,
-      "labels": ["devDependencies", "testing"]
+      "labels": [
+        "devDependencies",
+        "testing"
+      ],
+      "matchPackageNames": [
+        "/^vitest/",
+        "/^@vitest//",
+        "/^playwright/",
+        "/^@playwright//",
+        "/^@testing-library//",
+        "/^@stryker-mutator//"
+      ]
     },
     {
       "description": "Biome - フォーマットルール変更の可能性があるため手動",
-      "matchPackageNames": ["@biomejs/biome"],
+      "matchPackageNames": [
+        "@biomejs/biome"
+      ],
       "automerge": false,
-      "labels": ["devDependencies", "linter"],
-      "reviewers": ["themeaningof8"]
+      "labels": [
+        "devDependencies",
+        "linter"
+      ],
+      "reviewers": [
+        "themeaningof8"
+      ]
     },
     {
       "description": "TypeScript - 型システム変更の可能性があるため手動",
-      "matchPackageNames": ["typescript"],
+      "matchPackageNames": [
+        "typescript"
+      ],
       "automerge": false,
-      "labels": ["devDependencies", "typescript"],
-      "reviewers": ["themeaningof8"]
+      "labels": [
+        "devDependencies",
+        "typescript"
+      ],
+      "reviewers": [
+        "themeaningof8"
+      ]
     },
     {
       "description": "Tailwind CSS - グループ化",
       "groupName": "Tailwind CSS",
-      "matchPackagePatterns": ["^tailwindcss", "^@tailwindcss/"],
       "automerge": false,
-      "labels": ["dependencies", "styling"]
+      "labels": [
+        "dependencies",
+        "styling"
+      ],
+      "matchPackageNames": [
+        "/^tailwindcss/",
+        "/^@tailwindcss//"
+      ]
     },
     {
       "description": "本番依存関係のその他 - 手動レビュー",
-      "matchDepTypes": ["dependencies"],
+      "matchDepTypes": [
+        "dependencies"
+      ],
       "automerge": false,
-      "labels": ["dependencies"]
+      "labels": [
+        "dependencies"
+      ]
     },
     {
       "description": "開発依存関係のメジャー・マイナー - 手動レビュー",
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["major", "minor"],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
       "automerge": false,
-      "labels": ["devDependencies"]
+      "labels": [
+        "devDependencies"
+      ]
     },
     {
       "description": "セキュリティ更新 - 優先度高、即座にPR作成",
-      "matchUpdateTypes": ["patch"],
-      "matchDatasources": ["npm"],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchDatasources": [
+        "npm"
+      ],
       "vulnerabilityAlerts": {
         "enabled": true
       },
-      "schedule": ["at any time"],
+      "schedule": [
+        "at any time"
+      ],
       "automerge": false,
-      "labels": ["security", "dependencies"],
-      "reviewers": ["themeaningof8"]
+      "labels": [
+        "security",
+        "dependencies"
+      ],
+      "reviewers": [
+        "themeaningof8"
+      ]
     }
   ],
   "vulnerabilityAlerts": {
     "enabled": true,
-    "labels": ["security"]
+    "labels": [
+      "security"
+    ]
   },
   "ignoreDeps": [],
   "ignorePresets": []
