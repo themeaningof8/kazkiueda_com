@@ -86,7 +86,7 @@ jobs:
           bunx dotenvx run -f projects/.env.development -- bun next build
       - name: Cache Next.js build
         if: inputs.suite == 'unit'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .next/cache
