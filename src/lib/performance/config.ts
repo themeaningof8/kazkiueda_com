@@ -49,17 +49,32 @@ export const PERFORMANCE_THRESHOLDS = {
 } as const;
 
 /**
+ * Playwrightブラウザが利用可能かをチェック
+ */
+export function isPlaywrightAvailable(): boolean {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("playwright");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * テスト実行環境の設定
  */
 export const TEST_ENVIRONMENT = {
   // ローカル開発環境
   isLocal: process.env.NODE_ENV === "development",
   // CI環境
-  isCI: process.env.CI === "true",
+  isCI: process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true",
   // ヘッドレスブラウザを使用
   headless: process.env.CI === "true" || process.env.HEADLESS === "true",
   // サーバーURL (CI環境では3001、ローカルでは3000を使用)
   serverUrl: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  // Playwrightが利用可能か
+  playwrightAvailable: isPlaywrightAvailable(),
   // タイムアウト設定 (ms)
   timeout: {
     lighthouse: 60000,

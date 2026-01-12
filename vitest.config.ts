@@ -6,7 +6,7 @@ export default defineConfig({
     environment: "happy-dom",
     setupFiles: ["./src/__tests__/setup.ts"],
     globals: true,
-    include: ["src/**/*.{test,spec}.{ts,tsx}", "tests/performance/**/*.{test,spec}.{ts,tsx}"],
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
     testTimeout: 60000, // 30秒 → 60秒（全体的な安定性のため）
     hookTimeout: 60000,
 

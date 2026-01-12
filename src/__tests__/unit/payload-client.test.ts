@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { clearPayloadCache, findPostBySlug, type findPosts } from "@/lib/api/payload-client";
+import { clearPayloadCache, findPostBySlug, findPosts } from "@/lib/api/payload-client";
 
 // payload-client.tsの内部関数をテストするためにモック化
 vi.mock("@payload-config", () => ({}));
@@ -16,38 +16,31 @@ vi.mock("@/lib/api/payload-filters", () => ({
   buildSlugFilter: vi.fn(),
 }));
 
-// findPayload関数をモックするための準備
+// payload-clientモジュールをモック
+vi.mock("@/lib/api/payload-client", async () => {
+  const actual = await vi.importActual("@/lib/api/payload-client");
+  return {
+    ...actual,
+    findPayload: vi.fn(),
+    clearPayloadCache: vi.fn(),
+  };
+});
 
-// モックを保存するための変数
-let originalFindPayload: unknown;
-
-// payload-client モジュールの型
-type PayloadClientModule = {
-  findPayload: unknown;
-  findPostBySlug: typeof findPostBySlug;
-  findPosts: typeof findPosts;
-};
+// モックされた関数を取得
+const mockFindPayload = vi.mocked(await import("@/lib/api/payload-client")).findPayload;
 
 describe("payload-client public API", () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     clearPayloadCache();
-    // モックの元の関数を保存
-    const module = await import("@/lib/api/payload-client");
-    originalFindPayload = module.findPayload;
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     clearPayloadCache();
-    // モックを元に戻す
-    if (originalFindPayload) {
-      const module = (await import("@/lib/api/payload-client")) as PayloadClientModule;
-      module.findPayload = originalFindPayload;
-    }
+    vi.clearAllMocks();
   });
 
   describe("findPostBySlug", () => {
     test("正常に記事を取得できる", async () => {
-      // モックを設定してからインポート
       const mockResult = {
         docs: [
           {
@@ -72,13 +65,7 @@ describe("payload-client public API", () => {
         totalDocs: 1,
       };
 
-      // findPayload関数をモック - より安全な方法
-      const module = (await import("@/lib/api/payload-client")) as PayloadClientModule;
-      const _originalFindPayload = module.findPayload;
-      const findPayloadSpy = vi.fn().mockResolvedValue(mockResult);
-
-      // 一時的に置き換え
-      module.findPayload = findPayloadSpy;
+      mockFindPayload.mockResolvedValue(mockResult);
 
       const result = await findPostBySlug("test-post");
 
@@ -105,7 +92,7 @@ describe("payload-client public API", () => {
         ],
         totalDocs: 1,
       });
-      expect(findPayloadSpy).toHaveBeenCalledWith({
+      expect(mockFindPayload).toHaveBeenCalledWith({
         collection: "posts",
         where: expect.any(Object), // buildSlugFilterの結果
         limit: 1,
@@ -119,13 +106,7 @@ describe("payload-client public API", () => {
     });
 
     test("エラー時は空の結果を返す", async () => {
-      const { findPostBySlug } = await import("@/lib/api/payload-client");
-
-      // findPayloadがエラーを投げるようにモック
-      const module = (await import("@/lib/api/payload-client")) as PayloadClientModule;
-      const _originalFindPayload = module.findPayload;
-      const findPayloadSpy = vi.fn().mockRejectedValue(new Error("test error"));
-      module.findPayload = findPayloadSpy;
+      mockFindPayload.mockRejectedValue(new Error("test error"));
 
       const result = await findPostBySlug("test-post");
 
@@ -138,8 +119,6 @@ describe("payload-client public API", () => {
 
   describe("findPosts", () => {
     test("正常に記事一覧を取得できる", async () => {
-      const { findPosts } = await import("@/lib/api/payload-client");
-
       const mockResult = {
         docs: [
           {
@@ -166,10 +145,7 @@ describe("payload-client public API", () => {
         hasPrevPage: false,
       };
 
-      const module = (await import("@/lib/api/payload-client")) as PayloadClientModule;
-      const _originalFindPayload = module.findPayload;
-      const findPayloadSpy = vi.fn().mockResolvedValue(mockResult);
-      module.findPayload = findPayloadSpy;
+      mockFindPayload.mockResolvedValue(mockResult);
 
       const result = await findPosts({ limit: 10, page: 1 });
 
@@ -198,7 +174,7 @@ describe("payload-client public API", () => {
         hasNextPage: false,
         hasPrevPage: false,
       });
-      expect(findPayloadSpy).toHaveBeenCalledWith({
+      expect(mockFindPayload).toHaveBeenCalledWith({
         collection: "posts",
         where: expect.any(Object), // buildPublishStatusFilterの結果
         sort: "-publishedDate",

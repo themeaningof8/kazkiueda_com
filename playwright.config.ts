@@ -6,7 +6,7 @@ const isCI = !!process.env.GITHUB_ACTIONS;
 
 export default defineConfig({
   // グローバルセットアップ・ティアダウンは各テストで個別に実行
-  testDir: './tests/e2e',
+  testDir: './tests',
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
@@ -63,11 +63,22 @@ export default defineConfig({
         '**/accessibility.spec.ts',
         '**/accessibility-essential.spec.ts', // Ignored
         '**/auth.setup.ts', // Setupファイルを除外
+        '**/performance/**', // パフォーマンステストを除外
       ],
       use: {
         ...devices['Desktop Chrome'],
         baseURL: 'http://localhost:3001',
         storageState: 'tests/e2e/.auth/admin.json',
+      },
+    },
+
+    // 3. パフォーマンステスト
+    {
+      name: 'performance',
+      testMatch: 'tests/performance/**/*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3001',
       },
     },
   ],

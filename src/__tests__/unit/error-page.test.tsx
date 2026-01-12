@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { ErrorPage } from "@/components/error-page";
 
@@ -86,7 +86,9 @@ describe("ErrorPage", () => {
 
       // オンラインイベントを発火
       onLineSpy.mockReturnValue(true);
-      window.dispatchEvent(new Event("online"));
+      await act(async () => {
+        window.dispatchEvent(new Event("online"));
+      });
 
       // サーバーエラーが表示される
       await waitFor(() => {
@@ -103,7 +105,9 @@ describe("ErrorPage", () => {
 
       // オフラインイベントを発火
       onLineSpy.mockReturnValue(false);
-      window.dispatchEvent(new Event("offline"));
+      await act(async () => {
+        window.dispatchEvent(new Event("offline"));
+      });
 
       // オフラインメッセージが表示される
       await waitFor(() => {

@@ -100,6 +100,9 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Install Playwright browsers
+        run: bunx playwright install chromium --with-deps
+
       - name: Load environment variables
         id: dotenv
         run: |
