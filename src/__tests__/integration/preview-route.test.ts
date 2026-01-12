@@ -25,20 +25,23 @@ describe("Preview Route Handler Integration", () => {
     await getTestPayload(payloadKey);
   });
 
+  function createRequestWithValidSecret(url: string): NextRequest {
+    // 有効なpreview secretをURLに追加
+    const separator = url.includes("?") ? "&" : "?";
+    const urlWithSecret = `${url}${separator}previewSecret=test-preview-secret`;
+    return new NextRequest(new URL(urlWithSecret, "http://localhost:3000"));
+  }
+
   afterAll(async () => {
     vi.unstubAllEnvs();
     await destroyTestPayload(payloadKey);
     await destroyTestDbPool(pool);
   });
 
-  function createRequest(url: string): NextRequest {
-    return new NextRequest(new URL(url, "http://localhost:3000"));
-  }
-
   test("Open Redirect対策 - 外部URL拒否", async () => {
     const url =
-      "http://localhost:3000/preview?collection=posts&slug=test-post&path=http://evil.com&previewSecret=test-preview-secret";
-    const request = createRequest(url);
+      "http://localhost:3000/preview?collection=posts&slug=test-post&path=http://evil.com";
+    const request = createRequestWithValidSecret(url);
 
     const response = await previewRouteGET(request);
 
@@ -48,9 +51,8 @@ describe("Preview Route Handler Integration", () => {
   });
 
   test("Open Redirect対策 - スキームなし外部URL拒否", async () => {
-    const url =
-      "http://localhost:3000/preview?collection=posts&slug=test-post&path=//evil.com&previewSecret=test-preview-secret";
-    const request = createRequest(url);
+    const url = "http://localhost:3000/preview?collection=posts&slug=test-post&path=//evil.com";
+    const request = createRequestWithValidSecret(url);
 
     const response = await previewRouteGET(request);
 
@@ -61,8 +63,8 @@ describe("Preview Route Handler Integration", () => {
 
   test("Open Redirect対策 - 許可されないパス拒否", async () => {
     const url =
-      "http://localhost:3000/preview?collection=posts&slug=test-post&path=/admin/dashboard&previewSecret=test-preview-secret";
-    const request = createRequest(url);
+      "http://localhost:3000/preview?collection=posts&slug=test-post&path=/admin/dashboard";
+    const request = createRequestWithValidSecret(url);
 
     const response = await previewRouteGET(request);
 
@@ -72,9 +74,8 @@ describe("Preview Route Handler Integration", () => {
   });
 
   test("slug形式検証 - 不正なslug拒否", async () => {
-    const url =
-      "http://localhost:3000/preview?collection=posts&slug=invalid slug&previewSecret=test-preview-secret";
-    const request = createRequest(url);
+    const url = "http://localhost:3000/preview?collection=posts&slug=invalid slug";
+    const request = createRequestWithValidSecret(url);
 
     const response = await previewRouteGET(request);
 
@@ -84,9 +85,8 @@ describe("Preview Route Handler Integration", () => {
   });
 
   test("コレクション検証 - サポートされないコレクション拒否", async () => {
-    const url =
-      "http://localhost:3000/preview?collection=users&slug=test-user&previewSecret=test-preview-secret";
-    const request = createRequest(url);
+    const url = "http://localhost:3000/preview?collection=users&slug=test-user";
+    const request = createRequestWithValidSecret(url);
 
     const response = await previewRouteGET(request);
 
@@ -96,8 +96,8 @@ describe("Preview Route Handler Integration", () => {
   });
 
   test("必須パラメータの欠如 - slugなし", async () => {
-    const url = "http://localhost:3000/preview?collection=posts&previewSecret=test-preview-secret";
-    const request = createRequest(url);
+    const url = "http://localhost:3000/preview?collection=posts";
+    const request = createRequestWithValidSecret(url);
 
     const response = await previewRouteGET(request);
 
@@ -107,8 +107,8 @@ describe("Preview Route Handler Integration", () => {
   });
 
   test("必須パラメータの欠如 - collectionなし", async () => {
-    const url = "http://localhost:3000/preview?slug=test-post&previewSecret=test-preview-secret";
-    const request = createRequest(url);
+    const url = "http://localhost:3000/preview?slug=test-post";
+    const request = createRequestWithValidSecret(url);
 
     const response = await previewRouteGET(request);
 

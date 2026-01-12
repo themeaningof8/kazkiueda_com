@@ -170,6 +170,10 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      # Install Playwright browsers for performance tests
+      - name: Install Playwright browsers
+        run: bun run test:e2e:install
+
       - name: Create Neon test branch
         run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts create
 

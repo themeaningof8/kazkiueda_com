@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { clearPayloadCache, findPostBySlug, findPosts } from "@/lib/api/payload-client";
+import {
+  clearPayloadCache,
+  findPayload,
+  findPostBySlug,
+  findPosts,
+} from "@/lib/api/payload-client";
 
 // payload-client.tsの内部関数をテストするためにモック化
 vi.mock("@payload-config", () => ({}));
@@ -16,27 +21,18 @@ vi.mock("@/lib/api/payload-filters", () => ({
   buildSlugFilter: vi.fn(),
 }));
 
-// payload-clientモジュールをモック
-vi.mock("@/lib/api/payload-client", async () => {
-  const actual = await vi.importActual("@/lib/api/payload-client");
-  return {
-    ...actual,
-    findPayload: vi.fn(),
-    clearPayloadCache: vi.fn(),
-  };
-});
-
-// モックされた関数を取得
-const mockFindPayload = vi.mocked(await import("@/lib/api/payload-client")).findPayload;
+// findPayload関数をモック化
+const mockFindPayload = vi.mocked(findPayload);
 
 describe("payload-client public API", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     clearPayloadCache();
   });
 
   afterEach(() => {
-    clearPayloadCache();
     vi.clearAllMocks();
+    clearPayloadCache();
   });
 
   describe("findPostBySlug", () => {
