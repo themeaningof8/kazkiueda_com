@@ -117,22 +117,13 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Create Neon test branch
-        run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts create
-
-      - name: Update DATABASE_URL to use Neon branch
-        run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
-
+      # scheduled maintenanceでは開発DBを直接使用（本番データで定期チェック）
       - name: Run migrations
-        run: bun run test:migrate
+        run: bunx dotenvx run -f projects/.env.development -- bun run test:migrate
 
       # 全テストのカバレッジを収集
       - name: Run tests with coverage
-        run: bun run test:coverage:all
-
-      - name: Cleanup Neon branch
-        if: always()
-        run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts delete
+        run: bunx dotenvx run -f projects/.env.development -- bun run test:coverage:all
 
       # カバレッジレポートをアップロード
       - name: Upload coverage to Codecov
@@ -174,22 +165,13 @@ jobs:
       - name: Install Playwright browsers
         run: bun run test:e2e:install
 
-      - name: Create Neon test branch
-        run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts create
-
-      - name: Update DATABASE_URL to use Neon branch
-        run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
-
+      # scheduled maintenanceでは開発DBを直接使用（本番データで定期チェック）
       - name: Run migrations
-        run: bun run test:migrate
+        run: bunx dotenvx run -f projects/.env.development -- bun run test:migrate
 
       # パフォーマンステスト実行
       - name: Run performance tests
         run: bunx dotenvx run -f projects/.env.development -- vitest run src/__tests__/performance/
-
-      - name: Cleanup Neon branch
-        if: always()
-        run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts delete
 
   # ==========================================
   # Database health check
