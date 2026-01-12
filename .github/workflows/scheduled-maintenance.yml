@@ -125,11 +125,18 @@ jobs:
         run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
 
       - name: Run migrations
-        run: bunx dotenvx run -f projects/.env.production -- bun run test:migrate
+        run: |
+          bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
+            PAYLOAD_CONFIG_PATH=src/payload.config.ts \
+            payload migrate:fresh --force-accept-warning
+        env:
+          PAYLOAD_SECRET: ci-test-secret-key-for-scheduled-maintenance
 
       # 全テストのカバレッジを収集
       - name: Run tests with coverage
         run: bunx dotenvx run -f projects/.env.production -- bun run test:coverage:all
+        env:
+          PAYLOAD_SECRET: ci-test-secret-key-for-scheduled-maintenance
 
       - name: Cleanup Neon branch
         if: always()
@@ -183,11 +190,18 @@ jobs:
         run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
 
       - name: Run migrations
-        run: bunx dotenvx run -f projects/.env.production -- bun run test:migrate
+        run: |
+          bunx cross-env NODE_OPTIONS="--no-deprecation --import tsx" \
+            PAYLOAD_CONFIG_PATH=src/payload.config.ts \
+            payload migrate:fresh --force-accept-warning
+        env:
+          PAYLOAD_SECRET: ci-test-secret-key-for-scheduled-maintenance
 
       # パフォーマンステスト実行
       - name: Run performance tests
         run: bunx dotenvx run -f projects/.env.production -- vitest run src/__tests__/performance/
+        env:
+          PAYLOAD_SECRET: ci-test-secret-key-for-scheduled-maintenance
 
       - name: Cleanup Neon branch
         if: always()
