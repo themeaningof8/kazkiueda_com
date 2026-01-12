@@ -95,7 +95,7 @@ jobs:
     env:
       NODE_ENV: test
       DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-      DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+      DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
 
     steps:
       - uses: actions/checkout@v4
@@ -117,13 +117,25 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      # scheduled maintenanceでは開発DBを直接使用（本番データで定期チェック）
+      # 本番DBブランチから一時ブランチを作成（本番環境のデータでテスト）
+      - name: Create Neon branch from production
+        run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts create
+        env:
+          NEON_PARENT_BRANCH_ID: br-quiet-brook-a7skh7bx
+
+      - name: Update DATABASE_URL to use Neon branch
+        run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
+
       - name: Run migrations
-        run: bunx dotenvx run -f projects/.env.development -- bun run test:migrate
+        run: bun run test:migrate
 
       # 全テストのカバレッジを収集
       - name: Run tests with coverage
-        run: bunx dotenvx run -f projects/.env.development -- bun run test:coverage:all
+        run: bun run test:coverage:all
+
+      - name: Cleanup Neon branch
+        if: always()
+        run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts delete
 
       # カバレッジレポートをアップロード
       - name: Upload coverage to Codecov
@@ -139,7 +151,7 @@ jobs:
     env:
       NODE_ENV: test
       DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-      DOTENV_PRIVATE_KEY_DEVELOPMENT: ${{ secrets.DOTENV_PRIVATE_KEY_DEVELOPMENT }}
+      DOTENV_PRIVATE_KEY_PRODUCTION: ${{ secrets.DOTENV_PRIVATE_KEY_PRODUCTION }}
 
     steps:
       - uses: actions/checkout@v4
@@ -165,13 +177,25 @@ jobs:
       - name: Install Playwright browsers
         run: bun run test:e2e:install
 
-      # scheduled maintenanceでは開発DBを直接使用（本番データで定期チェック）
+      # 本番DBブランチから一時ブランチを作成（本番環境のデータでテスト）
+      - name: Create Neon branch from production
+        run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts create
+        env:
+          NEON_PARENT_BRANCH_ID: br-quiet-brook-a7skh7bx
+
+      - name: Update DATABASE_URL to use Neon branch
+        run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
+
       - name: Run migrations
-        run: bunx dotenvx run -f projects/.env.development -- bun run test:migrate
+        run: bun run test:migrate
 
       # パフォーマンステスト実行
       - name: Run performance tests
-        run: bunx dotenvx run -f projects/.env.development -- vitest run src/__tests__/performance/
+        run: vitest run src/__tests__/performance/
+
+      - name: Cleanup Neon branch
+        if: always()
+        run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts delete
 
   # ==========================================
   # Database health check
