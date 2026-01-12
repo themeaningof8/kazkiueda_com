@@ -119,23 +119,21 @@ jobs:
 
       # 本番DBブランチから一時ブランチを作成（本番環境のデータでテスト）
       - name: Create Neon branch from production
-        run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts create
-        env:
-          NEON_PARENT_BRANCH_ID: br-quiet-brook-a7skh7bx
+        run: NEON_PARENT_BRANCH_ID=br-quiet-brook-a7skh7bx bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts create
 
       - name: Update DATABASE_URL to use Neon branch
         run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
 
       - name: Run migrations
-        run: bun run test:migrate
+        run: bunx dotenvx run -f projects/.env.production -- bun run test:migrate
 
       # 全テストのカバレッジを収集
       - name: Run tests with coverage
-        run: bun run test:coverage:all
+        run: bunx dotenvx run -f projects/.env.production -- bun run test:coverage:all
 
       - name: Cleanup Neon branch
         if: always()
-        run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts delete
+        run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts delete
 
       # カバレッジレポートをアップロード
       - name: Upload coverage to Codecov
@@ -179,23 +177,21 @@ jobs:
 
       # 本番DBブランチから一時ブランチを作成（本番環境のデータでテスト）
       - name: Create Neon branch from production
-        run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts create
-        env:
-          NEON_PARENT_BRANCH_ID: br-quiet-brook-a7skh7bx
+        run: NEON_PARENT_BRANCH_ID=br-quiet-brook-a7skh7bx bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts create
 
       - name: Update DATABASE_URL to use Neon branch
         run: echo "DATABASE_URL=$NEON_DATABASE_URL" >> $GITHUB_ENV
 
       - name: Run migrations
-        run: bun run test:migrate
+        run: bunx dotenvx run -f projects/.env.production -- bun run test:migrate
 
       # パフォーマンステスト実行
       - name: Run performance tests
-        run: vitest run src/__tests__/performance/
+        run: bunx dotenvx run -f projects/.env.production -- vitest run src/__tests__/performance/
 
       - name: Cleanup Neon branch
         if: always()
-        run: bunx dotenvx run -f projects/.env.production -- bun scripts/neon-branch.ts delete
+        run: bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts delete
 
   # ==========================================
   # Database health check
