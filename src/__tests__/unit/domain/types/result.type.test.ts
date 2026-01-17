@@ -116,6 +116,26 @@ describe("Result Type", () => {
     });
   });
 
+  describe("mapError", () => {
+    it("失敗結果のエラーを変換できる", () => {
+      const result: Result<number, Error> = Result.fail(new Error("original error"));
+      const mapped = Result.mapError(result, (error) => new Error(`mapped: ${error.message}`));
+      expect(Result.isFailure(mapped)).toBe(true);
+      if (Result.isFailure(mapped)) {
+        expect(mapped.error.message).toBe("mapped: original error");
+      }
+    });
+
+    it("成功結果はそのまま返す", () => {
+      const result = Result.ok(42);
+      const mapped = Result.mapError(result, (error: string) => new Error(`mapped: ${error}`));
+      expect(Result.isSuccess(mapped)).toBe(true);
+      if (Result.isSuccess(mapped)) {
+        expect(mapped.data).toBe(42);
+      }
+    });
+  });
+
   describe("getOrElse", () => {
     it("成功の場合は値を返す", () => {
       const result = Result.ok(42);
@@ -148,6 +168,16 @@ describe("Result Type", () => {
         expect(result.error.message).toBe("error");
       }
     });
+
+    it("非Errorオブジェクトがスローされた場合もErrorに変換する", () => {
+      const result = Result.tryCatch(() => {
+        throw "string error";
+      });
+      expect(Result.isFailure(result)).toBe(true);
+      if (Result.isFailure(result)) {
+        expect(result.error.message).toBe("string error");
+      }
+    });
   });
 
   describe("tryAsync", () => {
@@ -166,6 +196,16 @@ describe("Result Type", () => {
       expect(Result.isFailure(result)).toBe(true);
       if (Result.isFailure(result)) {
         expect(result.error.message).toBe("error");
+      }
+    });
+
+    it("非Errorオブジェクトがスローされた場合もErrorに変換する", async () => {
+      const result = await Result.tryAsync(async () => {
+        throw "string error";
+      });
+      expect(Result.isFailure(result)).toBe(true);
+      if (Result.isFailure(result)) {
+        expect(result.error.message).toBe("string error");
       }
     });
   });

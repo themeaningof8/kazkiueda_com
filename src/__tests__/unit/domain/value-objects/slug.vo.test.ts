@@ -65,6 +65,20 @@ describe("Slug Value Object", () => {
       const slug = Slug.fromTitle("Café Münchën");
       expect(slug?.toString()).toBe("cafe-munchen");
     });
+
+    it("非常に長いタイトルの場合はundefinedを返す", () => {
+      // 101文字以上の英数字のみのタイトル
+      const longTitle = "a".repeat(150);
+      const slug = Slug.fromTitle(longTitle);
+      expect(slug).toBeUndefined();
+    });
+  });
+
+  describe("toString", () => {
+    it("スラッグの文字列表現を返す", () => {
+      const slug = Slug.create("my-blog-post");
+      expect(slug.toString()).toBe("my-blog-post");
+    });
   });
 
   describe("equals", () => {
@@ -78,6 +92,18 @@ describe("Slug Value Object", () => {
       const slug1 = Slug.create("my-blog-post");
       const slug2 = Slug.create("another-post");
       expect(slug1.equals(slug2)).toBe(false);
+    });
+
+    it("Slugインスタンス以外と比較するとfalseを返す", () => {
+      const slug = Slug.create("my-blog-post");
+      // @ts-expect-error Testing instanceof check
+      expect(slug.equals("my-blog-post")).toBe(false);
+      // @ts-expect-error Testing instanceof check
+      expect(slug.equals(null)).toBe(false);
+      // @ts-expect-error Testing instanceof check
+      expect(slug.equals(undefined)).toBe(false);
+      // @ts-expect-error Testing instanceof check
+      expect(slug.equals({})).toBe(false);
     });
   });
 });
