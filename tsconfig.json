@@ -22,7 +22,15 @@
     "paths": {
       "@/*": ["./src/*"],
       "@payload-config": ["./src/payload.config.ts"],
-      "@/payload-types": ["./src/payload-types.ts"]
+      "@/payload-types": ["./src/payload-types.ts"],
+      "@/domain/*": ["./src/domain/*"],
+      "@/application/*": ["./src/application/*"],
+      "@/interface-adapters/*": ["./src/interface-adapters/*"],
+      "@/infrastructure/*": ["./src/infrastructure/*"],
+      "@/presentation/*": ["./src/presentation/*"],
+      "@/app/*": ["./src/app/*"],
+      "@/di/*": ["./src/di/*"],
+      "@/shared/*": ["./src/shared/*"]
     }
   },
   "include": [
