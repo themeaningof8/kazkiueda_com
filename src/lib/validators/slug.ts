@@ -1,3 +1,4 @@
+import { Slug } from "@/domain/value-objects/slug.vo";
 import { VALIDATION_LIMITS } from "../constants";
 
 /**
@@ -32,21 +33,6 @@ export function validateSlug(value: unknown): true | string {
  * @returns 生成されたスラッグ、生成できない場合はundefined
  */
 export function generateSlugFromTitle(title: string): string | undefined {
-  if (!title) return undefined;
-
-  // Unicode正規化（NFD）でアクセント付き文字を分解
-  const slug = title
-    .toLowerCase()
-    .normalize("NFD")
-    // 結合文字（アクセントなど）を除去
-    .replace(/[\u0300-\u036f]/g, "")
-    // URLセーフでない文字を除去
-    .replace(/[^\w\s-]/g, "")
-    // 連続する空白をハイフンに変換
-    .replace(/\s+/g, "-")
-    // 先頭・末尾のハイフンを除去
-    .replace(/^-+|-+$/g, "");
-
-  // 有効なスラッグが生成できなかった場合はundefinedを返し、必須バリデーションを発動
-  return slug.length > 0 ? slug : undefined;
+  const slugVO = Slug.fromTitle(title);
+  return slugVO?.toString();
 }

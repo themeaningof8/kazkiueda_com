@@ -18,20 +18,12 @@ export abstract class DomainException extends Error {
 /**
  * ビジネスルール違反の例外
  */
-export class BusinessRuleViolationException extends DomainException {
-  constructor(message: string) {
-    super(message);
-  }
-}
+export class BusinessRuleViolationException extends DomainException {}
 
 /**
  * バリデーションエラー
  */
-export class ValidationException extends DomainException {
-  constructor(message: string) {
-    super(message);
-  }
-}
+export class ValidationException extends DomainException {}
 
 /**
  * エンティティが見つからない例外
@@ -45,8 +37,4 @@ export class EntityNotFoundException extends DomainException {
 /**
  * 重複エラー
  */
-export class DuplicateException extends DomainException {
-  constructor(message: string) {
-    super(message);
-  }
-}
+export class DuplicateException extends DomainException {}

@@ -5,6 +5,7 @@
  * Payload CMSを使用したデータ永続化を提供する
  */
 
+import type { Where } from "payload";
 import type { Post } from "@/domain/entities/post.entity";
 import type {
   FindPostsOptions,
@@ -14,43 +15,16 @@ import type {
 import { Pagination } from "@/domain/value-objects/pagination.vo";
 import type { PostStatus } from "@/domain/value-objects/post-status.vo";
 import type { Slug } from "@/domain/value-objects/slug.vo";
-import { BLOG_CONFIG } from "@/infrastructure/config/constants";
-import { findPayload } from "../client/payload-client";
-import { buildPublishStatusFilter, buildSlugFilter } from "../filters/payload-filters";
+import { findPayload } from "@/lib/api/payload-client";
+import { buildPublishStatusFilter, buildSlugFilter } from "@/lib/api/payload-filters";
+import { BLOG_CONFIG } from "@/lib/constants";
 import { PostMapper } from "../mappers/post.mapper";
 
 export class PayloadPostRepository implements PostRepository {
   /**
-   * IDで記事を取得
+   * 共通のfindヘルパーメソッド
    */
-  async findById(id: number): Promise<Post | undefined> {
-    const result = await findPayload({
-      collection: "posts",
-      where: {
-        id: {
-          equals: id,
-        },
-      },
-      limit: 1,
-      populate: {
-        featuredImage: true,
-        author: true,
-      },
-    });
-
-    if (result.docs.length === 0) {
-      return undefined;
-    }
-
-    return PostMapper.toDomain(result.docs[0]);
-  }
-
-  /**
-   * Slugで記事を取得
-   */
-  async findBySlug(slug: Slug): Promise<Post | undefined> {
-    const where = buildSlugFilter(slug.toString(), false);
-
+  private async findSinglePost(where: Where): Promise<Post | undefined> {
     const result = await findPayload({
       collection: "posts",
       where,
@@ -66,6 +40,25 @@ export class PayloadPostRepository implements PostRepository {
     }
 
     return PostMapper.toDomain(result.docs[0]);
+  }
+
+  /**
+   * IDで記事を取得
+   */
+  async findById(id: number): Promise<Post | undefined> {
+    return this.findSinglePost({
+      id: {
+        equals: id,
+      },
+    });
+  }
+
+  /**
+   * Slugで記事を取得
+   */
+  async findBySlug(slug: Slug): Promise<Post | undefined> {
+    const where = buildSlugFilter(slug.toString(), false);
+    return this.findSinglePost(where);
   }
 
   /**

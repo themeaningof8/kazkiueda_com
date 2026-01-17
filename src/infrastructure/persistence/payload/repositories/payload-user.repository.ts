@@ -4,7 +4,7 @@
 
 import type { User, UserRole } from "@/domain/entities/user.entity";
 import type { UserRepository } from "@/domain/repositories/user.repository";
-import { findPayload } from "../client/payload-client";
+import { findPayload } from "@/lib/api/payload-client";
 import { UserMapper } from "../mappers/user.mapper";
 
 export class PayloadUserRepository implements UserRepository {

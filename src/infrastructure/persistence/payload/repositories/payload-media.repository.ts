@@ -4,7 +4,7 @@
 
 import type { Media } from "@/domain/entities/media.entity";
 import type { FindMediaOptions, MediaRepository } from "@/domain/repositories/media.repository";
-import { findPayload } from "../client/payload-client";
+import { findPayload } from "@/lib/api/payload-client";
 import { MediaMapper } from "../mappers/media.mapper";
 
 export class PayloadMediaRepository implements MediaRepository {
