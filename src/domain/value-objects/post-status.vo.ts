@@ -6,6 +6,8 @@
  * - published: 公開済み
  */
 
+import { ValidationError, ValidationErrorCode } from "@/domain/errors/validation-error";
+
 export type PostStatusValue = "draft" | "published";
 
 export class PostStatus {
@@ -34,7 +36,10 @@ export class PostStatus {
    */
   static from(value: string): PostStatus {
     if (value !== "draft" && value !== "published") {
-      throw new Error(`無効な公開状態です: ${value}`);
+      throw new ValidationError(ValidationErrorCode.POST_STATUS_INVALID, {
+        value,
+        validValues: ["draft", "published"],
+      });
     }
     return new PostStatus(value);
   }

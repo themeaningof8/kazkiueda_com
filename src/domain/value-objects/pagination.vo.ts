@@ -6,6 +6,8 @@
  * - 不正な値はエラー
  */
 
+import { ValidationError, ValidationErrorCode } from "@/domain/errors/validation-error";
+
 export interface PaginationProps {
   page: number;
   limit: number;
@@ -24,15 +26,24 @@ export class Pagination {
    */
   static create(page: number, limit: number, totalDocs: number): Pagination {
     if (page < 1) {
-      throw new Error("ページ番号は1以上である必要があります");
+      throw new ValidationError(ValidationErrorCode.PAGINATION_PAGE_INVALID, {
+        value: page,
+        min: 1,
+      });
     }
 
     if (limit < 1) {
-      throw new Error("1ページあたりの件数は1以上である必要があります");
+      throw new ValidationError(ValidationErrorCode.PAGINATION_PER_PAGE_INVALID, {
+        value: limit,
+        min: 1,
+      });
     }
 
     if (totalDocs < 0) {
-      throw new Error("総件数は0以上である必要があります");
+      throw new ValidationError(ValidationErrorCode.PAGINATION_TOTAL_INVALID, {
+        value: totalDocs,
+        min: 0,
+      });
     }
 
     return new Pagination({ page, limit, totalDocs });

@@ -6,6 +6,8 @@
  * - イミュータブル
  */
 
+import { ValidationError, ValidationErrorCode } from "@/domain/errors/validation-error";
+
 const TAG_MAX_LENGTH = 50;
 
 export class Tag {
@@ -20,11 +22,14 @@ export class Tag {
    */
   static create(value: string): Tag {
     if (!value || typeof value !== "string") {
-      throw new Error("タグは必須です");
+      throw new ValidationError(ValidationErrorCode.TAG_REQUIRED);
     }
 
     if (value.length > TAG_MAX_LENGTH) {
-      throw new Error(`タグは${TAG_MAX_LENGTH}文字以内で入力してください`);
+      throw new ValidationError(ValidationErrorCode.TAG_TOO_LONG, {
+        maxLength: TAG_MAX_LENGTH,
+        actualLength: value.length,
+      });
     }
 
     return new Tag(value);

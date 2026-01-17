@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ValidationError, ValidationErrorCode } from "@/domain/errors/validation-error";
 import { Slug } from "@/domain/value-objects/slug.vo";
 
 describe("Slug Value Object", () => {
@@ -14,24 +15,46 @@ describe("Slug Value Object", () => {
     });
 
     it("空文字列の場合はエラーをスローする", () => {
-      expect(() => Slug.create("")).toThrow("スラッグは必須です");
+      expect(() => Slug.create("")).toThrow(ValidationError);
+      try {
+        Slug.create("");
+      } catch (error) {
+        expect(error).toBeInstanceOf(ValidationError);
+        expect((error as ValidationError).code).toBe(ValidationErrorCode.SLUG_REQUIRED);
+      }
     });
 
     it("URLセーフでない文字が含まれる場合はエラーをスローする", () => {
-      expect(() => Slug.create("my blog post")).toThrow(
-        "スラッグは英数字、ハイフン、アンダースコアのみ使用できます",
-      );
+      expect(() => Slug.create("my blog post")).toThrow(ValidationError);
+      try {
+        Slug.create("my blog post");
+      } catch (error) {
+        expect(error).toBeInstanceOf(ValidationError);
+        expect((error as ValidationError).code).toBe(ValidationErrorCode.SLUG_INVALID_FORMAT);
+      }
     });
 
     it("大文字が含まれる場合はエラーをスローする", () => {
-      expect(() => Slug.create("My-Blog-Post")).toThrow(
-        "スラッグは英数字、ハイフン、アンダースコアのみ使用できます",
-      );
+      expect(() => Slug.create("My-Blog-Post")).toThrow(ValidationError);
+      try {
+        Slug.create("My-Blog-Post");
+      } catch (error) {
+        expect(error).toBeInstanceOf(ValidationError);
+        expect((error as ValidationError).code).toBe(ValidationErrorCode.SLUG_INVALID_FORMAT);
+      }
     });
 
     it("100文字を超える場合はエラーをスローする", () => {
       const longSlug = "a".repeat(101);
-      expect(() => Slug.create(longSlug)).toThrow("スラッグは100文字以内で入力してください");
+      expect(() => Slug.create(longSlug)).toThrow(ValidationError);
+      try {
+        Slug.create(longSlug);
+      } catch (error) {
+        expect(error).toBeInstanceOf(ValidationError);
+        expect((error as ValidationError).code).toBe(ValidationErrorCode.SLUG_TOO_LONG);
+        expect((error as ValidationError).metadata?.maxLength).toBe(100);
+        expect((error as ValidationError).metadata?.actualLength).toBe(101);
+      }
     });
   });
 
