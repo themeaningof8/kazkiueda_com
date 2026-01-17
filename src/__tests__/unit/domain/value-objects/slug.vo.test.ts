@@ -2,6 +2,26 @@ import { describe, expect, it } from "vitest";
 import { ValidationError, ValidationErrorCode } from "@/domain/errors/validation-error";
 import { Slug } from "@/domain/value-objects/slug.vo";
 
+/**
+ * Helper function to test ValidationError
+ */
+function expectValidationError(
+  fn: () => void,
+  expectedCode: ValidationErrorCode,
+  expectedMetadata?: Record<string, unknown>,
+) {
+  expect(fn).toThrow(ValidationError);
+  try {
+    fn();
+  } catch (error) {
+    expect(error).toBeInstanceOf(ValidationError);
+    expect((error as ValidationError).code).toBe(expectedCode);
+    if (expectedMetadata) {
+      expect((error as ValidationError).metadata).toMatchObject(expectedMetadata);
+    }
+  }
+}
+
 describe("Slug Value Object", () => {
   describe("create", () => {
     it("有効なスラッグを作成できる", () => {
@@ -15,46 +35,29 @@ describe("Slug Value Object", () => {
     });
 
     it("空文字列の場合はエラーをスローする", () => {
-      expect(() => Slug.create("")).toThrow(ValidationError);
-      try {
-        Slug.create("");
-      } catch (error) {
-        expect(error).toBeInstanceOf(ValidationError);
-        expect((error as ValidationError).code).toBe(ValidationErrorCode.SLUG_REQUIRED);
-      }
+      expectValidationError(() => Slug.create(""), ValidationErrorCode.SLUG_REQUIRED);
     });
 
     it("URLセーフでない文字が含まれる場合はエラーをスローする", () => {
-      expect(() => Slug.create("my blog post")).toThrow(ValidationError);
-      try {
-        Slug.create("my blog post");
-      } catch (error) {
-        expect(error).toBeInstanceOf(ValidationError);
-        expect((error as ValidationError).code).toBe(ValidationErrorCode.SLUG_INVALID_FORMAT);
-      }
+      expectValidationError(
+        () => Slug.create("my blog post"),
+        ValidationErrorCode.SLUG_INVALID_FORMAT,
+      );
     });
 
     it("大文字が含まれる場合はエラーをスローする", () => {
-      expect(() => Slug.create("My-Blog-Post")).toThrow(ValidationError);
-      try {
-        Slug.create("My-Blog-Post");
-      } catch (error) {
-        expect(error).toBeInstanceOf(ValidationError);
-        expect((error as ValidationError).code).toBe(ValidationErrorCode.SLUG_INVALID_FORMAT);
-      }
+      expectValidationError(
+        () => Slug.create("My-Blog-Post"),
+        ValidationErrorCode.SLUG_INVALID_FORMAT,
+      );
     });
 
     it("100文字を超える場合はエラーをスローする", () => {
       const longSlug = "a".repeat(101);
-      expect(() => Slug.create(longSlug)).toThrow(ValidationError);
-      try {
-        Slug.create(longSlug);
-      } catch (error) {
-        expect(error).toBeInstanceOf(ValidationError);
-        expect((error as ValidationError).code).toBe(ValidationErrorCode.SLUG_TOO_LONG);
-        expect((error as ValidationError).metadata?.maxLength).toBe(100);
-        expect((error as ValidationError).metadata?.actualLength).toBe(101);
-      }
+      expectValidationError(() => Slug.create(longSlug), ValidationErrorCode.SLUG_TOO_LONG, {
+        maxLength: 100,
+        actualLength: 101,
+      });
     });
   });
 
