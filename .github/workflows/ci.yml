@@ -55,9 +55,40 @@ jobs:
       suite: unit-extended
       dotenv-key-name: DOTENV_PRIVATE_KEY_DEVELOPMENT
 
+  detect-changes:
+    name: Detect Change Type
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      skip_integration: ${{ steps.analyze.outputs.skip_integration }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Analyze PR changes
+        id: analyze
+        run: |
+          echo "Analyzing PR for dependency-only changes..."
+
+          # Run detection script
+          if bunx tsx scripts/detect-dependency-only-changes.ts; then
+            echo "skip_integration=true" >> $GITHUB_OUTPUT
+            echo "✓ Dependency-only changes detected - integration tests will be skipped"
+          else
+            echo "skip_integration=false" >> $GITHUB_OUTPUT
+            echo "✓ Code/config changes detected - running full test suite"
+          fi
+
   integration:
     name: Integration Tests
-    needs: unit
+    needs: [unit, detect-changes]
+    # Skip integration tests for dependency-only changes on Renovate PRs
+    if: needs.detect-changes.outputs.skip_integration != 'true'
     strategy:
       fail-fast: false
       matrix:

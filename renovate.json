@@ -36,23 +36,23 @@
       "matchPackageNames": ["/^@aws-sdk//", "/^@aws-crypto//"]
     },
     {
-      "description": "型定義 - 完全自動マージ",
+      "description": "型定義 - 完全自動マージ、integration testスキップ",
       "groupName": "Type definitions",
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash",
-      "labels": ["types", "automerge"],
+      "labels": ["types", "automerge", "skip-integration-tests"],
       "matchPackageNames": ["/^@types//"]
     },
     {
-      "description": "開発ツール（パッチのみ自動マージ）",
+      "description": "開発ツール（パッチのみ自動マージ、integration testスキップ）",
       "groupName": "Development tools (patch)",
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["patch"],
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash",
-      "labels": ["devDependencies", "automerge"],
+      "labels": ["devDependencies", "automerge", "skip-integration-tests"],
       "matchPackageNames": ["!@biomejs/biome", "!typescript"]
     },
     {
