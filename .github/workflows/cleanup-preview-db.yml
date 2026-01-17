@@ -1,0 +1,38 @@
+name: Cleanup Preview Database
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup-preview-db:
+    name: Cleanup Preview Database Branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Only run when PR is closed (either merged or closed without merge)
+    if: github.event.pull_request.merged == true || github.event.pull_request.state == 'closed'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Cleanup Neon Preview Branch
+        run: |
+          echo "Cleaning up Neon preview branch for PR #${{ github.event.pull_request.number }}"
+          echo "PR branch: ${{ github.event.pull_request.head.ref }}"
+
+          # Delete the corresponding Neon preview branch
+          bunx dotenvx run -f projects/.env -- bun scripts/neon-branch.ts delete-preview "${{ github.event.pull_request.head.ref }}"
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+        # Continue on error in case the branch was already deleted or doesn't exist
+        continue-on-error: true
+
+      - name: Notify cleanup result
+        run: |
+          echo "✅ Preview database cleanup completed for PR #${{ github.event.pull_request.number }}"
+          echo "Branch: ${{ github.event.pull_request.head.ref }}"

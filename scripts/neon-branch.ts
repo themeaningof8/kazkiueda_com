@@ -7,9 +7,11 @@
  * Vercel Preview environments use Neon Vercel Integration for automatic DB branching.
  *
  * Usage:
- *   bun scripts/neon-branch.ts create   # Create a new test branch
- *   bun scripts/neon-branch.ts delete   # Delete a test branch
- *   bun scripts/neon-branch.ts list     # List all branches
+ *   bun scripts/neon-branch.ts create                    # Create a new test branch
+ *   bun scripts/neon-branch.ts delete                    # Delete a test branch
+ *   bun scripts/neon-branch.ts delete-preview <branch>   # Delete a preview branch by git branch name
+ *   bun scripts/neon-branch.ts list                      # List all branches
+ *   bun scripts/neon-branch.ts list-preview              # List preview branches only
  *
  * DB Branch Naming:
  *   - GitHub Actions: ci-<run-id>-<attempt>-<random>
@@ -264,6 +266,90 @@ async function listBranches(): Promise<void> {
   console.log(`Total: ${data.branches.length} branches`);
 }
 
+async function deletePreviewBranch(gitBranchName: string): Promise<void> {
+  const branchName = `preview/${gitBranchName}`;
+  console.log(`🗑️  Deleting preview Neon branch: ${branchName}`);
+
+  // First, find the branch by name
+  const listResponse = await fetch(`${API_BASE}/projects/${NEON_PROJECT_ID}/branches`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${NEON_API_KEY}`,
+      Accept: "application/json",
+    },
+  });
+
+  if (!listResponse.ok) {
+    const error = await listResponse.text();
+    console.error("❌ Failed to list branches:", error);
+    process.exit(1);
+  }
+
+  const data = (await listResponse.json()) as { branches: NeonBranch[] };
+  const branch = data.branches.find((b) => b.name === branchName);
+
+  if (!branch) {
+    console.log(`⚠️  Preview branch ${branchName} not found - may have already been deleted`);
+    return;
+  }
+
+  // Delete the branch
+  const deleteResponse = await fetch(
+    `${API_BASE}/projects/${NEON_PROJECT_ID}/branches/${branch.id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${NEON_API_KEY}`,
+        Accept: "application/json",
+      },
+    },
+  );
+
+  if (!deleteResponse.ok) {
+    const error = await deleteResponse.text();
+    console.error("❌ Failed to delete preview branch:", error);
+    process.exit(1);
+  }
+
+  console.log("✅ Preview branch deleted successfully");
+}
+
+async function listPreviewBranches(): Promise<void> {
+  console.log("📋 Listing preview branches...\n");
+
+  const response = await fetch(`${API_BASE}/projects/${NEON_PROJECT_ID}/branches`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${NEON_API_KEY}`,
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error("❌ Failed to list branches:", error);
+    process.exit(1);
+  }
+
+  const data = (await response.json()) as { branches: NeonBranch[] };
+  const previewBranches = data.branches.filter((branch) => branch.name.startsWith("preview/"));
+
+  if (previewBranches.length === 0) {
+    console.log("No preview branches found");
+    return;
+  }
+
+  previewBranches.forEach((branch) => {
+    console.log(`  • ${branch.name}`);
+    console.log(`    ID: ${branch.id}`);
+    console.log(`    Parent: ${branch.parent_id || "none (main)"}`);
+    console.log(`    Created: ${new Date(branch.created_at).toLocaleString()}`);
+    console.log("");
+  });
+
+  console.log(`Total preview branches: ${previewBranches.length}`);
+}
+
 // Main
 const command = process.argv[2];
 
@@ -274,10 +360,25 @@ switch (command) {
   case "delete":
     await deleteBranch();
     break;
+  case "delete-preview": {
+    const gitBranchName = process.argv[3];
+    if (!gitBranchName) {
+      console.error("❌ Git branch name required for delete-preview command");
+      console.error("Usage: bun scripts/neon-branch.ts delete-preview <git-branch-name>");
+      process.exit(1);
+    }
+    await deletePreviewBranch(gitBranchName);
+    break;
+  }
   case "list":
     await listBranches();
     break;
+  case "list-preview":
+    await listPreviewBranches();
+    break;
   default:
-    console.error("Usage: bun scripts/neon-branch.ts <create|delete|list>");
+    console.error(
+      "Usage: bun scripts/neon-branch.ts <create|delete|delete-preview|list|list-preview>",
+    );
     process.exit(1);
 }
