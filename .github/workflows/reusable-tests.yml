@@ -139,7 +139,7 @@ jobs:
             test_file=$(echo "${{ inputs.integration-script }}" | sed 's/test:integration://').test.ts
             bunx dotenvx run -f projects/.env.development -- bunx vitest run "src/__tests__/integration/${test_file}"
           else
-            bun run test:integration:posts && bun run test:integration:collections-posts && bun run test:integration:performance
+            bun run test:integration:collections-posts && bun run test:integration:collections-users && bun run test:integration:collections-media && bun run test:integration:performance
           fi
         env:
           ALLOW_NON_TEST_DATABASE_URL: true
