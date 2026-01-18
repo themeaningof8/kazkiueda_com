@@ -18,7 +18,7 @@ import type { Slug } from "@/domain/value-objects/slug.vo";
 import { findPayload } from "@/lib/api/payload-client";
 import { buildPublishStatusFilter, buildSlugFilter } from "@/lib/api/payload-filters";
 import { BLOG_CONFIG } from "@/lib/constants";
-import { PostMapper } from "../mappers/post.mapper";
+import { toPostDomain, toPostDomainList } from "../mappers/post.mapper";
 
 export class PayloadPostRepository implements PostRepository {
   /**
@@ -39,7 +39,7 @@ export class PayloadPostRepository implements PostRepository {
       return undefined;
     }
 
-    return PostMapper.toDomain(result.docs[0]);
+    return toPostDomain(result.docs[0]);
   }
 
   /**
@@ -105,7 +105,7 @@ export class PayloadPostRepository implements PostRepository {
       },
     });
 
-    const posts = PostMapper.toDomainList(result.docs);
+    const posts = toPostDomainList(result.docs);
     const pagination = Pagination.create(page, limit, result.totalDocs);
 
     return {
@@ -161,14 +161,14 @@ export class PayloadPostRepository implements PostRepository {
       limit: 1000,
     });
 
-    const posts = PostMapper.toDomainList(result.docs);
+    const posts = toPostDomainList(result.docs);
     return posts.map((p) => ({ toString: () => p.slug }) as Slug);
   }
 
   /**
    * 記事を保存（新規作成または更新）
    */
-  async save(post: Post): Promise<Post> {
+  async save(_post: Post): Promise<Post> {
     // TODO: Phase 3で実装（現在は読み取り専用）
     throw new Error("Method not implemented: save");
   }
@@ -176,7 +176,7 @@ export class PayloadPostRepository implements PostRepository {
   /**
    * 記事を削除
    */
-  async delete(id: number): Promise<void> {
+  async delete(_id: number): Promise<void> {
     // TODO: Phase 3で実装（現在は読み取り専用）
     throw new Error("Method not implemented: delete");
   }

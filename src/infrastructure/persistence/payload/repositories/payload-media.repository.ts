@@ -5,7 +5,7 @@
 import type { Media } from "@/domain/entities/media.entity";
 import type { FindMediaOptions, MediaRepository } from "@/domain/repositories/media.repository";
 import { findPayload } from "@/lib/api/payload-client";
-import { MediaMapper } from "../mappers/media.mapper";
+import { toMediaDomain, toMediaDomainList } from "../mappers/media.mapper";
 
 export class PayloadMediaRepository implements MediaRepository {
   /**
@@ -26,7 +26,7 @@ export class PayloadMediaRepository implements MediaRepository {
       return undefined;
     }
 
-    return MediaMapper.toDomain(result.docs[0]);
+    return toMediaDomain(result.docs[0]);
   }
 
   /**
@@ -48,7 +48,7 @@ export class PayloadMediaRepository implements MediaRepository {
       sort: "-createdAt",
     });
 
-    return MediaMapper.toDomainList(result.docs);
+    return toMediaDomainList(result.docs);
   }
 
   /**
@@ -64,7 +64,7 @@ export class PayloadMediaRepository implements MediaRepository {
   /**
    * メディアを保存（新規作成または更新）
    */
-  async save(media: Media): Promise<Media> {
+  async save(_media: Media): Promise<Media> {
     // TODO: Phase 3で実装
     throw new Error("Method not implemented: save");
   }
@@ -72,7 +72,7 @@ export class PayloadMediaRepository implements MediaRepository {
   /**
    * メディアを削除
    */
-  async delete(id: number): Promise<void> {
+  async delete(_id: number): Promise<void> {
     // TODO: Phase 3で実装
     throw new Error("Method not implemented: delete");
   }

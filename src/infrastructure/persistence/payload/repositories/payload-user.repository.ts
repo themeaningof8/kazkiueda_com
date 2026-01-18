@@ -5,7 +5,7 @@
 import type { User, UserRole } from "@/domain/entities/user.entity";
 import type { UserRepository } from "@/domain/repositories/user.repository";
 import { findPayload } from "@/lib/api/payload-client";
-import { UserMapper } from "../mappers/user.mapper";
+import { toUserDomain, toUserDomainList } from "../mappers/user.mapper";
 
 export class PayloadUserRepository implements UserRepository {
   /**
@@ -26,7 +26,7 @@ export class PayloadUserRepository implements UserRepository {
       return undefined;
     }
 
-    return UserMapper.toDomain(result.docs[0]);
+    return toUserDomain(result.docs[0]);
   }
 
   /**
@@ -47,7 +47,7 @@ export class PayloadUserRepository implements UserRepository {
       return undefined;
     }
 
-    return UserMapper.toDomain(result.docs[0]);
+    return toUserDomain(result.docs[0]);
   }
 
   /**
@@ -69,13 +69,13 @@ export class PayloadUserRepository implements UserRepository {
       sort: "-createdAt",
     });
 
-    return UserMapper.toDomainList(result.docs);
+    return toUserDomainList(result.docs);
   }
 
   /**
    * ユーザーを保存（新規作成または更新）
    */
-  async save(user: User): Promise<User> {
+  async save(_user: User): Promise<User> {
     // TODO: Phase 3で実装
     throw new Error("Method not implemented: save");
   }
@@ -83,7 +83,7 @@ export class PayloadUserRepository implements UserRepository {
   /**
    * ユーザーを削除
    */
-  async delete(id: number): Promise<void> {
+  async delete(_id: number): Promise<void> {
     // TODO: Phase 3で実装
     throw new Error("Method not implemented: delete");
   }
