@@ -161,18 +161,4 @@ describe("getSiteUrl", () => {
       expect(result).toBe("http://localhost:3000");
     });
   });
-
-  describe("テスト環境", () => {
-    test("テスト環境でもデフォルトのlocalhost:3000を返す", async () => {
-      mockEnv = {
-        NEXT_PUBLIC_SITE_URL: undefined,
-        VERCEL_URL: undefined,
-      };
-      mockIsProduction = false;
-
-      const { getSiteUrl } = await import("@/lib/config/site");
-      const result = getSiteUrl();
-      expect(result).toBe("http://localhost:3000");
-    });
-  });
 });

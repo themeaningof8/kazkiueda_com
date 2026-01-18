@@ -8,6 +8,22 @@ const mockPayloadClient = {
   findPublishedPostSlugs: vi.fn(),
 };
 
+// 共通のテストヘルパー
+const createMockPost = (
+  id: number = 1,
+  title: string = "Test Post",
+  slug: string = "test-post",
+) => ({
+  id,
+  title,
+  slug,
+});
+
+const mockPayloadResponse = (docs: unknown[], totalDocs: number = docs.length) => ({
+  docs,
+  totalDocs,
+});
+
 describe("createPostRepository", () => {
   let repository: ReturnType<typeof createPostRepository>;
 
@@ -21,52 +37,42 @@ describe("createPostRepository", () => {
   });
 
   describe("findBySlug", () => {
-    test("正常に記事を取得できる", async () => {
-      const mockPost = {
-        id: 1,
-        title: "Test Post",
-        slug: "test-post",
-      };
+    test.each([
+      {
+        name: "デフォルトオプションで正常に記事を取得できる",
+        options: {},
+        expectedCallOptions: {},
+      },
+      {
+        name: "draftオプションを渡せる",
+        options: { draft: true },
+        expectedCallOptions: { draft: true },
+      },
+      {
+        name: "overrideAccessオプションを渡せる",
+        options: { overrideAccess: true },
+        expectedCallOptions: { overrideAccess: true },
+      },
+      {
+        name: "全てのオプションを渡せる",
+        options: { draft: true, overrideAccess: true },
+        expectedCallOptions: { draft: true, overrideAccess: true },
+      },
+    ])("$name", async ({ options, expectedCallOptions }) => {
+      const mockPost = createMockPost();
 
-      mockPayloadClient.findPostBySlug.mockResolvedValue({
-        docs: [mockPost],
-        totalDocs: 1,
-      });
+      mockPayloadClient.findPostBySlug.mockResolvedValue(mockPayloadResponse([mockPost]));
 
-      const result = await repository.findBySlug("test-post");
-
-      expect(result).toEqual({
-        success: true,
-        data: mockPost,
-      });
-      expect(mockPayloadClient.findPostBySlug).toHaveBeenCalledWith("test-post", {});
-    });
-
-    test("オプションを渡せる", async () => {
-      const mockPost = {
-        id: 1,
-        title: "Test Post",
-        slug: "test-post",
-      };
-
-      mockPayloadClient.findPostBySlug.mockResolvedValue({
-        docs: [mockPost],
-        totalDocs: 1,
-      });
-
-      const result = await repository.findBySlug("test-post", {
-        draft: true,
-        overrideAccess: true,
-      });
+      const result = await repository.findBySlug("test-post", options);
 
       expect(result).toEqual({
         success: true,
         data: mockPost,
       });
-      expect(mockPayloadClient.findPostBySlug).toHaveBeenCalledWith("test-post", {
-        draft: true,
-        overrideAccess: true,
-      });
+      expect(mockPayloadClient.findPostBySlug).toHaveBeenCalledWith(
+        "test-post",
+        expectedCallOptions,
+      );
     });
 
     test("記事が見つからない場合NOT_FOUNDエラーを返す", async () => {

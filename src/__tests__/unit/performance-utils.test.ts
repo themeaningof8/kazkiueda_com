@@ -65,7 +65,6 @@ describe("performance/utils", () => {
     test("無効なメトリック名の場合エラー", () => {
       expect(() => {
         // 意図的に無効なメトリック名を渡してエラーハンドリングをテスト
-        // biome-ignore lint/suspicious/noExplicitAny: 意図的に無効なメトリック名をテスト
         assertPerformanceThreshold("coreWebVitals", "invalidMetric" as any, 100);
       }).toThrow("Invalid threshold configuration for coreWebVitals.invalidMetric");
     });
