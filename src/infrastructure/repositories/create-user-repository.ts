@@ -1,5 +1,33 @@
+import type { Where } from "payload";
 import type { UserRepository } from "@/domain/repositories/user-repository";
 import type { PayloadClient } from "@/lib/api/types";
+import type { FetchResult } from "@/lib/types";
+import type { User } from "@/payload-types";
+
+/**
+ * ユーザーを単一条件で検索するヘルパー関数
+ */
+async function findUserByCondition(
+  payloadClient: PayloadClient,
+  where: Where,
+): Promise<FetchResult<User>> {
+  try {
+    const result = await payloadClient.findPayload({
+      collection: "users",
+      where,
+      limit: 1,
+    });
+
+    const user = result.docs[0];
+    if (!user) {
+      return { success: false, error: "NOT_FOUND" };
+    }
+
+    return { success: true, data: user };
+  } catch (_error) {
+    return { success: false, error: "UNKNOWN" };
+  }
+}
 
 /**
  * UserRepositoryファクトリー関数
@@ -11,43 +39,11 @@ import type { PayloadClient } from "@/lib/api/types";
 export function createUserRepository(payloadClient: PayloadClient): UserRepository {
   return {
     async findById(id) {
-      try {
-        // 汎用的なfindPayload関数を使用してユーザーを取得
-        // 将来的にパフォーマンスが問題になれば専用関数findUserByIdを追加
-        const result = await payloadClient.findPayload({
-          collection: "users",
-          where: { id: { equals: id } },
-          limit: 1,
-        });
-
-        const user = result.docs[0];
-        if (!user) {
-          return { success: false, error: "NOT_FOUND" };
-        }
-
-        return { success: true, data: user };
-      } catch (_error) {
-        return { success: false, error: "UNKNOWN" };
-      }
+      return findUserByCondition(payloadClient, { id: { equals: id } });
     },
 
     async findByEmail(email) {
-      try {
-        const result = await payloadClient.findPayload({
-          collection: "users",
-          where: { email: { equals: email } },
-          limit: 1,
-        });
-
-        const user = result.docs[0];
-        if (!user) {
-          return { success: false, error: "NOT_FOUND" };
-        }
-
-        return { success: true, data: user };
-      } catch (_error) {
-        return { success: false, error: "UNKNOWN" };
-      }
+      return findUserByCondition(payloadClient, { email: { equals: email } });
     },
 
     async findAll(page = 1, limit = 10) {

@@ -1,9 +1,9 @@
 import config from "@payload-config";
-import { getPayload, type Payload, type Where } from "payload";
+import { getPayload, type Payload } from "payload";
 import { BLOG_CONFIG } from "@/lib/constants";
 import type { ErrorType, PayloadFindResult } from "@/lib/types";
-import type { Media, Post, User } from "@/payload-types";
 import { buildPublishStatusFilter, buildSlugFilter } from "./payload-filters";
+import type { CollectionDataType, PayloadFindOptions } from "./types";
 
 // Payloadインスタンスのキャッシュ（プロセス内で一度だけ初期化）
 let payloadInstance: Payload | null = null;
@@ -88,26 +88,6 @@ export function clearPayloadCache(): void {
   injectedPayloadInstance = null;
 }
 
-type PayloadFindOptions<T extends "posts" | "media" | "users"> = {
-  collection: T;
-  where?: Where;
-  limit?: number;
-  page?: number;
-  sort?: string;
-  draft?: boolean;
-  overrideAccess?: boolean;
-  select?: {
-    slug?: boolean;
-  };
-  populate?: Record<string, boolean>; // リレーションシップのpopulate設定
-};
-
-type CollectionDataType = {
-  posts: Post;
-  media: Media;
-  users: User;
-};
-
 /**
  * Payload APIのラッパー（リトライ機能付き）
  */
@@ -169,7 +149,7 @@ export async function findPayload<T extends "posts" | "media" | "users">(
 export async function findPostBySlug(
   slug: string,
   options: { draft?: boolean; overrideAccess?: boolean } = {},
-): Promise<PayloadFindResult<Post>> {
+): Promise<PayloadFindResult<CollectionDataType["posts"]>> {
   try {
     const where = buildSlugFilter(slug, options.draft ?? false);
 
@@ -199,7 +179,7 @@ export async function findPostBySlug(
  */
 export async function findPosts(
   options: { page?: number; limit?: number; draft?: boolean; overrideAccess?: boolean } = {},
-): Promise<PayloadFindResult<Post>> {
+): Promise<PayloadFindResult<CollectionDataType["posts"]>> {
   try {
     const where = buildPublishStatusFilter(options.draft ?? false);
 
