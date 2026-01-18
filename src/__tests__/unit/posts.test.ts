@@ -1,71 +1,58 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { findPostBySlug, findPosts, findPublishedPostSlugs } from "@/lib/api/payload-client";
+import { createMockPost } from "@/__tests__/fixtures/posts";
+import { createMockPostRepository } from "@/__tests__/mocks/repositories";
+import type { PostRepository } from "@/domain/repositories/post-repository";
 
-vi.mock("@/lib/api/payload-client", () => ({
-  findPostBySlug: vi.fn(),
-  findPosts: vi.fn(),
-  findPublishedPostSlugs: vi.fn(),
-}));
-
-vi.mock("@/lib/constants", () => ({
-  BLOG_CONFIG: {
-    POSTS_PER_PAGE: 10,
-  },
-}));
+vi.mock("@/lib/constants", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/constants")>();
+  return {
+    ...actual,
+    BLOG_CONFIG: {
+      ...actual.BLOG_CONFIG,
+      POSTS_PER_PAGE: 10,
+    },
+  };
+});
 
 describe("posts", () => {
-  beforeEach(() => {
+  let mockRepository: PostRepository;
+
+  beforeEach(async () => {
     vi.clearAllMocks();
+    vi.resetModules();
+    mockRepository = createMockPostRepository();
   });
 
   describe("getPostBySlug", () => {
     test("正常に記事を取得できる", async () => {
-      const { getPostBySlug } = await import("@/lib/posts");
-      const mockPost = {
-        id: 1,
-        title: "Test Post",
-        slug: "test-post",
-        content: {
-          root: {
-            type: "root",
-            children: [],
-            direction: null,
-            format: "" as const,
-            indent: 0,
-            version: 1,
-          },
-        },
-        author: 1,
-        updatedAt: "2024-01-15T00:00:00.000Z",
-        createdAt: "2024-01-15T00:00:00.000Z",
-        publishedDate: "2024-01-15T00:00:00.000Z",
-        _status: "published" as const,
-      };
+      const mockPost = createMockPost();
 
-      vi.mocked(findPostBySlug).mockResolvedValue({
-        docs: [mockPost],
-        totalDocs: 1,
-      });
-
-      const result = await getPostBySlug("test-post");
-
-      expect(result).toEqual({
+      vi.mocked(mockRepository.findBySlug).mockResolvedValue({
         success: true,
         data: mockPost,
       });
-      expect(findPostBySlug).toHaveBeenCalledWith("test-post", {
+
+      // テスト用リポジトリを注入
+      const { setPostRepository, getPostBySlug } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
+
+      const result = await getPostBySlug("test-post");
+
+      expect(result).toEqual({ success: true, data: mockPost });
+      expect(mockRepository.findBySlug).toHaveBeenCalledWith("test-post", {
         draft: false,
         overrideAccess: false,
       });
     });
 
     test("記事が見つからない場合NOT_FOUNDエラーを返す", async () => {
-      const { getPostBySlug } = await import("@/lib/posts");
-
-      vi.mocked(findPostBySlug).mockResolvedValue({
-        docs: [],
-        totalDocs: 0,
+      vi.mocked(mockRepository.findBySlug).mockResolvedValue({
+        success: false,
+        error: "NOT_FOUND",
       });
+
+      const { setPostRepository, getPostBySlug } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
 
       const result = await getPostBySlug("non-existent");
 
@@ -76,9 +63,13 @@ describe("posts", () => {
     });
 
     test("APIエラー時にUNKNOWNエラーを返す", async () => {
-      const { getPostBySlug } = await import("@/lib/posts");
+      vi.mocked(mockRepository.findBySlug).mockResolvedValue({
+        success: false,
+        error: "UNKNOWN",
+      });
 
-      vi.mocked(findPostBySlug).mockRejectedValue(new Error("API error"));
+      const { setPostRepository, getPostBySlug } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
 
       const result = await getPostBySlug("test-post");
 
@@ -89,36 +80,23 @@ describe("posts", () => {
     });
 
     test("draftオプションが正しく渡される", async () => {
-      const { getPostBySlug } = await import("@/lib/posts");
-
-      vi.mocked(findPostBySlug).mockResolvedValue({
-        docs: [
-          {
-            id: 1,
-            title: "Draft Post",
-            slug: "draft-post",
-            content: {
-              root: {
-                type: "root",
-                children: [],
-                direction: null,
-                format: "" as const,
-                indent: 0,
-                version: 1,
-              },
-            },
-            author: 1,
-            updatedAt: "2024-01-15T00:00:00.000Z",
-            createdAt: "2024-01-15T00:00:00.000Z",
-            _status: "draft" as const,
-          },
-        ],
-        totalDocs: 1,
+      const draftPost = createMockPost({
+        title: "Draft Post",
+        slug: "draft-post",
+        _status: "draft",
       });
+
+      vi.mocked(mockRepository.findBySlug).mockResolvedValue({
+        success: true,
+        data: draftPost,
+      });
+
+      const { setPostRepository, getPostBySlug } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
 
       await getPostBySlug("draft-post", { draft: true, overrideAccess: true });
 
-      expect(findPostBySlug).toHaveBeenCalledWith("draft-post", {
+      expect(mockRepository.findBySlug).toHaveBeenCalledWith("draft-post", {
         draft: true,
         overrideAccess: true,
       });
@@ -127,57 +105,22 @@ describe("posts", () => {
 
   describe("getPosts", () => {
     test("正常に記事一覧を取得できる", async () => {
-      const { getPosts } = await import("@/lib/posts");
       const mockPosts = [
-        {
-          id: 1,
-          title: "Post 1",
-          slug: "post-1",
-          content: {
-            root: {
-              type: "root",
-              children: [],
-              direction: null,
-              format: "" as const,
-              indent: 0,
-              version: 1,
-            },
-          },
-          author: 1,
-          updatedAt: "2024-01-15T00:00:00.000Z",
-          createdAt: "2024-01-15T00:00:00.000Z",
-          publishedDate: "2024-01-15T00:00:00.000Z",
-          _status: "published" as const,
-        },
-        {
-          id: 2,
-          title: "Post 2",
-          slug: "post-2",
-          content: {
-            root: {
-              type: "root",
-              children: [],
-              direction: null,
-              format: "" as const,
-              indent: 0,
-              version: 1,
-            },
-          },
-          author: 1,
-          updatedAt: "2024-01-15T00:00:00.000Z",
-          createdAt: "2024-01-15T00:00:00.000Z",
-          publishedDate: "2024-01-15T00:00:00.000Z",
-          _status: "published" as const,
-        },
+        createMockPost({ id: 1, title: "Post 1", slug: "post-1" }),
+        createMockPost({ id: 2, title: "Post 2", slug: "post-2" }),
       ];
 
-      vi.mocked(findPosts).mockResolvedValue({
-        docs: mockPosts,
-        totalDocs: 2,
-        totalPages: 1,
-        hasPrevPage: false,
-        hasNextPage: false,
+      vi.mocked(mockRepository.findAll).mockResolvedValue({
+        success: true,
+        data: {
+          posts: mockPosts,
+          totalPages: 1,
+          totalDocs: 2,
+        },
       });
+
+      const { setPostRepository, getPosts } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
 
       const result = await getPosts(1, 10);
 
@@ -189,39 +132,41 @@ describe("posts", () => {
           totalDocs: 2,
         },
       });
-      expect(findPosts).toHaveBeenCalledWith({
-        page: 1,
-        limit: 10,
+      expect(mockRepository.findAll).toHaveBeenCalledWith(1, 10, {
         draft: false,
         overrideAccess: false,
       });
     });
 
     test("デフォルト値が正しく適用される", async () => {
-      const { getPosts } = await import("@/lib/posts");
-
-      vi.mocked(findPosts).mockResolvedValue({
-        docs: [],
-        totalDocs: 0,
-        totalPages: 0,
-        hasPrevPage: false,
-        hasNextPage: false,
+      vi.mocked(mockRepository.findAll).mockResolvedValue({
+        success: true,
+        data: {
+          posts: [],
+          totalPages: 0,
+          totalDocs: 0,
+        },
       });
+
+      const { setPostRepository, getPosts } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
 
       await getPosts(); // 引数なし
 
-      expect(findPosts).toHaveBeenCalledWith({
-        page: 1,
-        limit: 10, // BLOG_CONFIG.POSTS_PER_PAGE
+      expect(mockRepository.findAll).toHaveBeenCalledWith(1, 10, {
         draft: false,
         overrideAccess: false,
       });
     });
 
     test("APIエラー時にDB_ERRORを返す", async () => {
-      const { getPosts } = await import("@/lib/posts");
+      vi.mocked(mockRepository.findAll).mockResolvedValue({
+        success: false,
+        error: "DB_ERROR",
+      });
 
-      vi.mocked(findPosts).mockRejectedValue(new Error("Database error"));
+      const { setPostRepository, getPosts } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
 
       const result = await getPosts();
 
@@ -232,15 +177,17 @@ describe("posts", () => {
     });
 
     test("totalPagesがnullの場合0を返す", async () => {
-      const { getPosts } = await import("@/lib/posts");
-
-      vi.mocked(findPosts).mockResolvedValue({
-        docs: [],
-        totalDocs: 0,
-        totalPages: undefined,
-        hasPrevPage: false,
-        hasNextPage: false,
+      vi.mocked(mockRepository.findAll).mockResolvedValue({
+        success: true,
+        data: {
+          posts: [],
+          totalPages: 0,
+          totalDocs: 0,
+        },
       });
+
+      const { setPostRepository, getPosts } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
 
       const result = await getPosts();
 
@@ -253,10 +200,15 @@ describe("posts", () => {
 
   describe("getPublishedPostSlugs", () => {
     test("正常にスラッグ一覧を取得できる", async () => {
-      const { getPublishedPostSlugs } = await import("@/lib/posts");
       const mockSlugs = [{ slug: "post-1" }, { slug: "post-2" }];
 
-      vi.mocked(findPublishedPostSlugs).mockResolvedValue(mockSlugs);
+      vi.mocked(mockRepository.findPublishedSlugs).mockResolvedValue({
+        success: true,
+        data: mockSlugs,
+      });
+
+      const { setPostRepository, getPublishedPostSlugs } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
 
       const result = await getPublishedPostSlugs();
 
@@ -264,13 +216,17 @@ describe("posts", () => {
         success: true,
         data: mockSlugs,
       });
-      expect(findPublishedPostSlugs).toHaveBeenCalled();
+      expect(mockRepository.findPublishedSlugs).toHaveBeenCalled();
     });
 
     test("APIエラー時にUNKNOWNエラーを返す", async () => {
-      const { getPublishedPostSlugs } = await import("@/lib/posts");
+      vi.mocked(mockRepository.findPublishedSlugs).mockResolvedValue({
+        success: false,
+        error: "UNKNOWN",
+      });
 
-      vi.mocked(findPublishedPostSlugs).mockRejectedValue(new Error("API error"));
+      const { setPostRepository, getPublishedPostSlugs } = await import("@/lib/posts");
+      setPostRepository(mockRepository);
 
       const result = await getPublishedPostSlugs();
 
