@@ -24,16 +24,6 @@
   ],
   "ignoreBinaries": ["build", "open"],
   "ignoreExportsUsedInFile": true,
-  "ignore": [
-    "src/payload-types.ts",
-    "src/migrations/**/*.ts",
-    "**/*.d.ts",
-    "src/__tests__/helpers/**",
-    "src/__tests__/fixtures/**",
-    "src/__tests__/mocks/**",
-    "src/infrastructure/repositories/create-media-repository.ts",
-    "src/infrastructure/repositories/create-user-repository.ts"
-  ],
   "next": {
     "entry": ["src/app/**/*.{ts,tsx}", "next.config.ts"]
   }
