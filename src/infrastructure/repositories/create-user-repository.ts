@@ -12,8 +12,8 @@ export function createUserRepository(payloadClient: PayloadClient): UserReposito
   return {
     async findById(id) {
       try {
-        // Phase 3でpayload-client.tsにfindUserById関数を追加予定
-        // 現時点では基本実装のみ
+        // 汎用的なfindPayload関数を使用してユーザーを取得
+        // 将来的にパフォーマンスが問題になれば専用関数findUserByIdを追加
         const result = await payloadClient.findPayload({
           collection: "users",
           where: { id: { equals: id } },

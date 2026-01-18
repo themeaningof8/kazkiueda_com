@@ -37,6 +37,14 @@ export function getPostRepository(): PostRepository {
   return postRepositoryInstance;
 }
 
+/**
+ * テスト用：記事リポジトリをデフォルトにリセット
+ * テスト間の状態汚染を防ぐため、afterEachで呼び出すことを推奨
+ */
+export function resetPostRepository(): void {
+  postRepositoryInstance = defaultPostRepository;
+}
+
 type FetchOptions = {
   draft?: boolean;
   overrideAccess?: boolean;

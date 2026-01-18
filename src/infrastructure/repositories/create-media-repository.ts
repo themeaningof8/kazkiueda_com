@@ -12,8 +12,8 @@ export function createMediaRepository(payloadClient: PayloadClient): MediaReposi
   return {
     async findById(id) {
       try {
-        // Phase 3でpayload-client.tsにfindMediaById関数を追加予定
-        // 現時点では基本実装のみ
+        // 汎用的なfindPayload関数を使用してメディアを取得
+        // 将来的にパフォーマンスが問題になれば専用関数findMediaByIdを追加
         const result = await payloadClient.findPayload({
           collection: "media",
           where: { id: { equals: id } },
