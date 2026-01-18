@@ -4,6 +4,10 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 function setupMinimalEnv() {
   vi.stubEnv("DATABASE_URL", "postgresql://localhost:5432/test");
   vi.stubEnv("PAYLOAD_SECRET", "a".repeat(32));
+  // 本番環境用にResend設定も追加
+  vi.stubEnv("RESEND_API_KEY", "test-api-key");
+  vi.stubEnv("RESEND_FROM_EMAIL", "test@example.com");
+  vi.stubEnv("RESEND_FROM_NAME", "Test App");
 }
 
 describe("getSiteUrl", () => {

@@ -1,5 +1,20 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
+// valibotをモック化
+vi.mock("valibot", async () => {
+  const actual = await vi.importActual("valibot");
+  return {
+    ...actual,
+    parse: vi.fn((...args: unknown[]) => {
+      // 特定のテストケースでのみモックエラーを投げる
+      if (process.env.__TEST_VALIBOT_ERROR__) {
+        throw new Error("Mock valibot error");
+      }
+      return (actual as { parse: (...args: unknown[]) => unknown }).parse(...args);
+    }),
+  };
+});
+
 describe("env", () => {
   const originalEnv = { ...process.env };
 
@@ -175,6 +190,18 @@ describe("env", () => {
       });
 
       await expect(import("@/lib/env")).rejects.toThrow();
+    });
+
+    test("valibotが予期しないエラーを投げた場合エラーが再スローされる", async () => {
+      // valibotが予期しないエラーを投げるようにモックを設定
+      setEnv({
+        __TEST_VALIBOT_ERROR__: "true",
+        NODE_ENV: "test",
+        PAYLOAD_SECRET: "test-secret-key-that-is-long-enough-for-validation-32-chars",
+        DATABASE_URL: "postgresql://user:password@localhost:5432/testdb",
+      });
+
+      await expect(import("@/lib/env")).rejects.toThrow("Mock valibot error");
     });
   });
 

@@ -6,7 +6,6 @@ import { authenticatedOnly } from "@/collections/access";
 const createTestArgs = (user?: unknown): AccessArgs => ({
   req: {
     user,
-    // biome-ignore lint/suspicious/noExplicitAny: テスト用に最小限のPayloadRequestモックを作成
   } as any,
 });
 

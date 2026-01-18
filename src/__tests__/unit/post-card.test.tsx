@@ -107,6 +107,40 @@ describe("PostCard", () => {
     expect(image).toHaveAttribute("alt", "Test image");
   });
 
+  test("featuredImage.altがundefinedの場合、post.titleがalt属性に設定される", () => {
+    const post = createMockPost({
+      title: "Fallback Title",
+      featuredImage: {
+        id: 1,
+        url: "https://example.com/image.jpg",
+        alt: undefined,
+        updatedAt: "2024-01-01T00:00:00Z",
+        createdAt: "2024-01-01T00:00:00Z",
+      } satisfies NonNullable<Post["featuredImage"]>,
+    });
+    render(<PostCard post={post} />);
+    const image = screen.getByRole("img");
+    expect(image).toHaveAttribute("alt", "Fallback Title");
+  });
+
+  test("featuredImage.altとpost.titleが両方undefinedの場合、空文字列がalt属性に設定される", () => {
+    const post = createMockPost({
+      title: undefined,
+      featuredImage: {
+        id: 1,
+        url: "https://example.com/image.jpg",
+        alt: undefined,
+        updatedAt: "2024-01-01T00:00:00Z",
+        createdAt: "2024-01-01T00:00:00Z",
+      } satisfies NonNullable<Post["featuredImage"]>,
+    });
+    render(<PostCard post={post} />);
+    // alt="" の画像は getByRole で取得できないので、querySelector で取得
+    const image = document.querySelector('img[alt=""]');
+    expect(image).toBeInTheDocument();
+    expect(image).toHaveAttribute("src", "https://example.com/image.jpg");
+  });
+
   test("featuredImage.urlがnullの場合、ImageIconが表示される", () => {
     const post = createMockPost({
       featuredImage: {
@@ -136,6 +170,15 @@ describe("PostCard", () => {
     render(<PostCard post={post} />);
     expect(screen.getByText("React")).toBeInTheDocument();
     expect(screen.getByText("TypeScript")).toBeInTheDocument();
+  });
+
+  test("タグがstring[]形式の場合、正しく表示される", () => {
+    const post = createMockPost({
+      tags: ["JavaScript", "CSS"] as any,
+    });
+    render(<PostCard post={post} />);
+    expect(screen.getByText("JavaScript")).toBeInTheDocument();
+    expect(screen.getByText("CSS")).toBeInTheDocument();
   });
 
   test("タグが存在しない場合、タグが表示されない", () => {

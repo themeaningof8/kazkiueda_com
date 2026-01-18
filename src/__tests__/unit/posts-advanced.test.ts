@@ -5,6 +5,16 @@ import {
 } from "@/lib/api/payload-client";
 import { getPostBySlug, getPosts } from "@/lib/posts";
 
+vi.mock("@/lib/env", () => ({
+  env: {
+    NODE_ENV: "test",
+    PAYLOAD_SECRET: "test-secret-key-that-is-long-enough-for-validation-32-chars",
+    DATABASE_URL: "postgresql://user:password@localhost:5432/testdb",
+  },
+  isProduction: false,
+  isDevelopment: false,
+}));
+
 // Payload Clientをモック
 vi.mock("@/lib/api/payload-client");
 
