@@ -15,6 +15,18 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["src/__tests__/**/*"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "double",
