@@ -218,6 +218,7 @@ describe("createPostRepository", () => {
         success: false,
         error: "UNKNOWN",
       });
+      expect(mockPayloadClient.findPublishedPostSlugs).toHaveBeenCalledWith();
     });
   });
 });

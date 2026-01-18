@@ -85,6 +85,8 @@ describe("payload-client public API", () => {
         totalPages: 1,
         hasNextPage: false,
         hasPrevPage: false,
+        limit: 10,
+        pagingCounter: 1,
       };
 
       mockFind.mockResolvedValue(mockResult as any);
@@ -140,6 +142,118 @@ describe("payload-client public API", () => {
         totalDocs: 0,
       });
     });
+
+    test("ネットワークエラーの場合はリトライして成功する", async () => {
+      const networkError = new Error("fetch failed: ECONNREFUSED");
+      const mockResult = {
+        docs: [
+          {
+            id: 1,
+            title: "Test Post",
+            slug: "test-post",
+            content: {
+              root: {
+                type: "root",
+                children: [],
+                direction: null,
+                format: "" as const,
+                indent: 0,
+                version: 1,
+              },
+            },
+            author: 1,
+            updatedAt: "2024-01-15T00:00:00.000Z",
+            createdAt: "2024-01-15T00:00:00.000Z",
+          },
+        ],
+        totalDocs: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false,
+        limit: 10,
+        pagingCounter: 1,
+      };
+
+      mockFind.mockRejectedValueOnce(networkError).mockResolvedValueOnce(mockResult);
+
+      const result = await findPostBySlug("test-post");
+
+      expect(result).toEqual({
+        docs: [
+          {
+            id: 1,
+            title: "Test Post",
+            slug: "test-post",
+            content: {
+              root: {
+                type: "root",
+                children: [],
+                direction: null,
+                format: "" as const,
+                indent: 0,
+                version: 1,
+              },
+            },
+            author: 1,
+            updatedAt: "2024-01-15T00:00:00.000Z",
+            createdAt: "2024-01-15T00:00:00.000Z",
+          },
+        ],
+        totalDocs: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false,
+      });
+      expect(mockFind).toHaveBeenCalledTimes(2);
+    });
+
+    test("タイムアウトエラーの場合はリトライして成功する", async () => {
+      const timeoutError = new Error("Request timeout occurred");
+      const mockResult = {
+        docs: [{ id: 1, title: "Test Post", slug: "test-post" }],
+        totalDocs: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false,
+        limit: 10,
+        pagingCounter: 1,
+      };
+
+      mockFind.mockRejectedValueOnce(timeoutError).mockResolvedValueOnce(mockResult as any);
+
+      const result = await findPostBySlug("test-post");
+
+      expect(result).toEqual(mockResult);
+      expect(mockFind).toHaveBeenCalledTimes(2);
+    });
+
+    test("CORSエラーの場合は即座に失敗する", async () => {
+      const corsError = new Error("CORS policy violation blocked request");
+
+      mockFind.mockRejectedValue(corsError);
+
+      const result = await findPostBySlug("test-post");
+
+      expect(result).toEqual({
+        docs: [],
+        totalDocs: 0,
+      });
+      expect(mockFind).toHaveBeenCalledTimes(1);
+    });
+
+    test("データベースエラーの場合は即座に失敗する", async () => {
+      const dbError = new Error("SQLITE_ERROR: database is locked");
+
+      mockFind.mockRejectedValue(dbError);
+
+      const result = await findPostBySlug("test-post");
+
+      expect(result).toEqual({
+        docs: [],
+        totalDocs: 0,
+      });
+      expect(mockFind).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("findPosts", () => {
@@ -168,6 +282,8 @@ describe("payload-client public API", () => {
         totalPages: 1,
         hasNextPage: false,
         hasPrevPage: false,
+        limit: 10,
+        pagingCounter: 1,
       };
 
       mockFind.mockResolvedValue(mockResult as any);
@@ -302,6 +418,48 @@ describe("payload-client public API", () => {
       const result = await findPublishedPostSlugs();
 
       expect(result).toEqual([]);
+    });
+
+    test("並列処理で大量のスラッグを取得できる", async () => {
+      // 5ページ分のデータを生成 (5 * 10 = 50件)
+      const generatePageData = (page: number, pageSize: number = 10) => {
+        const docs = Array.from({ length: pageSize }, (_, i) => ({
+          slug: `post-${(page - 1) * pageSize + i + 1}`,
+        }));
+        return {
+          docs,
+          totalPages: 5,
+          totalDocs: 50,
+          hasNextPage: page < 5,
+          hasPrevPage: page > 1,
+          limit: 10,
+          pagingCounter: (page - 1) * 10 + 1,
+        };
+      };
+
+      // 各ページのモックレスポンスを設定
+      mockFind
+        .mockResolvedValueOnce(generatePageData(1) as any)
+        .mockResolvedValueOnce(generatePageData(2) as any)
+        .mockResolvedValueOnce(generatePageData(3) as any)
+        .mockResolvedValueOnce(generatePageData(4) as any)
+        .mockResolvedValueOnce(generatePageData(5) as any);
+
+      const result = await findPublishedPostSlugs();
+
+      expect(result).toHaveLength(50);
+      expect(result[0]).toEqual({ slug: "post-1" });
+      expect(result[49]).toEqual({ slug: "post-50" });
+      expect(mockFind).toHaveBeenCalledTimes(5);
+    });
+
+    test("findPublishedPostSlugsでエラーが発生した場合空配列を返す", async () => {
+      mockFind.mockRejectedValue(new Error("Database connection failed"));
+
+      const result = await findPublishedPostSlugs();
+
+      expect(result).toEqual([]);
+      expect(mockFind).toHaveBeenCalledTimes(1);
     });
   });
 });

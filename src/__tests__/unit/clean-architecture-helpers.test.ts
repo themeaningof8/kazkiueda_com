@@ -6,6 +6,16 @@ import {
 import { resetPayloadClient } from "@/lib/api/create-payload-client";
 import { getPostRepository, resetPostRepository } from "@/lib/posts";
 
+vi.mock("@/lib/env", () => ({
+  env: {
+    NODE_ENV: "test",
+    PAYLOAD_SECRET: "test-secret-key-that-is-long-enough-for-validation-32-chars",
+    DATABASE_URL: "postgresql://user:password@localhost:5432/testdb",
+  },
+  isProduction: false,
+  isDevelopment: false,
+}));
+
 /**
  * Clean Architecture拡張用のヘルパー関数のテスト
  *

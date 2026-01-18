@@ -3,6 +3,16 @@ import { createMockPost } from "@/__tests__/fixtures/posts";
 import { createMockPostRepository } from "@/__tests__/mocks/repositories";
 import type { PostRepository } from "@/domain/repositories/post-repository";
 
+vi.mock("@/lib/env", () => ({
+  env: {
+    NODE_ENV: "test",
+    PAYLOAD_SECRET: "test-secret-key-that-is-long-enough-for-validation-32-chars",
+    DATABASE_URL: "postgresql://user:password@localhost:5432/testdb",
+  },
+  isProduction: false,
+  isDevelopment: false,
+}));
+
 vi.mock("@/lib/constants", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/constants")>();
   return {
