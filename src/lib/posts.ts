@@ -1,10 +1,8 @@
 import { cache } from "react";
+import type { PostRepository } from "@/domain/repositories/post-repository";
+import { createPostRepository } from "@/infrastructure/repositories/create-post-repository";
 import type { Post } from "@/payload-types";
-import {
-  findPostBySlug as findPostBySlugPayload,
-  findPosts as findPostsPayload,
-  findPublishedPostSlugs as findPublishedPostSlugsPayload,
-} from "./api/payload-client";
+import { createPayloadClient } from "./api/create-payload-client";
 import { BLOG_CONFIG } from "./constants";
 import type { FetchResult } from "./types";
 
@@ -14,6 +12,30 @@ import type { FetchResult } from "./types";
  * - ISR (revalidate = 3600) と組み合わせて1時間のキャッシュを実現
  * - キャッシュキーは関数引数に基づいて自動生成される
  */
+
+// デフォルトのリポジトリインスタンスを作成
+const defaultPayloadClient = createPayloadClient();
+const defaultPostRepository = createPostRepository(defaultPayloadClient);
+
+/**
+ * 記事リポジトリインスタンス
+ * テスト時はsetPostRepository()でカスタムリポジトリを注入可能
+ */
+let postRepositoryInstance: PostRepository = defaultPostRepository;
+
+/**
+ * テスト用：記事リポジトリを設定
+ */
+export function setPostRepository(repository: PostRepository): void {
+  postRepositoryInstance = repository;
+}
+
+/**
+ * テスト用：記事リポジトリを取得
+ */
+export function getPostRepository(): PostRepository {
+  return postRepositoryInstance;
+}
 
 type FetchOptions = {
   draft?: boolean;
@@ -33,24 +55,7 @@ export const getPostBySlug = cache(
     slug: string,
     { draft = false, overrideAccess = false }: FetchOptions = {},
   ): Promise<FetchResult<Post>> => {
-    try {
-      const result = await findPostBySlugPayload(slug, {
-        draft,
-        overrideAccess,
-      });
-
-      const post = result.docs[0];
-
-      if (!post) {
-        return { success: false, error: "NOT_FOUND" };
-      }
-
-      return { success: true, data: post };
-    } catch (_error) {
-      // APIレベルでエラーハンドリングされているはずだが、
-      // 万一のエラー発生時にUNKNOWNエラーを返す
-      return { success: false, error: "UNKNOWN" };
-    }
+    return postRepositoryInstance.findBySlug(slug, { draft, overrideAccess });
   },
 );
 
@@ -74,27 +79,7 @@ export const getPosts = cache(
       totalDocs: number;
     }>
   > => {
-    try {
-      const result = await findPostsPayload({
-        page,
-        limit,
-        draft,
-        overrideAccess,
-      });
-
-      return {
-        success: true,
-        data: {
-          posts: result.docs,
-          totalPages: result.totalPages ?? 0,
-          totalDocs: result.totalDocs,
-        },
-      };
-    } catch (_error) {
-      // APIレベルでエラーハンドリングされているはずだが、
-      // 万一のエラー発生時にDB_ERRORを返す
-      return { success: false, error: "DB_ERROR" };
-    }
+    return postRepositoryInstance.findAll(page, limit, { draft, overrideAccess });
   },
 );
 
@@ -109,13 +94,6 @@ export const getPosts = cache(
  */
 export const getPublishedPostSlugs = cache(
   async (): Promise<FetchResult<Array<{ slug: string }>>> => {
-    try {
-      const slugs = await findPublishedPostSlugsPayload();
-      return { success: true, data: slugs };
-    } catch (_error) {
-      // APIレベルでエラーハンドリングされているはずだが、
-      // 万一のエラー発生時にUNKNOWNエラーを返す
-      return { success: false, error: "UNKNOWN" };
-    }
+    return postRepositoryInstance.findPublishedSlugs();
   },
 );
