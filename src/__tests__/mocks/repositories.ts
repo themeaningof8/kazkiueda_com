@@ -16,6 +16,7 @@ export function createMockPostRepository(): PostRepository {
 
 /**
  * テスト用のモックMediaRepositoryを作成
+ * @knipignore - Clean Architecture拡張用（将来的にMediaテストで使用）
  */
 export function createMockMediaRepository(): MediaRepository {
   return {
@@ -26,6 +27,7 @@ export function createMockMediaRepository(): MediaRepository {
 
 /**
  * テスト用のモックUserRepositoryを作成
+ * @knipignore - Clean Architecture拡張用（将来的にUserテストで使用）
  */
 export function createMockUserRepository(): UserRepository {
   return {

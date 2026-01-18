@@ -25,6 +25,7 @@ export function createPayloadClient(payloadInstance?: Payload | null): PayloadCl
 
 /**
  * PayloadClientのクリーンアップ（テスト用）
+ * @knipignore - Clean Architecture拡張用（将来的にテストで使用）
  */
 export function resetPayloadClient(): void {
   clearPayloadCache();

@@ -32,6 +32,7 @@ export function setPostRepository(repository: PostRepository): void {
 
 /**
  * テスト用：記事リポジトリを取得
+ * @knipignore - Clean Architecture拡張用（将来的にテストで使用）
  */
 export function getPostRepository(): PostRepository {
   return postRepositoryInstance;
@@ -40,6 +41,7 @@ export function getPostRepository(): PostRepository {
 /**
  * テスト用：記事リポジトリをデフォルトにリセット
  * テスト間の状態汚染を防ぐため、afterEachで呼び出すことを推奨
+ * @knipignore - Clean Architecture拡張用（将来的にテストで使用）
  */
 export function resetPostRepository(): void {
   postRepositoryInstance = defaultPostRepository;
