@@ -7,6 +7,8 @@ import { buildPublishStatusFilter, buildSlugFilter } from "./payload-filters";
 
 // Payloadインスタンスのキャッシュ（プロセス内で一度だけ初期化）
 let payloadInstance: Payload | null = null;
+// テスト用に注入されたPayloadインスタンス
+let injectedPayloadInstance: Payload | null = null;
 
 /**
  * エラーを分類して適切なErrorTypeを返す
@@ -58,8 +60,13 @@ function classifyError(error: unknown): ErrorType {
 
 /**
  * Payloadインスタンスを取得（キャッシュされたものを使用）
+ * 注入されたインスタンスがあればそれを使用、なければキャッシュから取得
  */
 async function getPayloadInstance(): Promise<Payload> {
+  if (injectedPayloadInstance) {
+    return injectedPayloadInstance;
+  }
+
   if (!payloadInstance) {
     payloadInstance = await getPayload({ config });
   }
@@ -67,10 +74,18 @@ async function getPayloadInstance(): Promise<Payload> {
 }
 
 /**
+ * テスト用：Payloadインスタンスを注入
+ */
+export function setPayloadInstance(instance: Payload | null): void {
+  injectedPayloadInstance = instance;
+}
+
+/**
  * テスト用：Payloadインスタンスのキャッシュをクリア
  */
 export function clearPayloadCache(): void {
   payloadInstance = null;
+  injectedPayloadInstance = null;
 }
 
 type PayloadFindOptions<T extends "posts" | "media" | "users"> = {

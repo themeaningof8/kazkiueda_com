@@ -1,16 +1,19 @@
 import type { Payload } from "payload";
 import * as payloadClientFns from "./payload-client";
+import { clearPayloadCache, setPayloadInstance } from "./payload-client";
 import type { PayloadClient } from "./types";
 
 /**
- * PayloadClientファクトリー関数
+ * PayloadClientファクトリー関数（完全版）
  *
- * @param payloadInstance - 注入するPayloadインスタンス（テスト用、Phase 3で実装予定）
+ * @param payloadInstance - 注入するPayloadインスタンス（テスト用）
  * @returns PayloadClient型のオブジェクト
  */
-export function createPayloadClient(_payloadInstance?: Payload | null): PayloadClient {
-  // Phase 2: 既存関数をそのまま使用
-  // Phase 3でpayloadInstanceの注入ロジックを実装予定
+export function createPayloadClient(payloadInstance?: Payload | null): PayloadClient {
+  // テスト時にインスタンスを注入
+  if (payloadInstance !== undefined) {
+    setPayloadInstance(payloadInstance);
+  }
 
   return {
     findPayload: payloadClientFns.findPayload,
@@ -18,4 +21,11 @@ export function createPayloadClient(_payloadInstance?: Payload | null): PayloadC
     findPosts: payloadClientFns.findPosts,
     findPublishedPostSlugs: payloadClientFns.findPublishedPostSlugs,
   };
+}
+
+/**
+ * PayloadClientのクリーンアップ（テスト用）
+ */
+export function resetPayloadClient(): void {
+  clearPayloadCache();
 }
