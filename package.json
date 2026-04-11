@@ -1,0 +1,32 @@
+{
+  "name": "kazkiueda_com",
+  "type": "module",
+  "version": "0.0.1",
+  "packageManager": "bun@1.3.5",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "pages:dev": "bun run build && bunx wrangler pages dev ./dist",
+    "deploy:pages": "bun run build && bunx wrangler pages deploy ./dist --project-name=kazkiueda_com",
+    "check": "astro check",
+    "astro": "astro",
+    "generate-types": "wrangler types"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^13.1.8",
+    "astro": "^6.1.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@types/node": "^25.6.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.81.1"
+  },
+  "overrides": {
+    "vite": "^7"
+  }
+}

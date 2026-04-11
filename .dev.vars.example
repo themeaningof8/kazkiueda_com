@@ -1,0 +1,5 @@
+# ローカル用（`wrangler pages dev` など）。このファイルをコピーして `.dev.vars` を作り、値を入れる。
+# `.dev.vars` は Git にコミットしないこと。
+#
+# 共有パスワード検証などを実装する際の例（名前は実装時に確定）:
+# PORTFOLIO_GATE_SECRET=

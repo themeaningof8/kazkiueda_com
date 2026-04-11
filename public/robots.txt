@@ -1,0 +1,3 @@
+# https://kazkiueda.com — 要件: /portfolio をクローラーに見せない
+User-agent: *
+Disallow: /portfolio

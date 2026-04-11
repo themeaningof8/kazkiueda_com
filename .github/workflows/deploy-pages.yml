@@ -1,0 +1,73 @@
+# Cloudflare Pages へ本番デプロイ（GitHub Actions）
+# Secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
+# 任意: Repository variable PAGES_PROJECT_NAME（未設定時は GitHub リポジトリ名を使用）
+
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # GitHub: JS 製アクションを Node 24 ランタイムで実行（checkout v4 の Node 20 非推奨警告の解消）
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # Astro 6 は Node >=22.12。ランナー既定の Node 20 のままだと `astro build` が失敗する。
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      # 7003 対策: トークン・Account ID の改行混入を除去し、認証と Pages プロジェクト一覧を先に表示する。
+      - name: Verify Cloudflare auth and list Pages projects
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          export CLOUDFLARE_API_TOKEN="$(printf '%s' "$CLOUDFLARE_API_TOKEN" | tr -d '\r\n')"
+          export CLOUDFLARE_ACCOUNT_ID="$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '\r\n')"
+          npx --yes wrangler@4.81.1 whoami
+          echo "---- Pages projects (use exact name as PAGES_PROJECT_NAME if deploy fails) ----"
+          npx --yes wrangler@4.81.1 pages project list
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PAGES_PROJECT_NAME: ${{ vars.PAGES_PROJECT_NAME }}
+        run: |
+          set -euo pipefail
+          export CLOUDFLARE_API_TOKEN="$(printf '%s' "$CLOUDFLARE_API_TOKEN" | tr -d '\r\n')"
+          export CLOUDFLARE_ACCOUNT_ID="$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '\r\n')"
+          # 未設定時はリポジトリ名（Git 連携で作った Pages の名前と一致しやすい）
+          DEFAULT_NAME="${GITHUB_REPOSITORY##*/}"
+          NAME="${PAGES_PROJECT_NAME:-$DEFAULT_NAME}"
+          echo "Deploying to Pages project: $NAME"
+          npx --yes wrangler@4.81.1 pages deploy dist --project-name="$NAME"
