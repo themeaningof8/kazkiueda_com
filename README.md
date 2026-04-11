@@ -44,7 +44,7 @@
 
 **Pages のプロジェクト名**は、`wrangler pages deploy --project-name=...` と **Cloudflare ダッシュボードに表示されている名前が一字一句同じ**である必要があります。GitHub から Pages を作った場合、**リポジトリ名**（例: `kazkiueda-com`）がプロジェクト名になっていることが多いです。
 
-GitHub Actions では、**Variable `PAGES_PROJECT_NAME` が未設定のときはリポジトリ名**（`owner/repo` の `repo` 部分）を既定のプロジェクト名に使う。ダッシュボードの名前と違うときだけ **`PAGES_PROJECT_NAME`** で上書きする。
+GitHub Actions では、**Variable `PAGES_PROJECT_NAME` が未設定のときは [wrangler.jsonc](wrangler.jsonc) の `name`**（現在は `kazkiueda_com`）を `pages deploy --project-name` に使う。ダッシュボードの実名と違うときだけ **`PAGES_PROJECT_NAME`** で上書きする。
 
 - **API 8000007**（`Project not found`）→ その名前の **Pages プロジェクトがまだ無い**。ダッシュボードで作成するか、`bunx wrangler pages project create <名前>` で作成する。
 - **API 7003**（`object identifier is invalid`）→ 多くの場合 **Account ID 誤り**か **トークンに Pages 権限がない**（下記「7003」節）。
@@ -85,6 +85,7 @@ GitHub Actions を使わず Pages がリポジトリを直接ビルドする場�
    - **推奨（どちらか）**
      - **A**: **Build command** に `bun run build` を入れ、**Deploy command** に `npx wrangler deploy` を入れる（**先に Build が実行される**こと）。
      - **B**: UI 上「デプロイ用のコマンド」しか無い／Build が無視される場合は、**Deploy command だけ**を次の1行にする: `bun run deploy:cf-worker`（[package.json](package.json) のスクリプト。`astro build` のあと `wrangler deploy` を続けて実行する）。
+   - **今のログにまだ `Executing user deploy command: npx wrangler deploy` とだけ出ている** → ダッシュボードの **Deploy command が書き換わっていない**。必ず **`bun run deploy:cf-worker`** に変更して保存し、再デプロイする。
    - **Build command** を別で付ける場合の例: `bun install --frozen-lockfile && bun run build`（依存はプラットフォームが既に `bun install` しているなら **`bun run build` だけ**でもよい）。
    - **Build output directory**: ダッシュボードの UI に合わせて `dist` など（プロジェクトの「Workers ビルド」向けドキュメントに従う）
 
