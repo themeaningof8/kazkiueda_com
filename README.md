@@ -44,7 +44,7 @@
 
 **Pages のプロジェクト名**は、`wrangler pages deploy --project-name=...` と **Cloudflare ダッシュボードに表示されている名前が一字一句同じ**である必要があります。GitHub から Pages を作った場合、**リポジトリ名**（例: `kazkiueda-com`）がプロジェクト名になっていることが多いです。
 
-GitHub Actions では、**Variable `PAGES_PROJECT_NAME` が未設定のときは [wrangler.jsonc](wrangler.jsonc) の `name`**（現在は `kazkiueda_com`）を `pages deploy --project-name` に使う。ダッシュボードの実名と違うときだけ **`PAGES_PROJECT_NAME`** で上書きする。
+GitHub Actions では、**Variable `PAGES_PROJECT_NAME` が未設定のときは [wrangler.jsonc](wrangler.jsonc) の `name`**（Cloudflare の Worker / Pages 名と一致させる。例: `kazkiueda`）を `pages deploy --project-name` に使う。ダッシュボードの実名と違うときだけ **`PAGES_PROJECT_NAME`** で上書きする。
 
 - **API 8000007**（`Project not found`）→ その名前の **Pages プロジェクトがまだ無い**。ダッシュボードで作成するか、`bunx wrangler pages project create <名前>` で作成する。
 - **API 7003**（`object identifier is invalid`）→ 多くの場合 **Account ID 誤り**か **トークンに Pages 権限がない**（下記「7003」節）。
@@ -68,7 +68,7 @@ GitHub Actions では、**Variable `PAGES_PROJECT_NAME` が未設定のときは
 ### B. 手元から Wrangler
 
 1. `bunx wrangler login`
-2. （初回）プロジェクト作成: `bunx wrangler pages project create kazkiueda_com`
+2. （初回）プロジェクト作成: `bunx wrangler pages project create kazkiueda`（実際の名前は [wrangler.jsonc](wrangler.jsonc) の `name` と揃える）
 3. `bun run deploy:pages`
 
 ### C. Cloudflare ダッシュボードだけ（Git 連携ビルド）
