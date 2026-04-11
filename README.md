@@ -79,11 +79,15 @@ GitHub Actions を使わず Pages がリポジトリを直接ビルドする場�
    - **`SKIP_DEPENDENCY_INSTALL`**: `true`（自動の `npm install` を止める）
    - **`BUN_VERSION`**: `.bun-version` と同じ系列（例: `1.3.5`）を推奨
    - （任意）**`NODE_VERSION`**: `.nvmrc` に合わせる（`22` など）
-3. **Build settings**
-   - **Build command**: `bun install && bun run build`
-   - **Build output directory**: `dist`
+3. **Build / Deploy（Astro + `@astrojs/cloudflare` の Workers デプロイ）**
+   - **`bun install` のあと必ず `astro build` が走ること**。ログに `bun install` の直後にだけ `npx wrangler deploy` が出ていて **`astro build` が無い**と、`dist/server/wrangler.json` が無くて失敗する。
+   - **Build command** の例: `bun install --frozen-lockfile && bun run build`
+   - **Deploy command**（別フィールドがある場合）の例: `npx wrangler deploy`（ビルド**後**に実行される設定にすること）
+   - **Build output directory**: ダッシュボードの UI に合わせて `dist` など（プロジェクトの「Workers ビルド」向けドキュメントに従う）
 
-4. **Custom domains**: `kazkiueda.com` を割り当て（DNS は指示に従う）。
+4. **`.wrangler/` を Git に含めない**。ローカル用の `.wrangler/deploy/config.json` がリポジトリに入っていると、CI 上で **`dist/server/wrangler.json` が存在しないのにそのパスへリダイレクト**され、今回のようなエラーになる。本リポジトリでは [.gitignore](.gitignore) で除外済み。
+
+5. **Custom domains**: `kazkiueda.com` を割り当て（DNS は指示に従う）。
 
 ## 補足
 

@@ -1,5 +1,7 @@
 # build output
 dist/
+# wrangler local state / deploy redirect (must not commit; breaks CI / Pages)
+.wrangler/
 # generated types
 .astro/
 worker-configuration.d.ts
