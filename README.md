@@ -44,9 +44,9 @@
 
 **Pages のプロジェクト名**は、`wrangler pages deploy --project-name=...` と **Cloudflare ダッシュボードに表示されている名前が一字一句同じ**である必要があります。GitHub から Pages を作った場合、**リポジトリ名**（例: `kazkiueda-com`）がプロジェクト名になっていることが多いです。
 
-GitHub Actions では、**Variable `PAGES_PROJECT_NAME` が未設定のときは [wrangler.jsonc](wrangler.jsonc) の `name`**（Cloudflare の Worker / Pages 名と一致させる。例: `kazkiueda`）を `pages deploy --project-name` に使う。ダッシュボードの実名と違うときだけ **`PAGES_PROJECT_NAME`** で上書きする。
+GitHub Actions では、**Variable `PAGES_PROJECT_NAME` が未設定のときは [package.json](package.json) の `name`** を `pages deploy --project-name` に使う（[wrangler.jsonc](wrangler.jsonc) の Worker 名とは別）。ダッシュボードの実名と違うときだけ **`PAGES_PROJECT_NAME`** で上書きする。
 
-- **API 8000007**（`Project not found`）→ その名前の **Pages プロジェクトがまだ無い**。ダッシュボードで作成するか、`bunx wrangler pages project create <名前>` で作成する。
+- **API 8000007**（`Project not found`）→ その名前の **Pages プロジェクトがこのアカウントに無い**（**GitHub の `CLOUDFLARE_ACCOUNT_ID` が、ダッシュボードでプロジェクトを作ったアカウントと違う**ことが多い）。または **Worker 名と混同**（Pages と Worker は別）。ワークフローの Preflight で **`wrangler pages project list` に出る名前**と `PAGES_PROJECT_NAME` / `package.json` の `name` を一致させる。
 - **API 7003**（`object identifier is invalid`）→ 多くの場合 **Account ID 誤り**か **トークンに Pages 権限がない**（下記「7003」節）。
 
 **Account ID** は **ゾーン ID（ドメイン用）ではない**ことに注意する。Workers / Pages の概要画面に出る **32 桁の Account ID** を使う。
@@ -68,30 +68,47 @@ GitHub Actions では、**Variable `PAGES_PROJECT_NAME` が未設定のときは
 ### B. 手元から Wrangler
 
 1. `bunx wrangler login`
-2. （初回）プロジェクト作成: `bunx wrangler pages project create kazkiueda`（実際の名前は [wrangler.jsonc](wrangler.jsonc) の `name` と揃える）
+2. （初回）プロジェクト作成: `bunx wrangler pages project create <名前>`（[package.json](package.json) の `deploy:pages` の `--project-name` や GitHub の **`PAGES_PROJECT_NAME`** と同じ名前にする）
 3. `bun run deploy:pages`
 
-### C. Cloudflare ダッシュボードだけ（Git 連携ビルド）
+### C. Cloudflare ダッシュボード（Workers Builds / Git 連携）
 
-GitHub Actions を使わず Pages がリポジトリを直接ビルドする場合の例。
+[Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/) は公式どおり **「1) Build command（任意）→ 2) Deploy command」** の順で動く。**Build が空のままだと `astro build` は一切走らず**、いまのログのように **`npx wrangler deploy` だけ**になり、`@astrojs/cloudflare/entrypoints/server` が無いエラーで落ちる。
 
-1. **Workers & Pages** → **Create** → **Pages** → Git 連携。
-2. **Environment variables**
-   - **`SKIP_DEPENDENCY_INSTALL`**: `true`（自動の `npm install` を止める）
-   - **`BUN_VERSION`**: `.bun-version` と同じ系列（例: `1.3.5`）を推奨
-   - （任意）**`NODE_VERSION`**: `.nvmrc` に合わせる（`22` など）
-3. **Build / Deploy（Astro + `@astrojs/cloudflare` の Workers デプロイ）**
-   - **症状**: ログに `Executing user deploy command: npx wrangler deploy` だけがあり、**`astro build` の行が一度も無い** → そのままだと `The entry-point file at "@astrojs/cloudflare/entrypoints/server" was not found` になる（ビルドで `dist/` が生成されて初めてデプロイできる）。
-   - **推奨（どちらか）**
-     - **A**: **Build command** に `bun run build` を入れ、**Deploy command** に `npx wrangler deploy` を入れる（**先に Build が実行される**こと）。
-     - **B**: UI 上「デプロイ用のコマンド」しか無い／Build が無視される場合は、**Deploy command だけ**を次の1行にする: `bun run deploy:cf-worker`（[package.json](package.json) のスクリプト。`astro build` のあと `wrangler deploy` を続けて実行する）。
-   - **今のログにまだ `Executing user deploy command: npx wrangler deploy` とだけ出ている** → ダッシュボードの **Deploy command が書き換わっていない**。必ず **`bun run deploy:cf-worker`** に変更して保存し、再デプロイする。
-   - **Build command** を別で付ける場合の例: `bun install --frozen-lockfile && bun run build`（依存はプラットフォームが既に `bun install` しているなら **`bun run build` だけ**でもよい）。
-   - **Build output directory**: ダッシュボードの UI に合わせて `dist` など（プロジェクトの「Workers ビルド」向けドキュメントに従う）
+1. ダッシュボード **[Workers & Pages](https://dash.cloudflare.com/)** → **Workers** 一覧から **`kazkiueda`**（Worker 名）を開く（**Pages** のプロジェクト画面ではなく、**Worker** の画面。2欄の Build / Deploy が無ければ開く場所が違う）。
+2. **Settings** → **Build**
+3. 次を **保存**。
 
-4. **`.wrangler/` を Git に含めない**。ローカル用の `.wrangler/deploy/config.json` がリポジトリに入っていると、CI 上で **`dist/server/wrangler.json` が存在しないのにそのパスへリダイレクト**され、今回のようなエラーになる。本リポジトリでは [.gitignore](.gitignore) で除外済み。
+**いちばん簡単（Deploy 欄だけ直す）**
 
-5. **Custom domains**: `kazkiueda.com` を割り当て（DNS は指示に従う）。
+| 欄 | 入れる値 |
+|----|-----------|
+| **Build command (Optional)** | （空のままでよい） |
+| **Deploy command** | **`bun run deploy`**（`npx wrangler deploy` のままだとビルドされない） |
+
+[package.json](package.json) の **`deploy`** は `bun run build && wrangler deploy` なので、**Deploy だけこれに差し替えれば**公式の2段階でも1段でも、必ず `astro build` が先に走る。
+
+**公式どおり2段に分けたい場合**
+
+| 欄 | 入れる値 |
+|----|-----------|
+| **Build command** | `bun run build` |
+| **Deploy command** | `npx wrangler deploy` |
+
+4. **Environment variables**（Workers の Build 用）  
+   - **`BUN_VERSION`**: `.bun-version` と同じ（例 `1.3.5`）  
+   - **`NODE_VERSION`**: `.nvmrc` に合わせる（例 `22.12`）  
+   - **`SKIP_DEPENDENCY_INSTALL`**: 使うなら、Build に **`bun install --frozen-lockfile && bun run build`** のように **install を自分で書く**
+
+5. まだ古いログが出るときは **Build cache をクリア**してから再デプロイ（空の `dist` がキャッシュされていることがある）。
+
+6. **`.wrangler/` は Git に含めない**（[.gitignore](.gitignore) 済み）。
+
+7. **Pages** から Git 連携している場合は UI が別物のことがある。その場合は **GitHub Actions だけ**に寄せるか、上記 **Worker の Settings → Build** を探す。
+
+### D. Cloudflare Pages（静的ホスト）としての Git 連携
+
+Workers ではなく **Pages** だけ使う場合の話は別ドキュメントが近い。**このリポジトリは Astro SSR + Cloudflare アダプタ前提**なので、基本は **§C の Worker / Workers Builds** か **GitHub Actions** を使う想定。
 
 ## 補足
 

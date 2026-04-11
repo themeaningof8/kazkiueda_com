@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "kazkiueda_com",
+      "name": "kazkiueda-com",
       "dependencies": {
         "@astrojs/cloudflare": "^13.1.8",
         "astro": "^6.1.5",

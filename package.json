@@ -1,5 +1,5 @@
 {
-  "name": "kazkiueda_com",
+  "name": "kazkiueda-com",
   "type": "module",
   "version": "0.0.1",
   "packageManager": "bun@1.3.5",
@@ -11,8 +11,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "pages:dev": "bun run build && bunx wrangler pages dev ./dist",
-    "deploy:pages": "bun run build && bunx wrangler pages deploy ./dist --project-name=kazkiueda",
+    "deploy:pages": "bun run build && bunx wrangler pages deploy ./dist --project-name=kazkiueda-com",
     "deploy:cf-worker": "bun run build && wrangler deploy",
+    "deploy": "bun run deploy:cf-worker",
     "check": "astro check",
     "astro": "astro",
     "generate-types": "wrangler types"
