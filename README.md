@@ -22,6 +22,7 @@
 | `bun run check` | `astro check` |
 | `bun run pages:dev` | `build` のあと `wrangler pages dev ./dist` |
 | `bun run deploy:pages` | `build` のあと `wrangler pages deploy`（要 `wrangler login` とプロジェクト作成済み） |
+| `bun run deploy:cf-worker` | Cloudflare **ダッシュボードの Workers デプロイ**用（`build` のあと `wrangler deploy`） |
 | `bun run generate-types` | `wrangler types`（任意） |
 
 ローカル用の環境変数は [`.dev.vars.example`](.dev.vars.example) を参照し、必要に応じて **`.dev.vars`** を作成する（`.dev.vars` は Git に含めない）。
@@ -80,9 +81,11 @@ GitHub Actions を使わず Pages がリポジトリを直接ビルドする場�
    - **`BUN_VERSION`**: `.bun-version` と同じ系列（例: `1.3.5`）を推奨
    - （任意）**`NODE_VERSION`**: `.nvmrc` に合わせる（`22` など）
 3. **Build / Deploy（Astro + `@astrojs/cloudflare` の Workers デプロイ）**
-   - **`bun install` のあと必ず `astro build` が走ること**。ログに `bun install` の直後にだけ `npx wrangler deploy` が出ていて **`astro build` が無い**と、`dist/server/wrangler.json` が無くて失敗する。
-   - **Build command** の例: `bun install --frozen-lockfile && bun run build`
-   - **Deploy command**（別フィールドがある場合）の例: `npx wrangler deploy`（ビルド**後**に実行される設定にすること）
+   - **症状**: ログに `Executing user deploy command: npx wrangler deploy` だけがあり、**`astro build` の行が一度も無い** → そのままだと `The entry-point file at "@astrojs/cloudflare/entrypoints/server" was not found` になる（ビルドで `dist/` が生成されて初めてデプロイできる）。
+   - **推奨（どちらか）**
+     - **A**: **Build command** に `bun run build` を入れ、**Deploy command** に `npx wrangler deploy` を入れる（**先に Build が実行される**こと）。
+     - **B**: UI 上「デプロイ用のコマンド」しか無い／Build が無視される場合は、**Deploy command だけ**を次の1行にする: `bun run deploy:cf-worker`（[package.json](package.json) のスクリプト。`astro build` のあと `wrangler deploy` を続けて実行する）。
+   - **Build command** を別で付ける場合の例: `bun install --frozen-lockfile && bun run build`（依存はプラットフォームが既に `bun install` しているなら **`bun run build` だけ**でもよい）。
    - **Build output directory**: ダッシュボードの UI に合わせて `dist` など（プロジェクトの「Workers ビルド」向けドキュメントに従う）
 
 4. **`.wrangler/` を Git に含めない**。ローカル用の `.wrangler/deploy/config.json` がリポジトリに入っていると、CI 上で **`dist/server/wrangler.json` が存在しないのにそのパスへリダイレクト**され、今回のようなエラーになる。本リポジトリでは [.gitignore](.gitignore) で除外済み。

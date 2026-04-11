@@ -12,6 +12,7 @@
     "preview": "astro preview",
     "pages:dev": "bun run build && bunx wrangler pages dev ./dist",
     "deploy:pages": "bun run build && bunx wrangler pages deploy ./dist --project-name=kazkiueda_com",
+    "deploy:cf-worker": "bun run build && wrangler deploy",
     "check": "astro check",
     "astro": "astro",
     "generate-types": "wrangler types"
