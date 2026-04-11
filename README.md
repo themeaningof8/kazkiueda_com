@@ -29,6 +29,20 @@
 
 `wrangler types` で生成される `worker-configuration.d.ts` は `.gitignore` 済み（リポジトリに含めない）。
 
+## `/portfolio` のプレビュー用パスワード（Basic 認証）
+
+[`src/middleware.ts`](src/middleware.ts) が **`/portfolio` 以下**に **HTTP Basic 認証**をかける。**パスワード**は環境変数 **`PREVIEW_SECRET`**（**ユーザー名は任意**）。
+
+- **`astro dev`** で `PREVIEW_SECRET` が無いときはゲートをかけない（開発の邪魔にならないようにするため）。
+- **本番**で `PREVIEW_SECRET` が無いときは `/portfolio` が **503** になる（設定忘れで公開したままにならないようにするため）。
+
+設定の例:
+
+- ローカル（Wrangler）: [`.dev.vars.example`](.dev.vars.example) をコピーして `.dev.vars` に `PREVIEW_SECRET` を書き、`bun run pages:dev` などで確認する。
+- Cloudflare: ダッシュボードの **Workers & Pages** → 該当プロジェクト → **Settings → Variables and Secrets** に **`PREVIEW_SECRET` を Secret** で追加するか、手元で `wrangler secret put PREVIEW_SECRET` を実行する。
+
+採用担当には **URL** と **パスワード**を別経路で渡す（Basic のダイアログにパスワードだけ入力してもよい）。
+
 ## 本番デプロイ
 
 ### A. GitHub Actions（`main` への push で自動）
