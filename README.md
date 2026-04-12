@@ -71,7 +71,7 @@
 ## 補足
 
 - **SolidJS**: `bunx astro add solid`
-- **Wrangler**: `wrangler pages dev` がローカルで失敗する場合は `bun run preview` で確認し、[workers-sdk の issue](https://github.com/cloudflare/workers-sdk/issues) も参照。
+- **Wrangler**: `wrangler pages dev` が **`dist/server/wrangler.json` が無い**等で落ちるときは、旧 Workers アダプタのキャッシュが残っていることが多い。リポジトリ直下の **`.wrangler` を削除**してから `bun run build` と `bun run pages:dev` をやり直す。それでもダメなら `bun run preview` で静的確認し、[workers-sdk の issue](https://github.com/cloudflare/workers-sdk/issues) も参照。
 
 ## ライセンス
 
