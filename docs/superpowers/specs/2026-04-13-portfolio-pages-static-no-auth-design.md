@@ -1,6 +1,6 @@
 # Portfolio — Cloudflare Pages (static) + no Basic auth + crawl controls — design spec
 
-**Status:** Draft — awaiting author review of this file.  
+**Status:** Approved (2026-04-13).  
 **Decisions locked in brainstorming (2026-04-13):** Hosting path **B** — GitHub Actions builds, **`wrangler pages deploy ./dist`** to Cloudflare Pages (not Cloudflare-only Git build). **Full static** for `/`, `/portfolio` index, and existing prerendered case studies. **Remove** HTTP Basic / `PREVIEW_SECRET` gate for recruiter UX. **Strengthen** crawl/index suppression because **current-employer-related content must not spread outward more than necessary** (no guarantee against malicious bots; target well-behaved crawlers and major search engines).
 
 ## 1. Goals

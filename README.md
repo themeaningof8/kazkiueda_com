@@ -1,6 +1,6 @@
 # kazkiueda.com
 
-個人サイト／ポートフォリオ（[要件](docs/requirements.md)）。スタックは **Astro 6** + **Cloudflare Pages**（`@astrojs/cloudflare`）。
+個人サイト／ポートフォリオ（[要件](docs/requirements.md)）。スタックは **Astro 6**（**静的出力**）+ **Cloudflare Pages**（`dist` を **`wrangler pages deploy`** で公開）。
 
 ## パッケージマネージャ: Bun
 
@@ -21,108 +21,52 @@
 | `bun run preview` | ビルド結果のプレビュー |
 | `bun run check` | `astro check` |
 | `bun run pages:dev` | `build` のあと `wrangler pages dev ./dist` |
-| `bun run deploy:pages` | `build` のあと `wrangler pages deploy`（要 `wrangler login` とプロジェクト作成済み） |
-| `bun run deploy:cf-worker` | Cloudflare **ダッシュボードの Workers デプロイ**用（`build` のあと `wrangler deploy`） |
-| `bun run generate-types` | `wrangler types`（任意） |
+| `bun run deploy` / `bun run deploy:pages` | `build` のあと **`wrangler pages deploy ./dist`**（要 `wrangler login` と **Pages プロジェクト作成済み**） |
+| `bun run generate-types` | `wrangler types`（任意・`wrangler.jsonc` 最小構成向け） |
 
 ローカル用の環境変数は [`.dev.vars.example`](.dev.vars.example) を参照し、必要に応じて **`.dev.vars`** を作成する（`.dev.vars` は Git に含めない）。
 
 `wrangler types` で生成される `worker-configuration.d.ts` は `.gitignore` 済み（リポジトリに含めない）。
 
-## `/portfolio` のプレビュー用パスワード（Basic 認証）
+## `/portfolio` と検索・クローラ
 
-[`src/middleware.ts`](src/middleware.ts) が **`/portfolio` 以下**に **HTTP Basic 認証**をかける。**パスワード**は環境変数 **`PREVIEW_SECRET`**（**ユーザー名は任意**）。
+採用担当には **URL のみ**共有する（Basic 認証は**廃止**）。**現職に関する情報**の外部露出を抑えるため、次を組み合わせる（詳細は [要件](docs/requirements.md) §5）。
 
-- **`astro dev`** で `PREVIEW_SECRET` が無いときはゲートをかけない（開発の邪魔にならないようにするため）。
-- **本番**で `PREVIEW_SECRET` が無いときは `/portfolio` が **503** になる（設定忘れで公開したままにならないようにするため）。
-
-設定の例:
-
-- ローカル（Wrangler）: [`.dev.vars.example`](.dev.vars.example) をコピーして `.dev.vars` に `PREVIEW_SECRET` を書き、`bun run pages:dev` などで確認する。
-- Cloudflare: ダッシュボードの **Workers & Pages** → 該当プロジェクト → **Settings → Variables and Secrets** に **`PREVIEW_SECRET` を Secret** で追加するか、手元で `wrangler secret put PREVIEW_SECRET` を実行する。
-
-採用担当には **URL** と **パスワード**を別経路で渡す（Basic のダイアログにパスワードだけ入力してもよい）。
+- **`public/robots.txt`** — `/portfolio` を `Disallow`（主要ボット向けブロックあり）
+- **`PortfolioLayout`** — `<meta name="robots" content="noindex, nofollow, noarchive">`
+- **`public/_headers`** — `X-Robots-Tag: noindex, nofollow, noarchive`（`/portfolio` 配下）
 
 ## 本番デプロイ
 
-### A. GitHub Actions（`main` への push で自動）
+### GitHub Actions（`main` への push で自動）
 
-[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml) が **Bun でビルド**し、`wrangler pages deploy` で Pages に載せます。
+[.github/workflows/deploy-cloudflare-pages.yml](.github/workflows/deploy-cloudflare-pages.yml) が **Bun でビルド**し、**`wrangler pages deploy ./dist --project-name=kazkiueda-com`** で **Cloudflare Pages** に載せます。
 
 リポジトリの **Settings → Secrets and variables → Actions** に次を登録する。
 
 | Secret | 内容 |
 |--------|------|
-| `CLOUDFLARE_API_TOKEN` | [API トークン](https://dash.cloudflare.com/profile/api-tokens)（**Account** → **Cloudflare Workers** など、Pages デプロイに必要な権限を含むテンプレート推奨） |
-| `CLOUDFLARE_ACCOUNT_ID` | ダッシュボード右サイドバーまたは Workers 概要の **Account ID** |
+| `CLOUDFLARE_API_TOKEN` | [API トークン](https://dash.cloudflare.com/profile/api-tokens)。**Cloudflare Pages** の編集・デプロイに必要な Account 権限を含むこと。 |
+| `CLOUDFLARE_ACCOUNT_ID` | ダッシュボードの **Account ID**（**ゾーン ID と混同しない**）。 |
 
-**Pages のプロジェクト名**は、`wrangler pages deploy --project-name=...` と **Cloudflare ダッシュボードに表示されている名前が一字一句同じ**である必要があります。GitHub から Pages を作った場合、**リポジトリ名**（例: `kazkiueda-com`）がプロジェクト名になっていることが多いです。
+**プロジェクト名**は [package.json](package.json) の **`deploy:pages`** の `--project-name` と **ダッシュボードの Pages プロジェクト名が一致**していること（このリポジトリでは **`kazkiueda-com`**）。
 
-GitHub Actions では、**Variable `PAGES_PROJECT_NAME` が未設定のときは [package.json](package.json) の `name`** を `pages deploy --project-name` に使う（[wrangler.jsonc](wrangler.jsonc) の Worker 名とは別）。ダッシュボードの実名と違うときだけ **`PAGES_PROJECT_NAME`** で上書きする。
+**移行後の手動チェック（重要）**
 
-- **API 8000007**（`Project not found`）→ その名前の **Pages プロジェクトがこのアカウントに無い**（**GitHub の `CLOUDFLARE_ACCOUNT_ID` が、ダッシュボードでプロジェクトを作ったアカウントと違う**ことが多い）。または **Worker 名と混同**（Pages と Worker は別）。ワークフローの Preflight で **`wrangler pages project list` に出る名前**と `PAGES_PROJECT_NAME` / `package.json` の `name` を一致させる。
-- **API 7003**（`object identifier is invalid`）→ 多くの場合 **Account ID 誤り**か **トークンに Pages 権限がない**（下記「7003」節）。
+- 同じカスタムドメインで **旧 Cloudflare Worker** がまだ有効なら、**二重公開**や意図しないルーティングになる。ダッシュボードで **Worker のルートを外す**か、Worker を削除／無効化する。
+- **`PREVIEW_SECRET`** など旧 Worker 用シークレットは **不要**なら削除する。
 
-**Account ID** は **ゾーン ID（ドメイン用）ではない**ことに注意する。Workers / Pages の概要画面に出る **32 桁の Account ID** を使う。
-
-初回はダッシュボードで **Create application → Pages** からプロジェクトを作るか、`bunx wrangler pages project create <名前>` で作成する。
-
-デプロイ時に **`pages_build_output_dir` の警告**が出ても、Astro の Cloudflare アダプタは Worker 向けの `ASSETS` バインディングを使うため、ルートの [wrangler.jsonc](wrangler.jsonc) に `pages_build_output_dir` を足すとビルドが衝突することがあります。**警告は無視してよい**（公式も「ローカル用として無視」と説明している）ケースが多いです。
-
-### デプロイが API 7003 で落ちるとき
-
-ワークフローに **Verify Cloudflare auth and list Pages projects** ステップがあるので、ログを順に見る。
-
-1. **`whoami` が失敗** → `CLOUDFLARE_API_TOKEN` か `CLOUDFLARE_ACCOUNT_ID` が無効（**ゾーン ID を Account ID と間違えていないか**、Secret に**余分な改行・スペース**が入っていないか）。必要なら Secret を作り直す。
-2. **`whoami` は成功だが `pages project list` が 7003** → トークンに **Pages 向け権限がない**ことが多い。ダッシュボードで **Create Token → Edit custom token** とし、**Account → Cloudflare Pages → Edit**（少なくとも Read）を付与したトークンに差し替える（「Edit Cloudflare Workers」テンプレだけでは足りないことがある）。
-3. **一覧に出ている名前と `--project-name` が違う** → GitHub の **Variable `PAGES_PROJECT_NAME`** を、一覧の名前に**完全一致**で設定する。
-
-一覧にプロジェクトが無い場合は、ダッシュボードまたは `bunx wrangler pages project create <名前>` で先に作成する。
-
-### B. 手元から Wrangler
+### 手元から Wrangler
 
 1. `bunx wrangler login`
-2. （初回）プロジェクト作成: `bunx wrangler pages project create <名前>`（[package.json](package.json) の `deploy:pages` の `--project-name` や GitHub の **`PAGES_PROJECT_NAME`** と同じ名前にする）
-3. `bun run deploy:pages`
+2. （初回）`bunx wrangler pages project create kazkiueda-com` など、**`deploy:pages` と同じ名前**で Pages プロジェクトを作る。
+3. `bun run deploy` または `bun run deploy:pages`
 
-### C. Cloudflare ダッシュボード（Workers Builds / Git 連携）
+### デプロイが API 7003 / 8000007 で落ちるとき
 
-[Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/) は公式どおり **「1) Build command（任意）→ 2) Deploy command」** の順で動く。**Build が空のままだと `astro build` は一切走らず**、いまのログのように **`npx wrangler deploy` だけ**になり、`@astrojs/cloudflare/entrypoints/server` が無いエラーで落ちる。
-
-1. ダッシュボード **[Workers & Pages](https://dash.cloudflare.com/)** → **Workers** 一覧から **`kazkiueda`**（Worker 名）を開く（**Pages** のプロジェクト画面ではなく、**Worker** の画面。2欄の Build / Deploy が無ければ開く場所が違う）。
-2. **Settings** → **Build**
-3. 次を **保存**。
-
-**いちばん簡単（Deploy 欄だけ直す）**
-
-| 欄 | 入れる値 |
-|----|-----------|
-| **Build command (Optional)** | （空のままでよい） |
-| **Deploy command** | **`bun run deploy`**（`npx wrangler deploy` のままだとビルドされない） |
-
-[package.json](package.json) の **`deploy`** は `bun run build && wrangler deploy` なので、**Deploy だけこれに差し替えれば**公式の2段階でも1段でも、必ず `astro build` が先に走る。
-
-**公式どおり2段に分けたい場合**
-
-| 欄 | 入れる値 |
-|----|-----------|
-| **Build command** | `bun run build` |
-| **Deploy command** | `npx wrangler deploy` |
-
-4. **Environment variables**（Workers の Build 用）  
-   - **`BUN_VERSION`**: `.bun-version` と同じ（例 `1.3.5`）  
-   - **`NODE_VERSION`**: `.nvmrc` に合わせる（例 `22.12`）  
-   - **`SKIP_DEPENDENCY_INSTALL`**: 使うなら、Build に **`bun install --frozen-lockfile && bun run build`** のように **install を自分で書く**
-
-5. まだ古いログが出るときは **Build cache をクリア**してから再デプロイ（空の `dist` がキャッシュされていることがある）。
-
-6. **`.wrangler/` は Git に含めない**（[.gitignore](.gitignore) 済み）。
-
-7. **Pages** から Git 連携している場合は UI が別物のことがある。その場合は **GitHub Actions だけ**に寄せるか、上記 **Worker の Settings → Build** を探す。
-
-### D. Cloudflare Pages（静的ホスト）としての Git 連携
-
-Workers ではなく **Pages** だけ使う場合の話は別ドキュメントが近い。**このリポジトリは Astro SSR + Cloudflare アダプタ前提**なので、基本は **§C の Worker / Workers Builds** か **GitHub Actions** を使う想定。
+1. **`whoami` が失敗** → `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` の誤り、または Secret に余分な改行。
+2. **`Project not found`** → **`--project-name`** がダッシュボードの **Pages** プロジェクト名と一致しているか。Worker 名と混同していないか。
+3. **7003** → トークンに **Pages** 向け権限がないことが多い。**Account → Cloudflare Pages → Edit** 等を付与したトークンに差し替える。
 
 ## 補足
 
