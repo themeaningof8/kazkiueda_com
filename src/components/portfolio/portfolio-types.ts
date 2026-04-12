@@ -28,3 +28,12 @@ export interface FooterLink {
   label: string;
   href?: string;
 }
+
+export interface PortfolioTopNavProps {
+  brand: string;
+  workHref: string;
+  aboutHref: string;
+  contactHref: string;
+  ctaHref: string;
+  ctaLabel: string;
+}

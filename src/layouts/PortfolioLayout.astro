@@ -1,12 +1,15 @@
 ---
 import '../styles/portfolio.css';
 import { ClientRouter } from 'astro:transitions';
+import PortfolioTopNav from '../components/portfolio/PortfolioTopNav.astro';
+import type { PortfolioTopNavProps } from '../components/portfolio/portfolio-types';
 
 interface Props {
   title?: string;
+  topNav?: PortfolioTopNavProps;
 }
 
-const { title = 'Portfolio' } = Astro.props;
+const { title = 'Portfolio', topNav } = Astro.props;
 ---
 
 <!doctype html>
@@ -39,6 +42,7 @@ const { title = 'Portfolio' } = Astro.props;
       aria-hidden="true"
     >
     </div>
+    {topNav && <PortfolioTopNav {...topNav} />}
     <slot />
   </body>
 </html>

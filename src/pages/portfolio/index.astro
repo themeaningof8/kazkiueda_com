@@ -10,7 +10,12 @@ import PortfolioCaseStudyNav from '../../components/portfolio/PortfolioCaseStudy
 import PortfolioAbout from '../../components/portfolio/PortfolioAbout.astro';
 import PortfolioContact from '../../components/portfolio/PortfolioContact.astro';
 import PortfolioFooter from '../../components/portfolio/PortfolioFooter.astro';
-import type { CaseStudy, CaseStudyNavItem, FooterLink } from '../../components/portfolio/portfolio-types';
+import type {
+  CaseStudy,
+  CaseStudyNavItem,
+  FooterLink,
+  PortfolioTopNavProps,
+} from '../../components/portfolio/portfolio-types';
 
 const contactEmail =
   import.meta.env.PUBLIC_CONTACT_EMAIL?.trim() || 'hello@kazkiueda.com';
@@ -95,12 +100,21 @@ const aboutSections = [
 
 const aboutClosing =
   '肩書きはデザイナーですが、組織が前に進むために必要なことをやる人間だと自己認識しています。';
+
+const topNav = {
+  brand: 'Kazki Ueda',
+  workHref: '#work',
+  aboutHref: '#about',
+  contactHref: '#contact',
+  ctaHref: `mailto:${contactEmail}`,
+  ctaLabel: 'お問い合わせ',
+} satisfies PortfolioTopNavProps;
 ---
 
-<PortfolioLayout title="Portfolio | kazkiueda.com">
+<PortfolioLayout title="Portfolio | kazkiueda.com" topNav={topNav}>
   <main
     id="main-content"
-    class="mx-auto min-w-0 max-w-portfolio px-6 pt-20 pb-32 md:px-12 md:pt-28 md:pb-48"
+    class="mx-auto min-w-0 max-w-portfolio px-6 pt-28 pb-32 md:px-12 md:pt-32 md:pb-48"
   >
     <PortfolioHero
       titleLine1="静かな画面に、"
@@ -112,7 +126,7 @@ const aboutClosing =
       <h2 id="work-heading" class="sr-only">ケーススタディ</h2>
 
       <div class="md:hidden">
-        <div class="sticky top-0 z-20 -mx-6 px-6 pt-2 pb-3 md:static">
+        <div class="sticky top-16 z-20 -mx-6 px-6 pt-2 pb-3 md:static">
           <PortfolioCaseStudyNav variant="chips" items={navItems} />
         </div>
       </div>
