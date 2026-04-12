@@ -1,6 +1,6 @@
 # Portfolio — Stitch layout parity (Sage + Noto) — design spec
 
-**Status:** Draft pending author review (2026-04-12).  
+**Status:** Approved (2026-04-12).  
 **Reference:** `docs/stitch-ref/portfolio-home-updated/screen.html`（Stitch 画面「Portfolio Home (Updated Content)」エクスポート。配色・Inter は参照せず、**レイアウト・コンポーネント形状・余白・情報階層**のみ正とする）。  
 **Supersedes (partial):** `docs/superpowers/specs/2026-04-12-portfolio-persistent-case-study-nav-design.md` のうち、**レイアウト／ナビ配置**に関する記述。機能要件（アンカー、詳細遷移、コレクション）と整合する範囲で置き換える。
 
