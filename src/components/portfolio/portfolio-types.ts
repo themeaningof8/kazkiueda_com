@@ -11,6 +11,8 @@ export interface CaseStudy {
   href?: string;
   /** `href` 時の短い `aria-label`（未指定時はタイトルから自動生成） */
   linkLabel?: string;
+  /** View Transitions: 一覧カード画像と詳細ヒーローで一致させる名前 */
+  transitionName?: string;
 }
 
 /** `href` が無いときはリンク未設定として `<span>` で描画（キーボードで空の `#` に飛ばない） */

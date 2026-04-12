@@ -11,13 +11,19 @@ interface Props {
   imageAlt: string;
   href?: string;
   linkLabel?: string;
+  transitionName?: string;
 }
 
-const { preset, tags, title, description, imageSrc, imageAlt, href, linkLabel } = Astro.props;
+const { preset, tags, title, description, imageSrc, imageAlt, href, linkLabel, transitionName } =
+  Astro.props;
 
 const headingId = `case-study-heading-${preset}`;
 
-const caseStudyAriaLabel = linkLabel ?? `View case study: ${title}`;
+const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
+
+const linkedImageTransitionAttrs = transitionName
+  ? ({ 'transition:name': transitionName } as const)
+  : {};
 
 const cardLinkClass =
   'group flex flex-col gap-6 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas';
@@ -108,6 +114,7 @@ const L = layout[preset];
               height={L.imgHeight}
               loading="lazy"
               decoding="async"
+              {...linkedImageTransitionAttrs}
             />
           </div>
         </a>
