@@ -1,0 +1,94 @@
+---
+import type { CaseStudyNavItem } from './portfolio-types';
+
+interface Props {
+  items: CaseStudyNavItem[];
+  variant: 'rail' | 'chips';
+}
+
+const { items, variant } = Astro.props;
+
+const navClass =
+  variant === 'chips'
+    ? 'border-b border-border-subtle bg-surface-canvas/90 backdrop-blur supports-[backdrop-filter]:bg-surface-canvas/70'
+    : '';
+
+const listClass =
+  variant === 'chips'
+    ? 'flex gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+    : 'flex flex-col gap-1';
+---
+
+<nav
+  class:list={['portfolio-case-study-nav', navClass]}
+  data-case-study-nav={variant}
+  aria-label="ケーススタディ"
+>
+  <ul class:list={[listClass]}>
+    {
+      items.map((item) => (
+        <li class:list={[variant === 'chips' && 'shrink-0']}>
+          <a
+            class="inline-flex max-w-full rounded-md px-3 py-2 text-sm font-medium text-fg-muted underline-offset-4 transition-colors hover:bg-surface-ui hover:text-fg-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            href={`#${item.anchorId}`}
+            data-case-anchor={item.anchorId}
+          >
+            <span class="line-clamp-2">{item.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  let observer: IntersectionObserver | null = null;
+
+  function setActiveAnchor(activeId: string | null) {
+    const links = document.querySelectorAll<HTMLAnchorElement>('a[data-case-anchor]');
+    for (const link of links) {
+      const id = link.dataset.caseAnchor;
+      const isActive = Boolean(activeId && id === activeId);
+      link.setAttribute('aria-current', isActive ? 'page' : 'false');
+      link.classList.toggle('bg-surface-ui-active', isActive);
+      link.classList.toggle('text-fg-strong', isActive);
+    }
+  }
+
+  function initCaseStudyNavHighlight() {
+    if (observer) observer.disconnect();
+
+    const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('a[data-case-anchor]')];
+    if (!navLinks.length) return;
+
+    const ids = [
+      ...new Set(navLinks.map((a) => a.dataset.caseAnchor ?? '').filter(Boolean)),
+    ];
+
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    if (!sections.length) return;
+
+    observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        const first = visible[0]?.target.id ?? ids[0];
+        setActiveAnchor(first);
+      },
+      {
+        root: null,
+        rootMargin: '-22% 0px -40% 0px',
+        threshold: [0, 0.15, 0.35, 0.55, 0.75, 1],
+      },
+    );
+
+    for (const section of sections) observer.observe(section);
+    setActiveAnchor(ids[0]);
+  }
+
+  document.addEventListener('astro:page-load', initCaseStudyNavHighlight);
+</script>

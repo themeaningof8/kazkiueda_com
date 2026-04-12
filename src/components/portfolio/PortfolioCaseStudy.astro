@@ -9,13 +9,24 @@ interface Props {
   description: string;
   imageSrc: string;
   imageAlt: string;
+  sectionId: string;
   href?: string;
   linkLabel?: string;
   transitionName?: string;
 }
 
-const { preset, tags, title, description, imageSrc, imageAlt, href, linkLabel, transitionName } =
-  Astro.props;
+const {
+  preset,
+  tags,
+  title,
+  description,
+  imageSrc,
+  imageAlt,
+  sectionId,
+  href,
+  linkLabel,
+  transitionName,
+} = Astro.props;
 
 const headingId = `case-study-heading-${preset}`;
 
@@ -72,17 +83,26 @@ const layout = {
 } as const;
 
 const L = layout[preset];
+
+const imageShellClass = [
+  'relative w-full overflow-hidden bg-surface-subtle transition-colors duration-500 group-hover:bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText',
+  L.aspect,
+];
 ---
 
-<article class:list={['relative min-w-0', L.grid]} aria-labelledby={headingId}>
+<article
+  id={sectionId}
+  class:list={['relative min-w-0 scroll-mt-24 md:scroll-mt-32', L.grid]}
+  aria-labelledby={headingId}
+>
   <span class={L.number} aria-hidden="true">{preset}</span>
-  <div class="min-w-0 space-y-6">
+  <div class="group min-w-0 space-y-6">
     <div class="mb-4 flex flex-wrap gap-3">
       {tags.map((t) => <PortfolioTag label={t} />)}
     </div>
     {
       href ? (
-        <a class={cardLinkClass} href={href} aria-label={caseStudyAriaLabel}>
+        <>
           <h3
             id={headingId}
             class:list={[
@@ -100,24 +120,36 @@ const L = layout[preset];
           >
             {description}
           </p>
-          <div
-            class:list={[
-              'relative w-full overflow-hidden bg-surface-subtle transition-colors duration-500 group-hover:bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText',
-              L.aspect,
-            ]}
-          >
-            <img
-              class="h-full w-full object-cover opacity-20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-60 forced-colors:opacity-100 forced-colors:mix-blend-normal"
-              src={imageSrc}
-              alt=""
-              width={L.imgWidth}
-              height={L.imgHeight}
-              loading="lazy"
-              decoding="async"
-              {...linkedImageTransitionAttrs}
-            />
+          <a class={cardLinkClass} href={href} aria-label={caseStudyAriaLabel}>
+            <div class:list={imageShellClass}>
+              <img
+                class="h-full w-full object-cover opacity-20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-60 forced-colors:opacity-100 forced-colors:mix-blend-normal"
+                src={imageSrc}
+                alt=""
+                width={L.imgWidth}
+                height={L.imgHeight}
+                loading="lazy"
+                decoding="async"
+                {...linkedImageTransitionAttrs}
+              />
+            </div>
+          </a>
+          <div class="pt-1">
+            <a
+              class="group/detail inline-flex items-center gap-3 self-start outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
+              href={href}
+            >
+              <span
+                class="border-b-2 border-surface-ui text-base font-bold text-accent transition-all group-hover/detail:border-accent"
+                >{linkLabel ?? '詳細を見る'}</span
+              >
+              <span
+                class="material-symbols-outlined text-base text-accent transition-transform group-hover/detail:translate-x-2"
+                aria-hidden="true">arrow_forward</span
+              >
+            </a>
           </div>
-        </a>
+        </>
       ) : (
         <div class="group flex min-w-0 flex-col gap-6">
           <h3
@@ -137,12 +169,7 @@ const L = layout[preset];
           >
             {description}
           </p>
-          <div
-            class:list={[
-              'relative w-full overflow-hidden bg-surface-subtle transition-colors duration-500 group-hover:bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText',
-              L.aspect,
-            ]}
-          >
+          <div class:list={imageShellClass}>
             <img
               class="h-full w-full object-cover opacity-20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-60 forced-colors:opacity-100 forced-colors:mix-blend-normal"
               src={imageSrc}
