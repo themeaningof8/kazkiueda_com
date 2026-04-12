@@ -1,0 +1,39 @@
+---
+import type { FooterLink } from './portfolio-types';
+
+interface Props {
+  copyright: string;
+  links: FooterLink[];
+}
+
+const { copyright, links } = Astro.props;
+---
+
+<footer class="w-full border-t border-border-subtle/20 bg-surface-subtle">
+  <div
+    class="mx-auto flex w-full max-w-portfolio flex-col items-center justify-between gap-8 px-6 py-10 md:flex-row md:px-12 md:py-12"
+  >
+    <div class="max-w-full min-w-0 break-words text-xs tracking-widest text-fg-muted uppercase">
+      {copyright}
+    </div>
+    <div class="flex min-w-0 flex-wrap items-center justify-center gap-2 md:gap-3">
+      {
+        links.map(({ href, label }) =>
+          href ? (
+            <a
+              class="inline-flex min-h-11 min-w-11 max-w-full items-center justify-center rounded-lg px-3 text-xs tracking-widest text-fg-muted uppercase transition-colors hover:bg-surface-ui-hover hover:text-fg-strong"
+              href={href}
+            >
+              {label}
+            </a>
+          ) : (
+            <span
+              class="inline-flex min-h-11 min-w-11 max-w-full cursor-default items-center justify-center rounded-lg px-3 text-xs tracking-widest text-border-default uppercase"
+              title="Coming soon">{label}</span
+            >
+          ),
+        )
+      }
+    </div>
+  </div>
+</footer>

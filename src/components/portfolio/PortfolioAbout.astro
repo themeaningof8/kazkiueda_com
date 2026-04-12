@@ -1,0 +1,74 @@
+---
+interface Props {
+  portraitSrc: string;
+  portraitAlt: string;
+  quoteBefore: string;
+  quoteHighlight: string;
+  quoteAfter: string;
+  paragraphs: string[];
+  storyHref: string;
+  storyLabel: string;
+}
+
+const {
+  portraitSrc,
+  portraitAlt,
+  quoteBefore,
+  quoteHighlight,
+  quoteAfter,
+  paragraphs,
+  storyHref,
+  storyLabel,
+} = Astro.props;
+---
+
+<section
+  id="about"
+  class="mt-40 grid grid-cols-1 items-center gap-12 md:mt-96 md:grid-cols-12 md:gap-32"
+  aria-labelledby="about-heading"
+>
+  <h2 id="about-heading" class="sr-only">About</h2>
+  <div class="relative md:col-span-4 md:col-start-2">
+    <div
+      class="relative aspect-[4/5] bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText"
+    >
+      <img
+        class="h-full w-full object-cover opacity-80 mix-blend-multiply grayscale forced-colors:opacity-100 forced-colors:mix-blend-normal forced-colors:grayscale-0"
+        src={portraitSrc}
+        alt={portraitAlt}
+        width={800}
+        height={1000}
+        loading="lazy"
+        decoding="async"
+      />
+      <div
+        class="pointer-events-none absolute inset-0 border border-surface-canvas border-[length:var(--spacing-portfolio-frame-sm)] md:border-[length:var(--spacing-portfolio-frame-md)]"
+      >
+      </div>
+    </div>
+  </div>
+  <div class="space-y-10 md:col-span-6 md:space-y-12">
+    <h3
+      class="min-w-0 break-words text-2xl leading-tight font-bold tracking-tight text-fg-strong italic md:text-5xl"
+    >
+      {quoteBefore}<span class="text-accent">{quoteHighlight}</span>{quoteAfter}
+    </h3>
+    <div class="max-w-lg min-w-0 space-y-6 text-lg text-fg-muted">
+      {paragraphs.map((p) => (
+        <p class="min-w-0 break-words">{p}</p>
+      ))}
+    </div>
+    <div class="pt-4 md:pt-8">
+      <a class="group inline-flex items-center gap-4" href={storyHref}>
+        <span
+          class="border-b-2 border-surface-ui text-lg font-bold text-accent transition-all group-hover:border-accent"
+          >{storyLabel}</span
+        >
+        <span
+          class="material-symbols-outlined text-accent transition-transform group-hover:translate-x-2"
+          aria-hidden="true">east</span
+        >
+      </a>
+    </div>
+  </div>
+</section>

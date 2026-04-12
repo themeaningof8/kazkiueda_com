@@ -1,0 +1,21 @@
+---
+interface Props {
+  email: string;
+  eyebrow?: string;
+}
+
+const { email, eyebrow = 'Next Step' } = Astro.props;
+---
+
+<section id="contact" class="mt-40 text-center md:mt-96" aria-labelledby="contact-heading">
+  <h2
+    id="contact-heading"
+    class="mb-6 text-xs font-semibold tracking-widest text-fg-muted uppercase md:mb-8"
+    >{eyebrow}</h2
+  >
+  <a
+    class="inline-block max-w-full break-all text-[clamp(2.5rem,10vw,8rem)] leading-none font-extrabold tracking-tighter text-fg-strong underline decoration-surface-ui transition-colors [text-decoration-thickness:var(--text-decoration-thickness-portfolio-link)] [text-underline-offset:var(--text-underline-offset-portfolio-link)] hover:text-accent hover:decoration-accent"
+    href={`mailto:${email}`}
+    aria-label={`Send email to ${email}`}>{email}</a
+  >
+</section>
