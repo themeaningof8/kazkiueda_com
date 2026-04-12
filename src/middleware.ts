@@ -27,14 +27,9 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   }
 
   const secret = (env.PREVIEW_SECRET ?? '').trim();
+  // 未設定ならゲートなし（本番の公開ポートフォリオ）。値を入れたときだけ Basic 認証。
   if (!secret) {
-    if (import.meta.env.DEV) {
-      return next();
-    }
-    return new Response(
-      'PREVIEW_SECRET が未設定です。Cloudflare では wrangler secret put PREVIEW_SECRET を実行してください。',
-      { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
-    );
+    return next();
   }
 
   const header = context.request.headers.get('Authorization');
