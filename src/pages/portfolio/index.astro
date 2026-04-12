@@ -101,6 +101,8 @@ const aboutSections = [
 const aboutClosing =
   '肩書きはデザイナーですが、組織が前に進むために必要なことをやる人間だと自己認識しています。';
 
+const aboutSkillTags = ['デザインストラテジー', 'システム設計', 'アジャイルリーダーシップ'];
+
 const topNav = {
   brand: 'Kazki Ueda',
   workHref: '#work',
@@ -153,6 +155,8 @@ const topNav = {
       introParagraphs={aboutIntroParagraphs}
       sections={aboutSections}
       closingParagraph={aboutClosing}
+      eyebrow="About"
+      skillTags={aboutSkillTags}
     />
 
     <PortfolioContact email={contactEmail} />

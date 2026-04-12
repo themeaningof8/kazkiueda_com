@@ -1,21 +1,39 @@
 ---
 interface Props {
   email: string;
-  eyebrow?: string;
+  headline?: string;
+  subcopy?: string;
+  buttonLabel?: string;
 }
 
-const { email, eyebrow = 'Next Step' } = Astro.props;
+const {
+  email,
+  headline = '一緒に、意味のあるものをつくりましょう。',
+  subcopy = 'プロジェクトのご相談や採用についてなど、お気軽にご連絡ください。',
+  buttonLabel = 'お問い合わせ',
+} = Astro.props;
 ---
 
-<section id="contact" class="mt-40 text-center md:mt-96" aria-labelledby="contact-heading">
-  <h2
-    id="contact-heading"
-    class="mb-6 text-xs font-semibold tracking-widest text-fg-muted uppercase md:mb-8"
-    >{eyebrow}</h2
-  >
-  <a
-    class="inline-block max-w-full break-all text-[clamp(2.5rem,10vw,8rem)] leading-none font-extrabold tracking-tighter text-fg-strong underline decoration-surface-ui transition-colors [text-decoration-thickness:var(--text-decoration-thickness-portfolio-link)] [text-underline-offset:var(--text-underline-offset-portfolio-link)] hover:text-accent hover:decoration-accent"
-    href={`mailto:${email}`}
-    aria-label={`Send email to ${email}`}>{email}</a
-  >
+<section
+  id="contact"
+  class="scroll-mt-28 border-y border-border-subtle/40 bg-accent px-6 py-20 text-center text-fg-on-accent md:px-12 md:py-28"
+  aria-labelledby="contact-heading"
+>
+  <div class="mx-auto max-w-3xl">
+    <h2
+      id="contact-heading"
+      class="text-3xl font-bold leading-tight tracking-tighter md:text-5xl"
+    >
+      {headline}
+    </h2>
+    <p class="mt-6 text-base font-light text-fg-on-accent/85 md:text-lg">
+      {subcopy}
+    </p>
+    <a
+      class="mt-10 inline-block rounded-lg bg-surface-canvas px-10 py-4 text-base font-bold text-accent shadow-lg transition hover:bg-surface-subtle active:scale-[0.98] motion-reduce:transition-none"
+      href={`mailto:${email}`}
+    >
+      {buttonLabel}
+    </a>
+  </div>
 </section>
