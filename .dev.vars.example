@@ -3,3 +3,9 @@
 #
 # /portfolio の Basic 認証（パスワード部分）。ユーザー名は任意。
 PREVIEW_SECRET=
+
+# オプション: ポートフォリオの mailto（Astro の `PUBLIC_CONTACT_EMAIL`）
+# PUBLIC_CONTACT_EMAIL=
+# PUBLIC_INSTAGRAM_URL=
+# PUBLIC_LINKEDIN_URL=
+# PUBLIC_DRIBBBLE_URL=

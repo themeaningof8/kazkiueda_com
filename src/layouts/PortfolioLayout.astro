@@ -1,4 +1,6 @@
 ---
+import '../styles/portfolio.css';
+
 interface Props {
   title?: string;
 }
@@ -7,7 +9,7 @@ const { title = 'Portfolio' } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="ja">
+<html class="light" lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,8 +18,25 @@ const { title = 'Portfolio' } = Astro.props;
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body>
+  <body
+    class="bg-surface-canvas font-sans text-fg-strong selection:bg-surface-ui selection:text-fg-muted"
+  >
+    <a
+      class="fixed z-[100] inline-block translate-y-[calc(-100%-theme(spacing.6))] rounded-lg bg-accent px-4 py-3 font-sans text-sm font-semibold text-fg-on-accent underline outline-offset-2 transition-transform focus:translate-y-0 focus:outline focus:outline-2 focus:outline-fg-on-accent focus-visible:outline-[3px] forced-colors:focus:outline forced-colors:focus:outline-CanvasText forced-colors:focus-visible:outline-CanvasText"
+      href="#main-content">Skip to main content</a
+    >
+    <div
+      class="pointer-events-none fixed inset-0 -z-10 opacity-25 bg-[radial-gradient(var(--color-accent)_1.5px,transparent_1.5px)] bg-[length:var(--spacing-portfolio-dot)_var(--spacing-portfolio-dot)]"
+      aria-hidden="true"
+    >
+    </div>
     <slot />
   </body>
 </html>

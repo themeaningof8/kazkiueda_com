@@ -2,6 +2,7 @@
 import { defineConfig, sessionDrivers } from 'astro/config';
 
 import cloudflare from '@astrojs/cloudflare';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
@@ -10,4 +11,7 @@ export default defineConfig({
   // In-memory per isolate (no KV). Good enough until password sessions are designed.
   session: { driver: sessionDrivers.lruCache() },
   adapter: cloudflare({ imageService: 'compile' }),
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });

@@ -1,0 +1,22 @@
+---
+interface Props {
+  titleLine1: string;
+  titleAccent: string;
+  lead: string;
+}
+
+const { titleLine1, titleAccent, lead } = Astro.props;
+---
+
+<section class="mb-32 md:mb-72">
+  <h1
+    class="max-w-5xl min-w-0 break-words text-[clamp(3rem,8vw,5.5rem)] leading-[0.9] font-extrabold tracking-tighter text-fg-strong"
+  >
+    {titleLine1}
+    <br />
+    <span class="break-words text-fg-muted">{titleAccent}</span>
+  </h1>
+  <p class="mt-8 max-w-lg min-w-0 break-words text-lg leading-relaxed text-fg-muted">
+    {lead}
+  </p>
+</section>
