@@ -81,6 +81,14 @@ html.dark,
     scroll-padding-top: 5.5rem;
   }
 
+  @media (max-width: 767px) {
+    html {
+      scroll-padding-bottom: calc(
+        var(--spacing-portfolio-dock) + env(safe-area-inset-bottom, 0px)
+      );
+    }
+  }
+
   /* スキップリンクは <main> 外のため除外される */
   main a:focus-visible {
     border-radius: var(--radius-sm);
