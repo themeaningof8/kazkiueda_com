@@ -22,6 +22,8 @@ export interface CaseStudyNavItem {
   label: string;
   /** モバイルチップ背面に重ねる番号（例: コレクションの `preset`） */
   mono?: string;
+  /** 省略時は `#${anchorId}`（詳細ページなどで `/portfolio#…` を渡す） */
+  href?: string;
 }
 
 export interface FooterLink {
@@ -36,4 +38,6 @@ export interface PortfolioTopNavProps {
   contactHref: string;
   ctaHref: string;
   ctaLabel: string;
+  /** 一覧・詳細でヘッダー内の横スクロールチップとして表示 */
+  caseNavItems?: CaseStudyNavItem[];
 }
