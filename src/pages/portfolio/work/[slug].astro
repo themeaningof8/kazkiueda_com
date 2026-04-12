@@ -1,0 +1,82 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import PortfolioLayout from '../../../layouts/PortfolioLayout.astro';
+import PortfolioTag from '../../../components/portfolio/PortfolioTag.astro';
+
+export const prerender = true;
+
+export const getStaticPaths = (async () => {
+  const entries = await getCollection('caseStudies');
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}) satisfies GetStaticPaths;
+
+export interface Props {
+  entry: CollectionEntry<'caseStudies'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, tags, preset, heroImage, heroAlt } = entry.data;
+
+const transitionName = `case-hero-${entry.id}`;
+
+const layoutMeta = {
+  '01': { imgWidth: 1920, imgHeight: 1080, aspect: 'aspect-video' },
+  '02': { imgWidth: 1080, imgHeight: 1080, aspect: 'aspect-square' },
+  '03': { imgWidth: 1200, imgHeight: 1600, aspect: 'aspect-[3/4]' },
+  '04': { imgWidth: 1000, imgHeight: 1250, aspect: 'aspect-[4/5]' },
+} as const;
+
+const L = layoutMeta[preset];
+
+const heroImageTransitionAttrs = { 'transition:name': transitionName } as const;
+---
+
+<PortfolioLayout title={`${title} | kazkiueda.com`}>
+  <main
+    id="main-content"
+    class="mx-auto min-w-0 max-w-portfolio px-6 pt-20 pb-32 md:px-12 md:pt-28 md:pb-48"
+  >
+    <article aria-labelledby="case-title">
+      <header class="min-w-0 space-y-6">
+        <div class="mb-0 flex flex-wrap gap-3">
+          {tags.map((t) => <PortfolioTag label={t} />)}
+        </div>
+        <h1
+          id="case-title"
+          class="max-w-4xl text-4xl font-bold tracking-tight text-fg-strong md:text-6xl"
+        >
+          {title}
+        </h1>
+        <p class="max-w-2xl text-lg leading-relaxed text-fg-muted">{description}</p>
+        <div
+          class:list={[
+            'relative w-full max-w-5xl overflow-hidden bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
+            L.aspect,
+          ]}
+        >
+          <Image
+            src={heroImage}
+            alt={heroAlt}
+            width={L.imgWidth}
+            height={L.imgHeight}
+            class="h-full w-full object-cover opacity-20 mix-blend-multiply grayscale transition-opacity duration-500 forced-colors:opacity-100 forced-colors:mix-blend-normal forced-colors:grayscale-0"
+            sizes="(min-width: 768px) 80vw, 100vw"
+            {...heroImageTransitionAttrs}
+          />
+        </div>
+      </header>
+
+      <div
+        class="prose prose-neutral prose-lg mt-16 max-w-3xl text-fg-muted prose-headings:text-fg-strong prose-a:text-accent prose-strong:text-fg-strong md:mt-24"
+      >
+        <Content />
+      </div>
+    </article>
+  </main>
+</PortfolioLayout>
