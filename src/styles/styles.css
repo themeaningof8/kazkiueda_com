@@ -1,0 +1,177 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@fontsource-variable/noto-sans-jp';
+@plugin '@tailwindcss/typography';
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Radix Colors — Sage（サイトの正）
+ * Starwind の `bg-background` / `bg-popover` 等は下記エイリアスで Sage に寄せる
+ */
+@theme {
+  --font-sans:
+    'Noto Sans JP Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --max-width-portfolio: 120rem;
+
+  --radius-sm: 0.125rem;
+
+  --spacing-portfolio-dot: 32px;
+  --spacing-portfolio-frame-sm: 12px;
+  --spacing-portfolio-frame-md: 20px;
+
+  --text-decoration-thickness-portfolio-link: 4px;
+  --text-underline-offset-portfolio-link: 0.75rem;
+
+  --color-surface-canvas: #fbfdfc;
+  --color-surface-subtle: #f7f9f8;
+  --color-surface-ui: #eef1f0;
+  --color-surface-ui-hover: #e6e9e8;
+  --color-surface-ui-active: #dfe2e0;
+  --color-border-subtle: #d7dad9;
+  --color-border-default: #cbcfcd;
+  --color-border-strong: #b8bcba;
+  --color-accent: #868e8b;
+  --color-accent-hover: #7c8481;
+  --color-fg-muted: #5f6563;
+  --color-fg-strong: #1a211e;
+  --color-fg-on-accent: #ffffff;
+
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+
+  /* Starwind / shadcn 系ユーティリティ → Sage にマップ（別パレットの :root は持たない） */
+  --color-background: var(--color-surface-canvas);
+  --color-foreground: var(--color-fg-strong);
+  --color-card: var(--color-surface-subtle);
+  --color-card-foreground: var(--color-fg-strong);
+  --color-popover: var(--color-surface-canvas);
+  --color-popover-foreground: var(--color-fg-strong);
+  --color-primary: var(--color-accent);
+  --color-primary-foreground: var(--color-fg-on-accent);
+  --color-secondary: var(--color-surface-ui);
+  --color-secondary-foreground: var(--color-fg-strong);
+  --color-muted: var(--color-surface-ui);
+  --color-muted-foreground: var(--color-fg-muted);
+  /* `bg-accent`（Sage の solid）上の文字は fg-on-accent */
+  --color-accent-foreground: var(--color-fg-on-accent);
+  --color-border: var(--color-border-subtle);
+  --color-input: var(--color-border-default);
+  --color-outline: var(--color-accent);
+  --color-info: var(--color-surface-ui-hover);
+  --color-info-foreground: var(--color-fg-strong);
+  --color-success: var(--color-surface-ui-hover);
+  --color-success-foreground: var(--color-fg-strong);
+  --color-warning: var(--color-surface-ui-hover);
+  --color-warning-foreground: var(--color-fg-strong);
+  --color-error: #9d4745;
+  --color-error-foreground: #ffffff;
+
+  --radius-xs: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-2xl: 0.5rem;
+  --radius-3xl: 0.75rem;
+
+  --color-sidebar: var(--color-surface-subtle);
+  --color-sidebar-foreground: var(--color-fg-strong);
+  --color-sidebar-primary: var(--color-accent);
+  --color-sidebar-primary-foreground: var(--color-fg-on-accent);
+  --color-sidebar-accent: var(--color-surface-ui);
+  --color-sidebar-accent-foreground: var(--color-fg-strong);
+  --color-sidebar-border: var(--color-border-subtle);
+  --color-sidebar-outline: var(--color-accent);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--starwind-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--starwind-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+html.dark,
+.dark {
+  --color-surface-canvas: #101211;
+  --color-surface-subtle: #171918;
+  --color-surface-ui: #202221;
+  --color-surface-ui-hover: #272a29;
+  --color-surface-ui-active: #2e3130;
+  --color-border-subtle: #373b39;
+  --color-border-default: #444947;
+  --color-border-strong: #5b625f;
+  --color-accent: #63706b;
+  --color-accent-hover: #717d79;
+  --color-fg-muted: #adb5b2;
+  --color-fg-strong: #eceeed;
+  --color-fg-on-accent: #101211;
+}
+
+@layer base {
+  html {
+    font-feature-settings: 'palt' 1;
+    scroll-padding-top: 5.75rem;
+  }
+
+  main a:focus-visible {
+    border-radius: var(--radius-sm);
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings:
+      'FILL' 0,
+      'wght' 300,
+      'GRAD' 0,
+      'opsz' 24;
+  }
+
+  /* Starwind トリガー用（グローバル * に border は当てない） */
+  button[data-slot='button'] {
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 280ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

@@ -1,72 +1,62 @@
 ---
 export const prerender = false;
 
+import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
 import PortfolioLayout from '../../layouts/PortfolioLayout.astro';
 import PortfolioHero from '../../components/portfolio/PortfolioHero.astro';
 import PortfolioCaseStudy from '../../components/portfolio/PortfolioCaseStudy.astro';
 import PortfolioAbout from '../../components/portfolio/PortfolioAbout.astro';
 import PortfolioContact from '../../components/portfolio/PortfolioContact.astro';
 import PortfolioFooter from '../../components/portfolio/PortfolioFooter.astro';
-import type { CaseStudy, FooterLink } from '../../components/portfolio/portfolio-types';
+import type {
+  CaseStudy,
+  CaseStudyNavItem,
+  FooterLink,
+  PortfolioTopNavProps,
+} from '../../components/portfolio/portfolio-types';
 
 const contactEmail =
   import.meta.env.PUBLIC_CONTACT_EMAIL?.trim() || 'hello@kazkiueda.com';
 
-const images = {
-  ether:
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuDe8TRkOkNVaT71hM2DUFnlyR9KZhQUC-f_0UT4KeQQA-ds-pXs_0LYUImMa-KJrSrTld2oYS1HyzWH4-ajVkkjXk7c9ypNNy4ooXsskfC0UqPngAd8QNKm5The98q30xDgnziGOTRY-XmG3zdGJtapH8gwiWZ4l74VDN00Tpqxdm5chthuAQpqkX7MJpGojRRRT4zfhfP6KU-88UYkDuy__ytuKwdeA_60zgpDbTXuyGU9lHJnXLAzhLxghHa21nY7SQMsFGpwZfU',
-  nexus:
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuDUX9sVoxMzpjhhPi5-0sl6-xMGpTywahAg5WyR-QOHZpY8zt5poTKC-2KlaMl4NSLU0XrMnPiY_I9Ir0tpW9WMQRfx2mbrxnVQ-SUs9kT5G-RdlwF-5LMA7Bs6-Rpi6EeTUotHEbQB_FLB1RMU0OcpI2sgaVur2uKA-KRiThblw8e_7wZDSOc3xqotixnU1dyvbAyPKl3_tPrM-qLfnGnM9FbDYKBdDHzkP2BLH5x7dzBIjGvnHEhIr9rvPPzcemIlZp0CS2OHAFI',
-  linear:
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuCTygJEVY4OIZUqikHBOgXmYr_QoKgN-qouF7C8zry6QVlDKzeXZMdrzhzd7YRLTZrZhaFTw4szCZR90YUBMWHP7DBsvGvEeS9hOW_Lnqp2YyMBiQMacIh3YFMYM0fnVNimSoB5NVagyJrARNxlia9GZaN8qpzzBzug0MUtDMj5xR88cfw0aCr6vKrr0D1gfxHebXZtwbW6VH2QmddMcYjNvGVFb0ukTsgm1O1IccnH18v3Mu47_zEmFEOPKNAK5ZdyDKSKZjVBF9k',
-  vera:
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuCuopCTW1NHv0yXeS07P2YWfWKj9LfmwDm8xCICb6DHFTVePTL2NJ-pVt-oqOXBOHUvS_yw4KZLd-QP4DwLJT0rfv3mqikLxOlyCRopX8MgMNH3h_O7Be0FHvlwSoBbYAT9zU0d5gtXxkSOKTb-WG-J2LWvgxjqx_SY4zke7f6iqv1YRFjgTBuzhD8REDhvsMpiK7CsOod4ymCU5qZILGQY_IvoX5JPOrvyw2cXZJw3bwo29qS6_dwgsUU_-udqtDt67PRGg3hmGts',
-  portrait:
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuB5VDClSm4KRAxtpm8kue7xUbl1G-ksEtVO4ROrWO9sLvWDSkww4tSNQSB51ytU_G7_lD2oWPbAIYAvw_8zBzVigzZ626J1Jwl6G4rW2qxyPuciqam7mOphTZ3M44Bh22jLIw_CFhK993qnNGDY_Xo_iBNjbSPeWmYWLxBF7srzGy23G9uvKexbFqcX22Q2UebBq77gDHYUoiJUEeWDuY6Dlq0QIxQ25q4Wx2rC1gvgAHvqDyfI62jV41wIxUF75fkeqYD9FeLR43A',
-} as const;
+const portraitSrc =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuB5VDClSm4KRAxtpm8kue7xUbl1G-ksEtVO4ROrWO9sLvWDSkww4tSNQSB51ytU_G7_lD2oWPbAIYAvw_8zBzVigzZ626J1Jwl6G4rW2qxyPuciqam7mOphTZ3M44Bh22jLIw_CFhK993qnNGDY_Xo_iBNjbSPeWmYWLxBF7srzGy23G9uvKexbFqcX22Q2UebBq77gDHYUoiJUEeWDuY6Dlq0QIxQ25q4Wx2rC1gvgAHvqDyfI62jV41wIxUF75fkeqYD9FeLR43A';
 
-const caseStudies: CaseStudy[] = [
-  {
-    preset: '01',
-    tags: ['E-commerce', 'Visual Strategy'],
-    title: 'Ether Store',
-    description:
-      'A complete redesign focusing on high-end visual storytelling and seamless checkout flows for boutique fashion.',
-    imageSrc: images.ether,
-    imageAlt:
-      'Minimalist fashion boutique interior with high ceilings, soft natural light, and clean white shelving displays',
-  },
-  {
-    preset: '02',
-    tags: ['SaaS', 'Data Viz'],
-    title: 'Nexus Data',
-    description:
-      'Simplifying complex analytical workflows into an intuitive dashboard system for enterprise cloud management.',
-    imageSrc: images.nexus,
-    imageAlt:
-      'Abstract visualization of digital data points and connections in a clean, soft sage and white color palette',
-  },
-  {
-    preset: '03',
-    tags: ['Architecture', 'Motion'],
-    title: 'Linear Studio',
-    description:
-      'Capturing the movement of space through interactive transitions and spatial UI for an award-winning firm.',
-    imageSrc: images.linear,
-    imageAlt:
-      'Close up of modern brutalist architecture with sharp shadows and soft morning light hitting concrete surfaces',
-  },
-  {
-    preset: '04',
-    tags: ['Fintech', 'UX Research'],
-    title: 'Vera Finance',
-    description:
-      'Humanizing personal finance with soft typography and a research-backed user experience.',
-    imageSrc: images.vera,
-    imageAlt:
-      'Clean minimalist workspace with a single ceramic mug and a thin laptop, diffused light from a nearby window',
-  },
-];
+const rawEntries = await getCollection('caseStudies');
+const sorted = [...rawEntries].sort((a, b) => {
+  if (a.data.order !== b.data.order) return a.data.order - b.data.order;
+  return a.id.localeCompare(b.id);
+});
+
+const caseStudies: CaseStudy[] = await Promise.all(
+  sorted.map(async (entry, rowIndex) => {
+    const { heroImage, heroAlt, order: _order, ...data } = entry.data;
+    const dims =
+      data.preset === '01'
+        ? { w: 1920, h: 1080 }
+        : data.preset === '02'
+          ? { w: 1080, h: 1080 }
+          : data.preset === '03'
+            ? { w: 1200, h: 1600 }
+            : { w: 1000, h: 1250 };
+    const optimized = await getImage({ src: heroImage, width: dims.w, height: dims.h });
+    return {
+      ...data,
+      imageSrc: optimized.src,
+      imageAlt: heroAlt,
+      sectionId: `case-${entry.id}`,
+      href: `/portfolio/work/${entry.id}`,
+      transitionName: `case-hero-${entry.id}`,
+      rowIndex,
+    };
+  }),
+);
+
+const navItems: CaseStudyNavItem[] = sorted.map((entry) => ({
+  anchorId: `case-${entry.id}`,
+  label: entry.data.title,
+  mono: entry.data.preset,
+}));
 
 const footerLinks: FooterLink[] = [
   {
@@ -83,39 +73,80 @@ const footerLinks: FooterLink[] = [
   },
 ];
 
-const aboutParagraphs = [
-  'With a decade of experience across digital landscapes, I focus on the emotional resonance of the interface. Architecture for the screen.',
-  'Currently based in the quiet corners of digital space, partnering with brands that value the intentionality of the silent architect.',
+const aboutIntroParagraphs = [
+  '私はチームのボトルネックを見つけ、自分がそこを埋めにいくデザイナーです。',
+  'デザイン・実装・事業戦略の三層を行き来しながら、「誰かがやらないと止まる」場所に自分から入っていくことでキャリアを作ってきました。',
 ];
+
+const aboutSections = [
+  {
+    heading: '原点となるエピソード',
+    paragraphs: [
+      '入社直後、デザイン組織のスキル水準は高くなく、フロントエンドを担える人間がいなかったためエンジニアがビュー実装を兼務していました。エンジニアは他の開発タスクを多く抱えており、テスト実装の優先度を巡る摩擦が常態化していた状態です。',
+      '私はこの構造をボトルネックと判断し、フロントエンドを自分でキャッチアップすることにしました。Symfony・Ruby on Railsのビュー実装から始め、jQuery、TypeScript、Reactへと段階的に習得。デザイナーとして実装を担えるようになった結果、施策のテスト本数は週2本から最大8本に増加。インタラクティブな実装案を施策の選択肢に加えられるようになり、チームの生産性と表現の幅が同時に広がりました。',
+      'その後も炎上気味だったプロジェクトのスクラムマスターに手を挙げたり、デザインシステムの構築を自ら提案・推進したりと、「自分が動けば前に進む」と判断した場所に一貫して入ってきました。',
+    ],
+  },
+  {
+    heading: '私が提供できること',
+    bullets: [
+      'デザインと実装の両側から課題を定義し、解決策を作る',
+      'ステークホルダー間の認識ズレを構造化し、合意形成につなげる',
+      'チームに不足しているケイパビリティを見極め、自分がそこを埋める',
+    ],
+  },
+];
+
+const aboutClosing =
+  '肩書きはデザイナーですが、組織が前に進むために必要なことをやる人間だと自己認識しています。';
+
+const aboutSkillTags = ['デザインストラテジー', 'システム設計', 'アジャイルリーダーシップ'];
+
+const topNav = {
+  brand: 'Kazki Ueda',
+  workHref: '#work',
+  aboutHref: '#about',
+  contactHref: '#contact',
+  ctaHref: `mailto:${contactEmail}`,
+  ctaLabel: 'お問い合わせ',
+  caseNavItems: navItems,
+} satisfies PortfolioTopNavProps;
 ---
 
-<PortfolioLayout title="Portfolio | kazkiueda.com">
+<PortfolioLayout title="Portfolio | kazkiueda.com" topNav={topNav}>
   <main
     id="main-content"
-    class="mx-auto min-w-0 max-w-portfolio px-6 pt-20 pb-32 md:px-12 md:pt-28 md:pb-48"
+    class="mx-auto min-w-0 max-w-portfolio px-6 pb-32 pt-28 md:px-12 md:pb-48 md:pt-32"
   >
     <PortfolioHero
-      titleLine1="Digital experiences"
-      titleAccent="carved in silence."
-      lead="A text-first approach to interface design. Prioritizing rhythm, hierarchy, and the subtle interplay of light and void."
+      titleLine1="静かな画面に、"
+      titleAccent="体験を刻む。"
+      lead="リズムと階層、光と余白の関係性を大切にする、テキスト起点のインターフェースデザインです。"
     />
 
-    <section id="work" class="relative" aria-labelledby="work-heading">
-      <h2 id="work-heading" class="sr-only">Selected work</h2>
-      <div class="grid min-w-0 grid-cols-1 gap-y-24 md:grid-cols-12 md:gap-y-64">
-        {caseStudies.map((study) => <PortfolioCaseStudy {...study} />)}
+    <section id="work" class="relative scroll-mt-28 md:scroll-mt-32" aria-labelledby="work-heading">
+      <div class="mb-16 min-w-0 md:mb-24">
+        <h2 id="work-heading" class="text-3xl font-bold tracking-tight text-fg-strong">
+          Selected Works
+        </h2>
+        <div class="mt-2 h-1 w-12 bg-accent" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex min-w-0 w-full flex-col gap-y-24 md:gap-y-32 lg:gap-y-40">
+        {caseStudies.map((study) => (
+          <PortfolioCaseStudy {...study} />
+        ))}
       </div>
     </section>
 
     <PortfolioAbout
-      portraitSrc={images.portrait}
-      portraitAlt="Portrait-style photograph used as an about-section visual (desaturated treatment)"
-      quoteBefore='"I believe design should be '
-      quoteHighlight="felt"
-      quoteAfter=', not just seen."'
-      paragraphs={aboutParagraphs}
-      storyHref="#contact"
-      storyLabel="Read the full story"
+      portraitSrc={portraitSrc}
+      portraitAlt="自己紹介セクション用のポートレート写真（低彩度・グレースケール加工）"
+      introParagraphs={aboutIntroParagraphs}
+      sections={aboutSections}
+      closingParagraph={aboutClosing}
+      eyebrow="About"
+      skillTags={aboutSkillTags}
     />
 
     <PortfolioContact email={contactEmail} />

@@ -1,43 +1,54 @@
 ---
+export interface AboutContentSection {
+  heading: string;
+  paragraphs?: string[];
+  bullets?: string[];
+}
+
 interface Props {
   portraitSrc: string;
   portraitAlt: string;
-  quoteBefore: string;
-  quoteHighlight: string;
-  quoteAfter: string;
-  paragraphs: string[];
-  storyHref: string;
-  storyLabel: string;
+  introParagraphs: string[];
+  sections: AboutContentSection[];
+  closingParagraph?: string;
+  storyHref?: string;
+  storyLabel?: string;
+  eyebrow?: string;
+  skillTags?: string[];
 }
 
 const {
   portraitSrc,
   portraitAlt,
-  quoteBefore,
-  quoteHighlight,
-  quoteAfter,
-  paragraphs,
+  introParagraphs,
+  sections,
+  closingParagraph,
   storyHref,
   storyLabel,
+  eyebrow = 'About',
+  skillTags,
 } = Astro.props;
+
+const sectionHeadingBase =
+  'scroll-mt-28 text-xl font-bold tracking-tight text-fg-strong md:scroll-mt-32 md:text-2xl';
+const bodyClass = 'mt-4 max-w-lg min-w-0 space-y-6 text-base leading-relaxed text-fg-muted md:text-lg';
 ---
 
 <section
   id="about"
-  class="mt-40 grid grid-cols-1 items-center gap-12 md:mt-96 md:grid-cols-12 md:gap-32"
+  class="scroll-mt-28 flex flex-col items-center gap-12 py-24 md:scroll-mt-32 md:flex-row md:items-center md:gap-20 md:py-40"
   aria-labelledby="about-heading"
 >
-  <h2 id="about-heading" class="sr-only">About</h2>
-  <div class="relative md:col-span-4 md:col-start-2">
+  <div class="relative w-full shrink-0 md:w-[44%]">
     <div
-      class="relative aspect-[4/5] bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText"
+      class="relative aspect-square overflow-hidden rounded-lg bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText"
     >
       <img
-        class="h-full w-full object-cover opacity-80 mix-blend-multiply grayscale forced-colors:opacity-100 forced-colors:mix-blend-normal forced-colors:grayscale-0"
+        class="h-full w-full object-cover opacity-85 mix-blend-multiply grayscale forced-colors:opacity-100 forced-colors:mix-blend-normal forced-colors:grayscale-0"
         src={portraitSrc}
         alt={portraitAlt}
         width={800}
-        height={1000}
+        height={800}
         loading="lazy"
         decoding="async"
       />
@@ -47,28 +58,86 @@ const {
       </div>
     </div>
   </div>
-  <div class="space-y-10 md:col-span-6 md:space-y-12">
-    <h3
-      class="min-w-0 break-words text-2xl leading-tight font-bold tracking-tight text-fg-strong italic md:text-5xl"
+
+  <div class="min-w-0 flex-1">
+    <h2
+      id="about-heading"
+      class="mb-4 text-xs font-semibold uppercase tracking-widest text-accent"
     >
-      {quoteBefore}<span class="text-accent">{quoteHighlight}</span>{quoteAfter}
-    </h3>
-    <div class="max-w-lg min-w-0 space-y-6 text-lg text-fg-muted">
-      {paragraphs.map((p) => (
+      {eyebrow}
+    </h2>
+    <div class={`${bodyClass} max-w-none`}>
+      {introParagraphs.map((p) => (
         <p class="min-w-0 break-words">{p}</p>
       ))}
     </div>
-    <div class="pt-4 md:pt-8">
-      <a class="group inline-flex items-center gap-4" href={storyHref}>
-        <span
-          class="border-b-2 border-surface-ui text-lg font-bold text-accent transition-all group-hover:border-accent"
-          >{storyLabel}</span
-        >
-        <span
-          class="material-symbols-outlined text-accent transition-transform group-hover:translate-x-2"
-          aria-hidden="true">east</span
-        >
-      </a>
-    </div>
+
+    {
+      sections.map((section, index) => (
+        <div class="min-w-0">
+          <h3
+            class:list={[
+              sectionHeadingBase,
+              index === 0 ? 'mt-10 md:mt-12' : 'mt-10 md:mt-14',
+            ]}
+          >
+            {section.heading}
+          </h3>
+          {section.paragraphs?.length ? (
+            <div class={bodyClass}>
+              {section.paragraphs.map((p) => (
+                <p class="min-w-0 break-words">{p}</p>
+              ))}
+            </div>
+          ) : null}
+          {section.bullets?.length ? (
+            <ul
+              class={`${bodyClass} list-outside list-disc space-y-3 pl-6 marker:text-accent`}
+            >
+              {section.bullets.map((item) => (
+                <li class="min-w-0 break-words pl-1">{item}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ))
+    }
+
+    {
+      skillTags?.length ? (
+        <div class="mt-12 flex flex-wrap gap-3">
+          {skillTags.map((t) => (
+            <span class="rounded-md border border-border-default bg-surface-subtle px-4 py-2 text-xs font-bold tracking-wider text-fg-strong">
+              {t}
+            </span>
+          ))}
+        </div>
+      ) : null
+    }
+
+    {
+      closingParagraph ? (
+        <p class="mt-10 max-w-lg min-w-0 break-words text-base leading-relaxed text-fg-muted md:mt-12 md:text-lg">
+          {closingParagraph}
+        </p>
+      ) : null
+    }
+
+    {
+      storyHref && storyLabel ? (
+        <div class="pt-8 md:pt-12">
+          <a class="group inline-flex items-center gap-4" href={storyHref}>
+            <span
+              class="border-b-2 border-surface-ui text-lg font-bold text-accent transition-all group-hover:border-accent"
+              >{storyLabel}</span
+            >
+            <span
+              class="material-symbols-outlined text-accent transition-transform group-hover:translate-x-2"
+              aria-hidden="true">east</span
+            >
+          </a>
+        </div>
+      ) : null
+    }
   </div>
 </section>

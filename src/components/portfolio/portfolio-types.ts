@@ -5,16 +5,39 @@ export interface CaseStudy {
   tags: string[];
   title: string;
   description: string;
+  roleBadge: string;
+  outcomeLabel: string;
+  outcomeTitle: string;
+  rowIndex: number;
   imageSrc: string;
   imageAlt: string;
-  /** 案件詳細・ケーススタディページなど（あるときだけタイトル〜画像がリンクになる） */
+  sectionId: string;
   href?: string;
-  /** `href` 時の短い `aria-label`（未指定時はタイトルから自動生成） */
   linkLabel?: string;
+  transitionName?: string;
 }
 
-/** `href` が無いときはリンク未設定として `<span>` で描画（キーボードで空の `#` に飛ばない） */
+export interface CaseStudyNavItem {
+  anchorId: string;
+  label: string;
+  /** モバイルチップ背面に重ねる番号（例: コレクションの `preset`） */
+  mono?: string;
+  /** 省略時は `#${anchorId}`（詳細ページなどで `/portfolio#…` を渡す） */
+  href?: string;
+}
+
 export interface FooterLink {
   label: string;
   href?: string;
+}
+
+export interface PortfolioTopNavProps {
+  brand: string;
+  workHref: string;
+  aboutHref: string;
+  contactHref: string;
+  ctaHref: string;
+  ctaLabel: string;
+  /** 一覧・詳細で「制作実績」Popover 内のケースリンク用 */
+  caseNavItems?: CaseStudyNavItem[];
 }

@@ -1,143 +1,157 @@
 ---
 import PortfolioTag from './PortfolioTag.astro';
-import type { CaseStudyPreset } from './portfolio-types';
+import type { CaseStudy, CaseStudyPreset } from './portfolio-types';
 
-interface Props {
-  preset: CaseStudyPreset;
-  tags: string[];
-  title: string;
-  description: string;
-  imageSrc: string;
-  imageAlt: string;
-  href?: string;
-  linkLabel?: string;
-}
+type Props = CaseStudy;
 
-const { preset, tags, title, description, imageSrc, imageAlt, href, linkLabel } = Astro.props;
+const {
+  preset,
+  tags,
+  title,
+  description,
+  roleBadge,
+  outcomeLabel,
+  outcomeTitle,
+  rowIndex,
+  imageSrc,
+  imageAlt,
+  sectionId,
+  href,
+  linkLabel,
+  transitionName,
+} = Astro.props;
 
-const headingId = `case-study-heading-${preset}`;
+const headingId = `${sectionId}-heading`;
+const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
+const reverse = rowIndex % 2 === 1;
 
-const caseStudyAriaLabel = linkLabel ?? `View case study: ${title}`;
-
-const cardLinkClass =
-  'group flex flex-col gap-6 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas';
+const linkedImageTransitionAttrs = transitionName
+  ? ({ 'transition:name': transitionName } as const)
+  : {};
 
 const layout = {
-  '01': {
-    grid: 'md:col-span-7 md:col-start-1',
-    number:
-      'pointer-events-none absolute -top-16 -left-6 z-[-1] select-none text-[8rem] font-bold text-surface-ui-hover opacity-50 md:-top-20 md:-left-10 md:text-[14rem]',
-    title: 'text-4xl md:text-7xl',
-    desc: 'max-w-md',
-    aspect: 'aspect-video',
-    imgWidth: 1920,
-    imgHeight: 1080,
-  },
-  '02': {
-    grid: 'md:col-span-5 md:col-start-7 md:mt-48',
-    number:
-      'pointer-events-none absolute -top-12 -right-4 z-[-1] w-full select-none text-right text-[7rem] font-bold text-surface-ui-hover opacity-50 md:-top-16 md:-right-6 md:text-[12rem]',
-    title: 'text-3xl md:text-6xl',
-    desc: 'max-w-sm',
-    aspect: 'aspect-square',
-    imgWidth: 1080,
-    imgHeight: 1080,
-  },
-  '03': {
-    grid: 'md:col-span-6 md:col-start-2',
-    number:
-      'pointer-events-none absolute -top-16 -left-4 z-[-1] select-none text-[8rem] font-bold text-surface-ui-hover opacity-50 md:-top-20 md:-left-12 md:text-[14rem]',
-    title: 'text-4xl md:text-7xl',
-    desc: 'max-w-md',
-    aspect: 'aspect-[3/4]',
-    imgWidth: 1200,
-    imgHeight: 1600,
-  },
-  '04': {
-    grid: 'md:col-span-5 md:col-start-8 md:-mt-24',
-    number:
-      'pointer-events-none absolute -top-12 -right-2 z-[-1] w-full select-none text-right text-[7rem] font-bold text-surface-ui-hover opacity-50 md:-top-16 md:-right-4 md:text-[12rem]',
-    title: 'text-3xl md:text-6xl',
-    desc: 'max-w-sm',
-    aspect: 'aspect-[4/5]',
-    imgWidth: 1000,
-    imgHeight: 1250,
-  },
-} as const;
+  '01': { aspect: 'aspect-video', imgWidth: 1920, imgHeight: 1080 },
+  '02': { aspect: 'aspect-square', imgWidth: 1080, imgHeight: 1080 },
+  '03': { aspect: 'aspect-[3/4]', imgWidth: 1200, imgHeight: 1600 },
+  '04': { aspect: 'aspect-[4/5]', imgWidth: 1000, imgHeight: 1250 },
+} as const satisfies Record<
+  CaseStudyPreset,
+  { aspect: string; imgWidth: number; imgHeight: number }
+>;
 
 const L = layout[preset];
+
+const numberClass = reverse
+  ? 'pointer-events-none absolute -top-16 right-0 z-0 w-full select-none text-right text-[6.5rem] font-bold leading-none text-surface-ui-hover/40 md:-top-24 md:text-[11rem]'
+  : 'pointer-events-none absolute -top-16 left-0 z-0 select-none text-[6.5rem] font-bold leading-none text-surface-ui-hover/40 md:-top-24 md:text-[11rem]';
+
+const imageShellClass = [
+  'relative w-full overflow-hidden rounded-xl bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
+  L.aspect,
+];
+
+const imgMotionClass =
+  'h-full w-full object-cover grayscale opacity-90 transition-all duration-700 group-hover/img:scale-105 group-hover/img:grayscale-0 motion-reduce:transition-none motion-reduce:group-hover/img:scale-100 forced-colors:grayscale-0 forced-colors:opacity-100';
 ---
 
-<article class:list={['relative min-w-0', L.grid]} aria-labelledby={headingId}>
-  <span class={L.number} aria-hidden="true">{preset}</span>
-  <div class="min-w-0 space-y-6">
-    <div class="mb-4 flex flex-wrap gap-3">
-      {tags.map((t) => <PortfolioTag label={t} />)}
-    </div>
+<article
+  id={sectionId}
+  class="relative min-w-0 scroll-mt-28 md:scroll-mt-32"
+  aria-labelledby={headingId}
+>
+  <div class:list={['relative grid grid-cols-12 gap-x-6 gap-y-8 md:gap-x-8 md:gap-y-10 lg:gap-x-10 lg:gap-y-8']}>
+    <span class={numberClass} aria-hidden="true">{preset}</span>
+
     {
       href ? (
-        <a class={cardLinkClass} href={href} aria-label={caseStudyAriaLabel}>
-          <h3
-            id={headingId}
-            class:list={[
-              'min-w-0 break-words font-bold tracking-tight text-fg-strong transition-colors duration-500 group-hover:text-accent',
-              L.title,
-            ]}
-          >
-            {title}
-          </h3>
-          <p
-            class:list={[
-              'min-w-0 break-words text-base leading-relaxed text-fg-muted',
-              L.desc,
-            ]}
-          >
-            {description}
-          </p>
+        <>
           <div
             class:list={[
-              'relative w-full overflow-hidden bg-surface-subtle transition-colors duration-500 group-hover:bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText',
-              L.aspect,
+              'col-span-12 min-w-0 w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-none',
+              reverse
+                ? 'order-1 mx-auto lg:order-2 lg:mx-0 lg:col-span-5 lg:col-start-8'
+                : 'mx-auto lg:mx-0 lg:col-span-5',
             ]}
           >
-            <img
-              class="h-full w-full object-cover opacity-20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-60 forced-colors:opacity-100 forced-colors:mix-blend-normal"
-              src={imageSrc}
-              alt=""
-              width={L.imgWidth}
-              height={L.imgHeight}
-              loading="lazy"
-              decoding="async"
-            />
+            <a
+              class="group/img block outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
+              href={href}
+              aria-label={caseStudyAriaLabel}
+            >
+              <div class:list={[imageShellClass, 'group-hover/img:shadow-lg']}>
+                <div
+                  class="absolute inset-0 z-[1] bg-accent/5 transition-colors group-hover/img:bg-transparent"
+                  aria-hidden="true"
+                >
+                </div>
+                <img
+                  class={imgMotionClass}
+                  src={imageSrc}
+                  alt=""
+                  width={L.imgWidth}
+                  height={L.imgHeight}
+                  loading="lazy"
+                  decoding="async"
+                  {...linkedImageTransitionAttrs}
+                />
+              </div>
+            </a>
           </div>
-        </a>
-      ) : (
-        <div class="group flex min-w-0 flex-col gap-6">
-          <h3
-            id={headingId}
-            class:list={[
-              'min-w-0 break-words font-bold tracking-tight text-fg-strong transition-colors duration-500 group-hover:text-accent',
-              L.title,
-            ]}
-          >
-            {title}
-          </h3>
-          <p
-            class:list={[
-              'min-w-0 break-words text-base leading-relaxed text-fg-muted',
-              L.desc,
-            ]}
-          >
-            {description}
-          </p>
+
           <div
             class:list={[
-              'relative w-full overflow-hidden bg-surface-subtle transition-colors duration-500 group-hover:bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText',
-              L.aspect,
+              'col-span-12 flex min-w-0 flex-col justify-center gap-4',
+              reverse
+                ? 'order-2 lg:order-1 lg:col-span-6 lg:col-start-1'
+                : 'lg:col-span-6 lg:col-start-7',
             ]}
           >
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="rounded bg-accent px-2 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-fg-on-accent"
+                >{roleBadge}</span
+              >
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {tags.map((t) => <PortfolioTag label={t} />)}
+            </div>
+            <h3
+              id={headingId}
+              class="text-2xl font-bold tracking-tight text-fg-strong md:text-3xl"
+            >
+              {title}
+            </h3>
+            <p class="max-w-xl text-sm leading-relaxed text-fg-muted md:text-base">
+              {description}
+            </p>
+            <div
+              class="rounded-lg border-l-4 border-accent bg-surface-ui p-4"
+              aria-label={`${outcomeLabel}: ${outcomeTitle}`}
+            >
+              <span class="mb-1 block text-xs font-bold text-accent">{outcomeLabel}</span>
+              <p class="text-lg font-bold text-fg-strong">{outcomeTitle}</p>
+            </div>
+            <div class="pt-2">
+              <a
+                class="group/detail inline-flex items-center gap-2 text-sm font-semibold text-fg-muted underline decoration-border-default underline-offset-4 transition-colors hover:text-accent"
+                href={href}
+              >
+                <span>{linkLabel ?? 'ケーススタディを見る'}</span>
+                <span
+                  class="material-symbols-outlined text-base transition-transform group-hover/detail:translate-x-1 motion-reduce:transition-none"
+                  aria-hidden="true">arrow_forward</span
+                >
+              </a>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div class="col-span-12 mx-auto w-full max-w-xl space-y-4 sm:max-w-2xl md:max-w-3xl lg:max-w-none">
+          <h3 id={headingId} class="text-2xl font-bold text-fg-strong">{title}</h3>
+          <p class="text-fg-muted">{description}</p>
+          <div class:list={imageShellClass}>
             <img
-              class="h-full w-full object-cover opacity-20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-60 forced-colors:opacity-100 forced-colors:mix-blend-normal"
+              class={imgMotionClass}
               src={imageSrc}
               alt={imageAlt}
               width={L.imgWidth}
