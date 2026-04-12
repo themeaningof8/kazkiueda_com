@@ -1,25 +1,18 @@
 ---
 import PortfolioTag from './PortfolioTag.astro';
-import type { CaseStudyPreset } from './portfolio-types';
+import type { CaseStudy, CaseStudyPreset } from './portfolio-types';
 
-interface Props {
-  preset: CaseStudyPreset;
-  tags: string[];
-  title: string;
-  description: string;
-  imageSrc: string;
-  imageAlt: string;
-  sectionId: string;
-  href?: string;
-  linkLabel?: string;
-  transitionName?: string;
-}
+type Props = CaseStudy;
 
 const {
   preset,
   tags,
   title,
   description,
+  roleBadge,
+  outcomeLabel,
+  outcomeTitle,
+  rowIndex,
   imageSrc,
   imageAlt,
   sectionId,
@@ -29,136 +22,136 @@ const {
 } = Astro.props;
 
 const headingId = `${sectionId}-heading`;
-
 const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
+const reverse = rowIndex % 2 === 1;
 
 const linkedImageTransitionAttrs = transitionName
   ? ({ 'transition:name': transitionName } as const)
   : {};
 
-const cardLinkClass =
-  'group flex flex-col gap-6 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas';
-
-/** 画像アスペクトと生成寸法のみプリセットで切替。カラム段差レイアウトは使わない。 */
 const layout = {
-  '01': {
-    aspect: 'aspect-video',
-    imgWidth: 1920,
-    imgHeight: 1080,
-  },
-  '02': {
-    aspect: 'aspect-square',
-    imgWidth: 1080,
-    imgHeight: 1080,
-  },
-  '03': {
-    aspect: 'aspect-[3/4]',
-    imgWidth: 1200,
-    imgHeight: 1600,
-  },
-  '04': {
-    aspect: 'aspect-[4/5]',
-    imgWidth: 1000,
-    imgHeight: 1250,
-  },
-} as const;
+  '01': { aspect: 'aspect-video', imgWidth: 1920, imgHeight: 1080 },
+  '02': { aspect: 'aspect-square', imgWidth: 1080, imgHeight: 1080 },
+  '03': { aspect: 'aspect-[3/4]', imgWidth: 1200, imgHeight: 1600 },
+  '04': { aspect: 'aspect-[4/5]', imgWidth: 1000, imgHeight: 1250 },
+} as const satisfies Record<
+  CaseStudyPreset,
+  { aspect: string; imgWidth: number; imgHeight: number }
+>;
 
 const L = layout[preset];
 
-const numberClass =
-  'pointer-events-none absolute -top-14 -left-2 z-[-1] select-none text-[7rem] font-bold text-surface-ui-hover opacity-50 md:-top-20 md:-left-4 md:text-[12rem]';
-
-const titleClass = 'text-3xl md:text-5xl';
-const descClass = 'max-w-3xl';
+const numberClass = reverse
+  ? 'pointer-events-none absolute -top-16 right-0 z-0 w-full select-none text-right text-[6.5rem] font-bold leading-none text-surface-ui-hover/40 md:-top-24 md:text-[11rem]'
+  : 'pointer-events-none absolute -top-16 left-0 z-0 select-none text-[6.5rem] font-bold leading-none text-surface-ui-hover/40 md:-top-24 md:text-[11rem]';
 
 const imageShellClass = [
-  'relative w-full overflow-hidden bg-surface-subtle transition-colors duration-500 group-hover:bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText',
+  'relative w-full overflow-hidden rounded-xl bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
   L.aspect,
 ];
+
+const imgMotionClass =
+  'h-full w-full object-cover grayscale opacity-90 transition-all duration-700 group-hover/img:scale-105 group-hover/img:grayscale-0 motion-reduce:transition-none motion-reduce:group-hover/img:scale-100 forced-colors:grayscale-0 forced-colors:opacity-100';
 ---
 
 <article
   id={sectionId}
-  class="relative w-full min-w-0 scroll-mt-24 md:scroll-mt-32"
+  class="relative min-w-0 scroll-mt-28 md:scroll-mt-36"
   aria-labelledby={headingId}
 >
-  <span class={numberClass} aria-hidden="true">{preset}</span>
-  <div class="group min-w-0 space-y-6">
-    <div class="mb-4 flex flex-wrap gap-3">
-      {tags.map((t) => <PortfolioTag label={t} />)}
-    </div>
+  <div class:list={['relative grid grid-cols-12 gap-x-6 gap-y-8 md:gap-x-8 md:gap-y-10 lg:gap-x-10']}>
+    <span class={numberClass} aria-hidden="true">{preset}</span>
+
     {
       href ? (
         <>
-          <h3
-            id={headingId}
+          <div
             class:list={[
-              'min-w-0 break-words font-bold tracking-tight text-fg-strong transition-colors duration-500 group-hover:text-accent',
-              titleClass,
+              'col-span-12 min-w-0',
+              reverse
+                ? 'order-1 lg:order-2 lg:col-span-7 lg:col-start-6'
+                : 'lg:col-span-7',
             ]}
           >
-            {title}
-          </h3>
-          <p
-            class:list={[
-              'min-w-0 break-words text-base leading-relaxed text-fg-muted',
-              descClass,
-            ]}
-          >
-            {description}
-          </p>
-          <a class={cardLinkClass} href={href} aria-label={caseStudyAriaLabel}>
-            <div class:list={imageShellClass}>
-              <img
-                class="h-full w-full object-cover opacity-20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-60 forced-colors:opacity-100 forced-colors:mix-blend-normal"
-                src={imageSrc}
-                alt=""
-                width={L.imgWidth}
-                height={L.imgHeight}
-                loading="lazy"
-                decoding="async"
-                {...linkedImageTransitionAttrs}
-              />
-            </div>
-          </a>
-          <div class="pt-1">
             <a
-              class="group/detail inline-flex items-center gap-3 self-start outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
+              class="group/img block outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
               href={href}
+              aria-label={caseStudyAriaLabel}
             >
-              <span
-                class="border-b-2 border-surface-ui text-base font-bold text-accent transition-all group-hover/detail:border-accent"
-                >{linkLabel ?? '詳細を見る'}</span
-              >
-              <span
-                class="material-symbols-outlined text-base text-accent transition-transform group-hover/detail:translate-x-2"
-                aria-hidden="true">arrow_forward</span
-              >
+              <div class:list={[imageShellClass, 'group-hover/img:shadow-lg']}>
+                <div
+                  class="absolute inset-0 z-[1] bg-accent/5 transition-colors group-hover/img:bg-transparent"
+                  aria-hidden="true"
+                >
+                </div>
+                <img
+                  class={imgMotionClass}
+                  src={imageSrc}
+                  alt=""
+                  width={L.imgWidth}
+                  height={L.imgHeight}
+                  loading="lazy"
+                  decoding="async"
+                  {...linkedImageTransitionAttrs}
+                />
+              </div>
             </a>
+          </div>
+
+          <div
+            class:list={[
+              'col-span-12 flex min-w-0 flex-col justify-center gap-4',
+              reverse
+                ? 'order-2 lg:order-1 lg:col-span-4 lg:col-start-1'
+                : 'lg:col-span-4 lg:col-start-9',
+            ]}
+          >
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="rounded bg-accent px-2 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-fg-on-accent"
+                >{roleBadge}</span
+              >
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {tags.map((t) => <PortfolioTag label={t} />)}
+            </div>
+            <h3
+              id={headingId}
+              class="text-2xl font-bold tracking-tight text-fg-strong md:text-3xl"
+            >
+              {title}
+            </h3>
+            <p class="max-w-xl text-sm leading-relaxed text-fg-muted md:text-base">
+              {description}
+            </p>
+            <div
+              class="rounded-lg border-l-4 border-accent bg-surface-ui p-4"
+              aria-label={`${outcomeLabel}: ${outcomeTitle}`}
+            >
+              <span class="mb-1 block text-xs font-bold text-accent">{outcomeLabel}</span>
+              <p class="text-lg font-bold text-fg-strong">{outcomeTitle}</p>
+            </div>
+            <div class="pt-2">
+              <a
+                class="group/detail inline-flex items-center gap-2 text-sm font-semibold text-fg-muted underline decoration-border-default underline-offset-4 transition-colors hover:text-accent"
+                href={href}
+              >
+                <span>{linkLabel ?? 'ケーススタディを見る'}</span>
+                <span
+                  class="material-symbols-outlined text-base transition-transform group-hover/detail:translate-x-1 motion-reduce:transition-none"
+                  aria-hidden="true">arrow_forward</span
+                >
+              </a>
+            </div>
           </div>
         </>
       ) : (
-        <div class="group flex min-w-0 flex-col gap-6">
-          <h3
-            id={headingId}
-            class:list={[
-              'min-w-0 break-words font-bold tracking-tight text-fg-strong transition-colors duration-500 group-hover:text-accent',
-              titleClass,
-            ]}
-          >
-            {title}
-          </h3>
-          <p
-            class:list={[
-              'min-w-0 break-words text-base leading-relaxed text-fg-muted',
-              descClass,
-            ]}
-          >
-            {description}
-          </p>
+        <div class="col-span-12 space-y-4">
+          <h3 id={headingId} class="text-2xl font-bold text-fg-strong">{title}</h3>
+          <p class="text-fg-muted">{description}</p>
           <div class:list={imageShellClass}>
             <img
-              class="h-full w-full object-cover opacity-20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-60 forced-colors:opacity-100 forced-colors:mix-blend-normal"
+              class={imgMotionClass}
               src={imageSrc}
               alt={imageAlt}
               width={L.imgWidth}
