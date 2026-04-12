@@ -28,7 +28,7 @@ const {
   transitionName,
 } = Astro.props;
 
-const headingId = `case-study-heading-${preset}`;
+const headingId = `${sectionId}-heading`;
 
 const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
 
@@ -39,43 +39,24 @@ const linkedImageTransitionAttrs = transitionName
 const cardLinkClass =
   'group flex flex-col gap-6 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas';
 
+/** 画像アスペクトと生成寸法のみプリセットで切替。カラム段差レイアウトは使わない。 */
 const layout = {
   '01': {
-    grid: 'md:col-span-7 md:col-start-1',
-    number:
-      'pointer-events-none absolute -top-16 -left-6 z-[-1] select-none text-[8rem] font-bold text-surface-ui-hover opacity-50 md:-top-20 md:-left-10 md:text-[14rem]',
-    title: 'text-4xl md:text-7xl',
-    desc: 'max-w-md',
     aspect: 'aspect-video',
     imgWidth: 1920,
     imgHeight: 1080,
   },
   '02': {
-    grid: 'md:col-span-5 md:col-start-7 md:mt-48',
-    number:
-      'pointer-events-none absolute -top-12 -right-4 z-[-1] w-full select-none text-right text-[7rem] font-bold text-surface-ui-hover opacity-50 md:-top-16 md:-right-6 md:text-[12rem]',
-    title: 'text-3xl md:text-6xl',
-    desc: 'max-w-sm',
     aspect: 'aspect-square',
     imgWidth: 1080,
     imgHeight: 1080,
   },
   '03': {
-    grid: 'md:col-span-6 md:col-start-2',
-    number:
-      'pointer-events-none absolute -top-16 -left-4 z-[-1] select-none text-[8rem] font-bold text-surface-ui-hover opacity-50 md:-top-20 md:-left-12 md:text-[14rem]',
-    title: 'text-4xl md:text-7xl',
-    desc: 'max-w-md',
     aspect: 'aspect-[3/4]',
     imgWidth: 1200,
     imgHeight: 1600,
   },
   '04': {
-    grid: 'md:col-span-5 md:col-start-8 md:-mt-24',
-    number:
-      'pointer-events-none absolute -top-12 -right-2 z-[-1] w-full select-none text-right text-[7rem] font-bold text-surface-ui-hover opacity-50 md:-top-16 md:-right-4 md:text-[12rem]',
-    title: 'text-3xl md:text-6xl',
-    desc: 'max-w-sm',
     aspect: 'aspect-[4/5]',
     imgWidth: 1000,
     imgHeight: 1250,
@@ -83,6 +64,12 @@ const layout = {
 } as const;
 
 const L = layout[preset];
+
+const numberClass =
+  'pointer-events-none absolute -top-14 -left-2 z-[-1] select-none text-[7rem] font-bold text-surface-ui-hover opacity-50 md:-top-20 md:-left-4 md:text-[12rem]';
+
+const titleClass = 'text-3xl md:text-5xl';
+const descClass = 'max-w-3xl';
 
 const imageShellClass = [
   'relative w-full overflow-hidden bg-surface-subtle transition-colors duration-500 group-hover:bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText',
@@ -92,10 +79,10 @@ const imageShellClass = [
 
 <article
   id={sectionId}
-  class:list={['relative min-w-0 scroll-mt-24 md:scroll-mt-32', L.grid]}
+  class="relative w-full min-w-0 scroll-mt-24 md:scroll-mt-32"
   aria-labelledby={headingId}
 >
-  <span class={L.number} aria-hidden="true">{preset}</span>
+  <span class={numberClass} aria-hidden="true">{preset}</span>
   <div class="group min-w-0 space-y-6">
     <div class="mb-4 flex flex-wrap gap-3">
       {tags.map((t) => <PortfolioTag label={t} />)}
@@ -107,7 +94,7 @@ const imageShellClass = [
             id={headingId}
             class:list={[
               'min-w-0 break-words font-bold tracking-tight text-fg-strong transition-colors duration-500 group-hover:text-accent',
-              L.title,
+              titleClass,
             ]}
           >
             {title}
@@ -115,7 +102,7 @@ const imageShellClass = [
           <p
             class:list={[
               'min-w-0 break-words text-base leading-relaxed text-fg-muted',
-              L.desc,
+              descClass,
             ]}
           >
             {description}
@@ -156,7 +143,7 @@ const imageShellClass = [
             id={headingId}
             class:list={[
               'min-w-0 break-words font-bold tracking-tight text-fg-strong transition-colors duration-500 group-hover:text-accent',
-              L.title,
+              titleClass,
             ]}
           >
             {title}
@@ -164,7 +151,7 @@ const imageShellClass = [
           <p
             class:list={[
               'min-w-0 break-words text-base leading-relaxed text-fg-muted',
-              L.desc,
+              descClass,
             ]}
           >
             {description}

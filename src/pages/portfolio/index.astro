@@ -127,9 +127,7 @@ const aboutClosing =
         </aside>
 
         <div class="min-w-0 md:col-span-9">
-          <div
-            class="grid min-w-0 grid-cols-1 gap-y-24 md:grid-cols-12 md:gap-y-40 lg:gap-y-48"
-          >
+          <div class="flex w-full min-w-0 flex-col gap-y-24 md:gap-y-40 lg:gap-y-48">
             {caseStudies.map((study) => (
               <PortfolioCaseStudy {...study} />
             ))}
