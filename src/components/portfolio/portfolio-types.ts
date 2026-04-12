@@ -5,6 +5,10 @@ export interface CaseStudy {
   tags: string[];
   title: string;
   description: string;
+  roleBadge: string;
+  outcomeLabel: string;
+  outcomeTitle: string;
+  rowIndex: number;
   imageSrc: string;
   imageAlt: string;
   sectionId: string;

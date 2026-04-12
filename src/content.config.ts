@@ -13,6 +13,9 @@ const caseStudies = defineCollection({
       preset: z.enum(['01', '02', '03', '04']),
       heroImage: image(),
       heroAlt: z.string(),
+      roleBadge: z.string(),
+      outcomeLabel: z.string(),
+      outcomeTitle: z.string(),
       linkLabel: z.string().optional(),
     }),
 });

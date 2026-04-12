@@ -25,28 +25,25 @@ const sorted = [...rawEntries].sort((a, b) => {
 });
 
 const caseStudies: CaseStudy[] = await Promise.all(
-  sorted.map(async (entry) => {
-    const { preset, tags, title, description, heroImage, heroAlt, linkLabel } = entry.data;
+  sorted.map(async (entry, rowIndex) => {
+    const { heroImage, heroAlt, order: _order, ...data } = entry.data;
     const dims =
-      preset === '01'
+      data.preset === '01'
         ? { w: 1920, h: 1080 }
-        : preset === '02'
+        : data.preset === '02'
           ? { w: 1080, h: 1080 }
-          : preset === '03'
+          : data.preset === '03'
             ? { w: 1200, h: 1600 }
             : { w: 1000, h: 1250 };
     const optimized = await getImage({ src: heroImage, width: dims.w, height: dims.h });
     return {
-      preset,
-      tags,
-      title,
-      description,
+      ...data,
       imageSrc: optimized.src,
       imageAlt: heroAlt,
       sectionId: `case-${entry.id}`,
       href: `/portfolio/work/${entry.id}`,
-      linkLabel,
       transitionName: `case-hero-${entry.id}`,
+      rowIndex,
     };
   }),
 );
@@ -129,9 +126,10 @@ const aboutClosing =
 
         <div class="min-w-0 md:col-span-9">
           <div class="flex w-full min-w-0 flex-col gap-y-24 md:gap-y-40 lg:gap-y-48">
-            {caseStudies.map((study) => (
-              <PortfolioCaseStudy {...study} />
-            ))}
+            {caseStudies.map((study) => {
+              const { roleBadge: _roleBadge, outcomeLabel: _outcomeLabel, outcomeTitle: _outcomeTitle, rowIndex: _rowIndex, ...card } = study;
+              return <PortfolioCaseStudy {...card} />;
+            })}
           </div>
         </div>
       </div>

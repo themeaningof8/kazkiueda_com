@@ -8,6 +8,9 @@ order: 3
 preset: "03"
 heroImage: "../../assets/case-studies/linear-studio/hero.png"
 heroAlt: "朝の光がコンクリートに落ちる、モダンなブルータリスト建築のクローズアップ（プレースホルダ）"
+roleBadge: "UI / モーション"
+outcomeLabel: "OUTCOME"
+outcomeTitle: "空間の質感と遷移のリズムを UI に翻訳し、作品の世界観を画面越しに伝える体験へ。"
 ---
 
 > このページはプレースホルダ本文です。

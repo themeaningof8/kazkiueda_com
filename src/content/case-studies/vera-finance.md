@@ -8,6 +8,9 @@ order: 4
 preset: "04"
 heroImage: "../../assets/case-studies/vera-finance/hero.png"
 heroAlt: "窓からの拡散光と、マグと薄型ノートだけのミニマルなデスク（プレースホルダ）"
+roleBadge: "UX リサーチ / デザイン"
+outcomeLabel: "OUTCOME"
+outcomeTitle: "不安を言語化するリサーチから、信頼が積み上がるマイクロコピーと導線の設計へ。"
 ---
 
 > このページはプレースホルダ本文です。
