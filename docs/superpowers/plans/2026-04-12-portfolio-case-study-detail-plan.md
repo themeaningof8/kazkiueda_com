@@ -4,7 +4,7 @@
 
 **Goal:** Add `/portfolio/work/[slug]` case study detail pages backed by Astro Content Collections (Markdown + Zod), wire listing cards with shared-image View Transitions, and align portfolio language to Japanese per the approved spec.
 
-**Architecture:** One `caseStudies` collection (`src/content/case-studies/*.md`) with `astro/zod` schema including `image()` for local heroes under `src/assets/case-studies/<slug>/`. Listing uses `getCollection` + ascending `order` (ties broken by `id`). Detail route uses `getStaticPaths` + `entry.render()`. `PortfolioLayout` enables `ViewTransitions` once; listing and detail pass the same `transition:name` (`case-hero-<id>`) on hero images. CSS in `portfolio.css` handles root/image transitions and `prefers-reduced-motion`.
+**Architecture:** One `caseStudies` collection (`src/content/case-studies/*.md`) with `astro/zod` schema including `image()` for local heroes under `src/assets/case-studies/<slug>/`. Listing uses `getCollection` + ascending `order` (ties broken by `id`). Detail route uses `getStaticPaths` + `render(entry)` from `astro:content`. `PortfolioLayout` enables `ClientRouter` once; listing and detail pass the same `transition:name` (`case-hero-<id>`) on hero images. CSS in `portfolio.css` handles root/image transitions and `prefers-reduced-motion`.
 
 **Tech Stack:** Astro 6, `@astrojs/cloudflare`, Tailwind CSS v4 (`@tailwindcss/vite`), `@tailwindcss/typography` (new), `astro/zod`, `astro:content`, `astro:assets` (`getImage`, `<Image>`), View Transitions (`astro:transitions`).
 
@@ -23,7 +23,7 @@
 | `src/assets/case-studies/<slug>/hero.webp`（拡張子は実ファイルに合わせる） | カード／詳細で共有するヒーロー画像 |
 | `src/pages/portfolio/work/[slug].astro` | 詳細ページ（`getStaticPaths`、`prerender: true` 明示） |
 | `src/pages/portfolio/index.astro` | `getCollection` 化、`href` / `transitionName` / `getImage` 連携。ポートレート用の外部 URL は当面このファイルに残してよい（仕様上ケーススタディ画像のみ assets 必須） |
-| `src/layouts/PortfolioLayout.astro` | `<ViewTransitions />`、`lang="ja"` |
+| `src/layouts/PortfolioLayout.astro` | `<ClientRouter />`、`lang="ja"` |
 | `src/components/portfolio/PortfolioCaseStudy.astro` | 任意 `transitionName` を `<img>` に付与 |
 | `src/components/portfolio/portfolio-types.ts` | `CaseStudy` に `transitionName?: string` を追加 |
 | `src/styles/portfolio.css` | `@plugin "@tailwindcss/typography"` + `::view-transition-*` + reduced-motion |
@@ -240,7 +240,7 @@ git commit -m "feat(portfolio): allow case study card image transition name"
 ```astro
 ---
 import type { GetStaticPaths } from 'astro';
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import PortfolioLayout from '../../../layouts/PortfolioLayout.astro';
 import PortfolioTag from '../../../components/portfolio/PortfolioTag.astro';
@@ -260,7 +260,7 @@ interface Props {
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 const { title, description, tags, preset, heroImage, heroAlt } = entry.data;
 
 const transitionName = `case-hero-${entry.id}`;
@@ -348,18 +348,18 @@ git commit -m "feat(portfolio): add case study detail route"
 - Modify: `src/styles/portfolio.css`
 - Modify: `src/pages/portfolio/index.astro`
 
-- [ ] **Step 1: `PortfolioLayout.astro` の `<html>` を `lang="ja"` にし、`<head>` に View Transitions を追加**
+- [ ] **Step 1: `PortfolioLayout.astro` の `<html>` を `lang="ja"` にし、`<head>` に `ClientRouter` を追加**
 
 ```astro
 ---
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 // ...
 ---
 
 <html class="light" lang="ja">
   <head>
     <!-- 既存 meta / link の直後あたり -->
-    <ViewTransitions />
+    <ClientRouter />
 ```
 
 - [ ] **Step 2: `portfolio.css` の先頭付近に typography プラグインを追加**（`@import 'tailwindcss';` の直後）

@@ -1,33 +1,41 @@
 ---
+export interface AboutContentSection {
+  heading: string;
+  paragraphs?: string[];
+  bullets?: string[];
+}
+
 interface Props {
   portraitSrc: string;
   portraitAlt: string;
-  quoteBefore: string;
-  quoteHighlight: string;
-  quoteAfter: string;
-  paragraphs: string[];
-  storyHref: string;
-  storyLabel: string;
+  introParagraphs: string[];
+  sections: AboutContentSection[];
+  closingParagraph?: string;
+  storyHref?: string;
+  storyLabel?: string;
 }
 
 const {
   portraitSrc,
   portraitAlt,
-  quoteBefore,
-  quoteHighlight,
-  quoteAfter,
-  paragraphs,
+  introParagraphs,
+  sections,
+  closingParagraph,
   storyHref,
   storyLabel,
 } = Astro.props;
+
+const sectionHeadingBase =
+  'scroll-mt-24 text-xl font-bold tracking-tight text-fg-strong md:text-2xl';
+const bodyClass = 'mt-4 max-w-lg min-w-0 space-y-6 text-lg leading-relaxed text-fg-muted';
 ---
 
 <section
   id="about"
-  class="mt-40 grid grid-cols-1 items-center gap-12 md:mt-96 md:grid-cols-12 md:gap-32"
+  class="mt-40 grid grid-cols-1 items-start gap-12 md:mt-96 md:grid-cols-12 md:gap-32"
   aria-labelledby="about-heading"
 >
-  <h2 id="about-heading" class="sr-only">About</h2>
+  <h2 id="about-heading" class="sr-only">About me</h2>
   <div class="relative md:col-span-4 md:col-start-2">
     <div
       class="relative aspect-[4/5] bg-surface-ui-hover forced-colors:border forced-colors:border-CanvasText"
@@ -47,28 +55,67 @@ const {
       </div>
     </div>
   </div>
-  <div class="space-y-10 md:col-span-6 md:space-y-12">
-    <h3
-      class="min-w-0 break-words text-2xl leading-tight font-bold tracking-tight text-fg-strong italic md:text-5xl"
-    >
-      {quoteBefore}<span class="text-accent">{quoteHighlight}</span>{quoteAfter}
-    </h3>
-    <div class="max-w-lg min-w-0 space-y-6 text-lg text-fg-muted">
-      {paragraphs.map((p) => (
+  <div class="min-w-0 md:col-span-6">
+    <div class={`${bodyClass} max-w-none`}>
+      {introParagraphs.map((p) => (
         <p class="min-w-0 break-words">{p}</p>
       ))}
     </div>
-    <div class="pt-4 md:pt-8">
-      <a class="group inline-flex items-center gap-4" href={storyHref}>
-        <span
-          class="border-b-2 border-surface-ui text-lg font-bold text-accent transition-all group-hover:border-accent"
-          >{storyLabel}</span
-        >
-        <span
-          class="material-symbols-outlined text-accent transition-transform group-hover:translate-x-2"
-          aria-hidden="true">east</span
-        >
-      </a>
-    </div>
+
+    {
+      sections.map((section, index) => (
+        <div class="min-w-0">
+          <h3
+            class:list={[
+              sectionHeadingBase,
+              index === 0 ? 'mt-10 md:mt-14' : 'mt-12 md:mt-16',
+            ]}
+          >
+            {section.heading}
+          </h3>
+          {section.paragraphs?.length ? (
+            <div class={bodyClass}>
+              {section.paragraphs.map((p) => (
+                <p class="min-w-0 break-words">{p}</p>
+              ))}
+            </div>
+          ) : null}
+          {section.bullets?.length ? (
+            <ul
+              class={`${bodyClass} list-outside list-disc space-y-3 pl-6 marker:text-accent`}
+            >
+              {section.bullets.map((item) => (
+                <li class="min-w-0 break-words pl-1">{item}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ))
+    }
+
+    {
+      closingParagraph ? (
+        <p class="mt-10 max-w-lg min-w-0 break-words text-lg leading-relaxed text-fg-muted md:mt-14">
+          {closingParagraph}
+        </p>
+      ) : null
+    }
+
+    {
+      storyHref && storyLabel ? (
+        <div class="pt-8 md:pt-12">
+          <a class="group inline-flex items-center gap-4" href={storyHref}>
+            <span
+              class="border-b-2 border-surface-ui text-lg font-bold text-accent transition-all group-hover:border-accent"
+              >{storyLabel}</span
+            >
+            <span
+              class="material-symbols-outlined text-accent transition-transform group-hover:translate-x-2"
+              aria-hidden="true">east</span
+            >
+          </a>
+        </div>
+      ) : null
+    }
   </div>
 </section>
