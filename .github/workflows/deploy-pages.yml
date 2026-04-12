@@ -1,8 +1,9 @@
-# Cloudflare Pages へ本番デプロイ（GitHub Actions）
-# Secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
-# 任意: Repository variable PAGES_PROJECT_NAME（未設定時は package.json の name）
+# Cloudflare Workers へ本番デプロイ（GitHub Actions）
+# Astro 6 + @astrojs/cloudflare（server モード）は dist が client/server 分割のため
+# `wrangler pages deploy dist` ではルートが 404 になる。`wrangler deploy` を使う。
+# Secrets: CLOUDFLARE_API_TOKEN（Workers Scripts:Edit 等）, CLOUDFLARE_ACCOUNT_ID
 
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Workers
 
 on:
   push:
@@ -10,7 +11,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: cloudflare-pages-deploy
+  group: cloudflare-workers-deploy
   cancel-in-progress: true
 
 jobs:
@@ -42,17 +43,7 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Resolve Pages project name
-        env:
-          PAGES_PROJECT_NAME: ${{ vars.PAGES_PROJECT_NAME }}
-        run: |
-          set -euo pipefail
-          DEFAULT_NAME="$(jq -r .name package.json)"
-          NAME="${PAGES_PROJECT_NAME:-$DEFAULT_NAME}"
-          echo "PAGES_DEPLOY_NAME=$NAME" >> "$GITHUB_ENV"
-          echo "Resolved Pages project name: $NAME"
-
-      - name: Preflight (auth + project exists in this account)
+      - name: Preflight (auth)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -60,22 +51,10 @@ jobs:
           set -euo pipefail
           export CLOUDFLARE_API_TOKEN="$(printf '%s' "$CLOUDFLARE_API_TOKEN" | tr -d '\r\n')"
           export CLOUDFLARE_ACCOUNT_ID="$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '\r\n')"
-          : "${PAGES_DEPLOY_NAME:?PAGES_DEPLOY_NAME missing}"
           echo "CLOUDFLARE_ACCOUNT_ID=$CLOUDFLARE_ACCOUNT_ID"
-          echo "Expecting Pages project name (exact match): $PAGES_DEPLOY_NAME"
           npx --yes wrangler@4.81.1 whoami
-          LIST="$(npx --yes wrangler@4.81.1 pages project list --json)"
-          # wrangler --json は [{ "Project Name": "...", ... }, ...] 形式（.name ではない）
-          if ! echo "$LIST" | jq -e --arg want "$PAGES_DEPLOY_NAME" '
-            map(.["Project Name"] // empty) | contains([$want])
-          ' >/dev/null; then
-            echo "::error::No Pages project named \"$PAGES_DEPLOY_NAME\" in the account tied to these Secrets. Names from wrangler list:" >&2
-            echo "$LIST" | jq -r '.[] | .["Project Name"] // empty' >&2 || true
-            echo "::error::Create the project in this account, or fix CLOUDFLARE_ACCOUNT_ID / token scope, or set GitHub variable PAGES_PROJECT_NAME to one of the names above." >&2
-            exit 1
-          fi
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Workers
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -83,6 +62,4 @@ jobs:
           set -euo pipefail
           export CLOUDFLARE_API_TOKEN="$(printf '%s' "$CLOUDFLARE_API_TOKEN" | tr -d '\r\n')"
           export CLOUDFLARE_ACCOUNT_ID="$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '\r\n')"
-          : "${PAGES_DEPLOY_NAME:?}"
-          echo "Deploying to Pages project: $PAGES_DEPLOY_NAME"
-          npx --yes wrangler@4.81.1 pages deploy dist --project-name="$PAGES_DEPLOY_NAME"
+          npx --yes wrangler@4.81.1 deploy
