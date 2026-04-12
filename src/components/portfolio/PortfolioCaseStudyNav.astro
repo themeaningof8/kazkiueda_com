@@ -76,8 +76,8 @@ const listClass =
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        const first = visible[0]?.target.id ?? ids[0];
-        setActiveAnchor(first);
+        if (!visible.length) return;
+        setActiveAnchor(visible[0].target.id);
       },
       {
         root: null,
