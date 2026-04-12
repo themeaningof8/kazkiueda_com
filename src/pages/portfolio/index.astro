@@ -54,6 +54,7 @@ const caseStudies: CaseStudy[] = await Promise.all(
 const navItems: CaseStudyNavItem[] = sorted.map((entry) => ({
   anchorId: `case-${entry.id}`,
   label: entry.data.title,
+  mono: entry.data.preset,
 }));
 
 const footerLinks: FooterLink[] = [

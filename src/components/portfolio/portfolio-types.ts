@@ -16,6 +16,8 @@ export interface CaseStudy {
 export interface CaseStudyNavItem {
   anchorId: string;
   label: string;
+  /** モバイルチップ背面に重ねる番号（例: コレクションの `preset`） */
+  mono?: string;
 }
 
 export interface FooterLink {

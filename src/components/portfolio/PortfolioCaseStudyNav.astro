@@ -15,8 +15,14 @@ const navClass =
 
 const listClass =
   variant === 'chips'
-    ? 'flex gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+    ? 'flex gap-3 overflow-x-auto pb-3 pt-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
     : 'flex flex-col gap-1';
+
+const railLinkClass =
+  'inline-flex max-w-full rounded-md px-3 py-2 text-sm font-medium text-fg-muted underline-offset-4 transition-colors hover:bg-surface-ui hover:text-fg-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+
+const chipLinkClass =
+  'group/chip relative inline-flex min-h-[3.25rem] min-w-[12.5rem] max-w-[16rem] shrink-0 flex-col justify-center overflow-hidden rounded-2xl border border-border-subtle bg-surface-subtle/80 px-3.5 py-2.5 pr-12 text-left shadow-sm transition-[border-color,box-shadow,background-color,color] duration-200 hover:border-border-default hover:bg-surface-ui hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 ---
 
 <nav
@@ -28,13 +34,36 @@ const listClass =
     {
       items.map((item) => (
         <li class:list={[variant === 'chips' && 'shrink-0']}>
-          <a
-            class="inline-flex max-w-full rounded-md px-3 py-2 text-sm font-medium text-fg-muted underline-offset-4 transition-colors hover:bg-surface-ui hover:text-fg-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            href={`#${item.anchorId}`}
-            data-case-anchor={item.anchorId}
-          >
-            <span class="line-clamp-2">{item.label}</span>
-          </a>
+          {variant === 'chips' ? (
+            <a
+              class={chipLinkClass}
+              href={`#${item.anchorId}`}
+              data-case-anchor={item.anchorId}
+              data-chip-link
+            >
+              {item.mono ? (
+                <span
+                  class="pointer-events-none absolute -right-1 bottom-[-0.15rem] select-none font-mono text-[2.85rem] font-bold leading-none tracking-tighter text-surface-ui-hover/50 transition-[opacity,transform] duration-200 group-hover/chip:translate-x-[-2px] group-hover/chip:text-surface-ui-hover/65"
+                  aria-hidden="true"
+                >
+                  {item.mono}
+                </span>
+              ) : null}
+              <span
+                class="chip-nav-label relative z-[1] line-clamp-2 text-xs font-semibold leading-snug text-fg-muted"
+              >
+                {item.label}
+              </span>
+            </a>
+          ) : (
+            <a
+              class={railLinkClass}
+              href={`#${item.anchorId}`}
+              data-case-anchor={item.anchorId}
+            >
+              <span class="line-clamp-2">{item.label}</span>
+            </a>
+          )}
         </li>
       ))
     }
@@ -49,9 +78,25 @@ const listClass =
     for (const link of links) {
       const id = link.dataset.caseAnchor;
       const isActive = Boolean(activeId && id === activeId);
+      const isChip = link.hasAttribute('data-chip-link');
+
       link.setAttribute('aria-current', isActive ? 'page' : 'false');
-      link.classList.toggle('bg-surface-ui-active', isActive);
-      link.classList.toggle('text-fg-strong', isActive);
+
+      if (isChip) {
+        link.classList.toggle('border-accent', isActive);
+        link.classList.toggle('bg-surface-ui', isActive);
+        link.classList.toggle('shadow-md', isActive);
+        link.classList.toggle('ring-1', isActive);
+        link.classList.toggle('ring-accent/35', isActive);
+        const label = link.querySelector('.chip-nav-label');
+        if (label) {
+          label.classList.toggle('text-fg-strong', isActive);
+          label.classList.toggle('text-fg-muted', !isActive);
+        }
+      } else {
+        link.classList.toggle('bg-surface-ui-active', isActive);
+        link.classList.toggle('text-fg-strong', isActive);
+      }
     }
   }
 
