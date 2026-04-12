@@ -38,6 +38,6 @@ export interface PortfolioTopNavProps {
   contactHref: string;
   ctaHref: string;
   ctaLabel: string;
-  /** 一覧・詳細でヘッダー内の横スクロールチップとして表示 */
+  /** 一覧・詳細で「制作実績」Popover 内のケースリンク用 */
   caseNavItems?: CaseStudyNavItem[];
 }
