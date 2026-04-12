@@ -16,6 +16,8 @@
   --radius-sm: 0.125rem;
 
   --spacing-portfolio-dot: 32px;
+  /* 下端固定ケースナビ（チップ帯）+ セーフエリア分の本文下余白用 */
+  --spacing-portfolio-dock: 5.75rem;
   --spacing-portfolio-frame-sm: 12px;
   --spacing-portfolio-frame-md: 20px;
 
@@ -76,6 +78,7 @@ html.dark,
 @layer base {
   html {
     font-feature-settings: 'palt' 1;
+    scroll-padding-top: 5.5rem;
   }
 
   /* スキップリンクは <main> 外のため除外される */
