@@ -1,4 +1,5 @@
 ---
+import PortfolioTag from './PortfolioTag.astro';
 import type { CaseStudyDetailHeaderProps } from './portfolio-types';
 
 type Props = CaseStudyDetailHeaderProps;
@@ -21,7 +22,7 @@ const { brand, caseStudyTitle, aboutHref, aboutLabel = 'About', tags = [] } = As
       </div>
       <a
         href={aboutHref}
-        class="shrink-0 text-sm font-medium text-accent transition-colors hover:text-accent"
+        class="shrink-0 rounded-sm text-sm font-medium text-accent outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
       >
         {aboutLabel}
       </a>
@@ -30,9 +31,7 @@ const { brand, caseStudyTitle, aboutHref, aboutLabel = 'About', tags = [] } = As
       tags.length > 0 && (
         <div class="flex flex-wrap gap-2 pb-3 pt-1">
           {tags.map((t) => (
-            <span class="inline-block max-w-full shrink-0 break-words rounded-full border border-accent bg-surface-canvas px-3 py-1 text-xs font-medium text-accent">
-              {t}
-            </span>
+            <PortfolioTag label={t} />
           ))}
         </div>
       )

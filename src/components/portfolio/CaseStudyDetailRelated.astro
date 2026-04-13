@@ -2,7 +2,8 @@
 interface RelatedItem {
   href: string;
   title: string;
-  preset: string;
+  /** ポートフォリオ一覧と同じ連番表示 */
+  listNumber: string;
 }
 
 interface Props {
@@ -26,9 +27,9 @@ const { items } = Astro.props;
           <li>
             <a
               href={item.href}
-              class="block rounded-lg border border-border-subtle bg-surface-canvas p-3 transition-colors hover:border-border-default hover:bg-surface-subtle"
+              class="block rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 transition-colors hover:border-border-default hover:bg-surface-subtle"
             >
-              <span class="text-xs tabular-nums text-fg-muted">{item.preset}</span>
+              <span class="text-xs tabular-nums text-fg-muted">{item.listNumber}</span>
               <span class="mt-1 block min-w-0 text-sm font-semibold leading-snug text-fg-strong">
                 {item.title}
               </span>

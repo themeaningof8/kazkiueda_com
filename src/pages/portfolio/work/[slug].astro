@@ -57,7 +57,7 @@ const relatedItems = sortedForNav
   .map((e) => ({
     href: `/portfolio/work/${e.id}`,
     title: e.data.title,
-    preset: e.data.preset,
+    listNumber: String(sortedForNav.findIndex((x) => x.id === e.id) + 1).padStart(2, '0'),
   }));
 
 const caseStudyDetailHeader = {
@@ -84,14 +84,14 @@ const caseStudyDetailHeader = {
         <article class="min-w-0 lg:self-start" aria-labelledby="case-study-lead">
           <p
             id="case-study-lead"
-            class="m-0 text-base leading-relaxed text-fg-strong md:text-lg"
+            class="m-0 text-base leading-relaxed text-fg-muted md:text-lg"
           >
             {description}
           </p>
 
           <div
             class:list={[
-              'relative mt-8 w-full overflow-hidden rounded-none bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
+              'relative mt-8 w-full overflow-hidden rounded-xl border border-border-subtle bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
               L.aspect,
             ]}
           >
@@ -100,20 +100,20 @@ const caseStudyDetailHeader = {
               alt={heroAlt}
               width={L.imgWidth}
               height={L.imgHeight}
-              class="h-full w-full object-cover transition-opacity duration-500"
+              class="h-full w-full object-cover opacity-[0.98] transition-opacity duration-500"
               sizes="(min-width: 1024px) 720px, 100vw"
               {...heroImageTransitionAttrs}
             />
           </div>
 
           <div
-            class="mt-10 border-y border-border-subtle"
+            class="mt-10 overflow-hidden rounded-2xl border border-border-subtle bg-surface-subtle/50"
             aria-label="概要"
           >
             {
               summaryRows.map((row) => (
                 <div
-                  class="grid grid-cols-1 gap-2 border-b border-border-subtle py-3 last:border-b-0 sm:grid-cols-[120px_1fr] sm:gap-6"
+                  class="grid grid-cols-1 gap-2 border-b border-border-subtle px-4 py-3 last:border-b-0 sm:grid-cols-[120px_1fr] sm:gap-6 sm:px-6"
                 >
                   <div class="text-sm font-medium text-fg-strong">{row.label}</div>
                   <div class="min-w-0 text-sm leading-relaxed text-fg-muted">{row.value}</div>
@@ -125,9 +125,9 @@ const caseStudyDetailHeader = {
           <div
             class:list={[
               'prose prose-neutral prose-lg mt-12 max-w-none text-fg-muted',
-              'prose-headings:scroll-mt-40 prose-headings:font-semibold prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-accent',
-              'prose-h2:mb-3 prose-h2:mt-10 prose-h2:text-base prose-h2:text-accent first:prose-h2:mt-12',
-              'prose-p:leading-relaxed prose-strong:text-fg-strong prose-a:text-accent',
+              'prose-headings:scroll-mt-40 prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-fg-strong prose-headings:normal-case',
+              'prose-h2:mb-3 prose-h2:mt-10 prose-h2:text-lg prose-h2:text-fg-strong first:prose-h2:mt-12',
+              'prose-p:leading-relaxed prose-strong:text-fg-strong prose-a:text-accent prose-a:font-medium',
             ]}
           >
             <Content />
