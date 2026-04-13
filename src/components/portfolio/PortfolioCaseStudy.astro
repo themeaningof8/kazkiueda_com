@@ -12,143 +12,100 @@ const {
   roleBadge,
   outcomeLabel,
   outcomeTitle,
-  imageSrc,
-  imageSrcset,
-  imageSizes,
-  imageAlt,
   sectionId,
   href,
   linkLabel,
-  transitionName,
 } = Astro.props;
 
 const headingId = `${sectionId}-heading`;
 const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
-
-const linkedImageTransitionAttrs = transitionName
-  ? ({ 'transition:name': transitionName } as const)
-  : {};
-
-/** 一覧サムネは正方形（`index` の getImage と同じ 1:1） */
-const THUMB = { w: 720, h: 720 } as const;
-
-/** テキスト列の高さ感に近いコンパクトさ（~15–16rem 四方） */
-const thumbColumnClass = 'min-w-0 w-full max-w-[min(100%,15rem)] lg:max-w-[16rem]';
-
-const imageShellClass = [
-  'relative w-full overflow-hidden rounded-xl bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
-  'aspect-square',
-];
-
-const imgMotionClass =
-  'h-full w-full object-cover opacity-95 grayscale-[40%] transition-[opacity,transform,filter] duration-500 ease-out group-hover/img:scale-[1.02] group-hover/img:grayscale-0 motion-reduce:transition-none motion-reduce:group-hover/img:scale-100 forced-colors:grayscale-0 forced-colors:opacity-100';
 ---
 
 <article class="relative mx-auto w-full min-w-0 max-w-[1296px]" aria-labelledby={headingId}>
   <div
     class="rounded-2xl border border-border-subtle bg-surface-subtle/50 p-6 md:p-8 lg:p-10"
   >
-  <div
-    class="grid grid-cols-1 gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-10 lg:items-start"
-  >
     {
       href ? (
-        <>
-          <div class:list={[thumbColumnClass, 'lg:shrink-0']}>
+        <div class="flex min-w-0 flex-col gap-4">
+          <div class="flex flex-wrap items-start gap-x-5 gap-y-2">
+            <span
+              class="shrink-0 pt-0.5 text-xs tabular-nums text-fg-muted"
+              aria-hidden="true">{preset}</span
+            >
+            <div class="flex min-w-0 flex-1 flex-wrap gap-2">
+              {tags.map((t) => <PortfolioTag label={t} />)}
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span
+              class="rounded border border-border-default bg-surface-ui px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
+              >{roleBadge}</span
+            >
+          </div>
+          <h3
+            id={headingId}
+            class="min-w-0 max-w-full break-words text-2xl font-bold tracking-tight text-fg-strong md:text-3xl"
+          >
+            {title}
+          </h3>
+          <p class="text-sm leading-relaxed text-fg-muted md:text-base">
+            {description}
+          </p>
+          <div
+            class="rounded-lg border border-border-subtle bg-surface-subtle p-4"
+            aria-label={`${outcomeLabel}: ${outcomeTitle}`}
+          >
+            <span class="mb-1 block text-xs font-semibold tracking-wide text-fg-muted"
+              >{outcomeLabel}</span
+            >
+            <p class="text-lg font-semibold leading-snug text-fg-strong">{outcomeTitle}</p>
+          </div>
+          <div class="pt-2">
             <a
-              class="group/img block outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
+              class="group/detail inline-flex items-center gap-2 text-sm font-semibold text-fg-muted underline decoration-border-default underline-offset-4 transition-colors hover:text-accent"
               href={href}
               aria-label={caseStudyAriaLabel}
             >
-              <div class:list={[imageShellClass, 'group-hover/img:shadow-sm']}>
-                <span
-                  class="pointer-events-none absolute left-3 top-3 z-10 text-xs tabular-nums text-fg-muted drop-shadow-[0_1px_1px_rgb(255_255_255/0.9)]"
-                  aria-hidden="true">{preset}</span
-                >
-                <img
-                  class={imgMotionClass}
-                  src={imageSrc}
-                  srcset={imageSrcset}
-                  sizes={imageSizes}
-                  alt=""
-                  width={THUMB.w}
-                  height={THUMB.h}
-                  loading="lazy"
-                  decoding="async"
-                  {...linkedImageTransitionAttrs}
-                />
-              </div>
+              <span>{linkLabel ?? 'ケーススタディを見る'}</span>
+              <span
+                class="material-symbols-outlined text-base transition-transform group-hover/detail:translate-x-1 motion-reduce:transition-none"
+                aria-hidden="true">arrow_forward</span
+              >
             </a>
           </div>
-
-          <div class="flex min-w-0 flex-col justify-start gap-4">
-            <div class="flex flex-wrap items-center gap-2">
-              <span
-                class="rounded border border-border-default bg-surface-ui px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
-                >{roleBadge}</span
-              >
-            </div>
-            <div class="flex flex-wrap gap-2">
+        </div>
+      ) : (
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-start gap-x-5 gap-y-2">
+            <span class="shrink-0 pt-0.5 text-xs tabular-nums text-fg-muted" aria-hidden="true"
+              >{preset}</span
+            >
+            <div class="flex min-w-0 flex-1 flex-wrap gap-2">
               {tags.map((t) => <PortfolioTag label={t} />)}
             </div>
-            <h3
-              id={headingId}
-              class="min-w-0 max-w-full break-words text-2xl font-bold tracking-tight text-fg-strong md:text-3xl"
-            >
-              {title}
-            </h3>
-            <p class="max-w-xl text-sm leading-relaxed text-fg-muted md:text-base">
-              {description}
-            </p>
-            <div
-              class="rounded-lg border border-border-subtle bg-surface-subtle p-4"
-              aria-label={`${outcomeLabel}: ${outcomeTitle}`}
-            >
-              <span class="mb-1 block text-xs font-semibold tracking-wide text-fg-muted"
-                >{outcomeLabel}</span
-              >
-              <p class="text-lg font-semibold leading-snug text-fg-strong">{outcomeTitle}</p>
-            </div>
-            <div class="pt-2">
-              <a
-                class="group/detail inline-flex items-center gap-2 text-sm font-semibold text-fg-muted underline decoration-border-default underline-offset-4 transition-colors hover:text-accent"
-                href={href}
-              >
-                <span>{linkLabel ?? 'ケーススタディを見る'}</span>
-                <span
-                  class="material-symbols-outlined text-base transition-transform group-hover/detail:translate-x-1 motion-reduce:transition-none"
-                  aria-hidden="true">arrow_forward</span
-                >
-              </a>
-            </div>
           </div>
-        </>
-      ) : (
-        <div class="col-span-full space-y-4">
-          <div class:list={[thumbColumnClass, ...imageShellClass]}>
+          <div class="flex flex-wrap items-center gap-2">
             <span
-              class="pointer-events-none absolute left-3 top-3 z-10 text-xs tabular-nums text-fg-muted drop-shadow-[0_1px_1px_rgb(255_255_255/0.9)]"
-              aria-hidden="true">{preset}</span
+              class="rounded border border-border-default bg-surface-ui px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
+              >{roleBadge}</span
             >
-            <img
-              class={imgMotionClass}
-              src={imageSrc}
-              srcset={imageSrcset}
-              sizes={imageSizes}
-              alt={imageAlt}
-              width={THUMB.w}
-              height={THUMB.h}
-              loading="lazy"
-              decoding="async"
-            />
           </div>
           <h3 id={headingId} class="min-w-0 max-w-full break-words text-2xl font-bold text-fg-strong">
             {title}
           </h3>
           <p class="text-fg-muted">{description}</p>
+          <div
+            class="rounded-lg border border-border-subtle bg-surface-subtle p-4"
+            aria-label={`${outcomeLabel}: ${outcomeTitle}`}
+          >
+            <span class="mb-1 block text-xs font-semibold tracking-wide text-fg-muted"
+              >{outcomeLabel}</span
+            >
+            <p class="text-lg font-semibold leading-snug text-fg-strong">{outcomeTitle}</p>
+          </div>
         </div>
       )
     }
-  </div>
   </div>
 </article>

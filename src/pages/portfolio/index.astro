@@ -2,7 +2,6 @@
 export const prerender = true;
 
 import { getCollection } from 'astro:content';
-import { getImage } from 'astro:assets';
 import PortfolioLayout from '../../layouts/PortfolioLayout.astro';
 import PortfolioCaseStudy from '../../components/portfolio/PortfolioCaseStudy.astro';
 import PortfolioFooter from '../../components/portfolio/PortfolioFooter.astro';
@@ -12,48 +11,21 @@ import type {
   PortfolioListingHeaderProps,
 } from '../../components/portfolio/portfolio-types';
 
-/** 一覧カード用: ビューポートに合わせた解像度だけ生成してペイロードを抑える */
-function caseListingImageWidths(maxWidth: number): number[] {
-  const steps = [640, 750, 828, 960, 1080, 1280, 1536, 1920];
-  const out = steps.filter((w) => w <= maxWidth);
-  if (!out.includes(maxWidth)) out.push(maxWidth);
-  return [...new Set(out)].sort((a, b) => a - b);
-}
-
 const rawEntries = await getCollection('caseStudies');
 const sorted = [...rawEntries].sort((a, b) => {
   if (a.data.order !== b.data.order) return a.data.order - b.data.order;
   return a.id.localeCompare(b.id);
 });
 
-/** 一覧サムネは正方形・実表示は ~16rem 相当のため 1:1 で十分な解像度に抑える */
-const LISTING_THUMB = { w: 720, h: 720 } as const;
-
-const caseStudies: CaseStudy[] = await Promise.all(
-  sorted.map(async (entry, rowIndex) => {
-    const { heroImage, heroAlt, order: _order, ...data } = entry.data;
-    const imageSizes =
-      '(max-width: 1023px) min(calc(100vw - 3rem), 15rem), 16rem';
-    const optimized = await getImage({
-      src: heroImage,
-      width: LISTING_THUMB.w,
-      height: LISTING_THUMB.h,
-      widths: caseListingImageWidths(LISTING_THUMB.w),
-      sizes: imageSizes,
-    });
-    return {
-      ...data,
-      imageSrc: optimized.src,
-      imageSrcset: optimized.srcSet.attribute,
-      imageSizes,
-      imageAlt: heroAlt,
-      sectionId: `case-${entry.id}`,
-      href: `/portfolio/work/${entry.id}`,
-      transitionName: `case-hero-${entry.id}`,
-      rowIndex,
-    };
-  }),
-);
+const caseStudies: CaseStudy[] = sorted.map((entry, rowIndex) => {
+  const { heroImage: _, heroAlt: __, order: ___, summaryRows: ____, ...listing } = entry.data;
+  return {
+    ...listing,
+    sectionId: `case-${entry.id}`,
+    href: `/portfolio/work/${entry.id}`,
+    rowIndex,
+  };
+});
 
 const footerLinks: FooterLink[] = [
   {
