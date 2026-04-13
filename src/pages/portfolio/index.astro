@@ -26,14 +26,14 @@ const sorted = [...rawEntries].sort((a, b) => {
   return a.id.localeCompare(b.id);
 });
 
-/** 一覧サムネは正方形表示のため、生成解像度も 1:1 に統一 */
-const LISTING_THUMB = { w: 1080, h: 1080 } as const;
+/** 一覧サムネは正方形・実表示は ~16rem 相当のため 1:1 で十分な解像度に抑える */
+const LISTING_THUMB = { w: 720, h: 720 } as const;
 
 const caseStudies: CaseStudy[] = await Promise.all(
   sorted.map(async (entry, rowIndex) => {
     const { heroImage, heroAlt, order: _order, ...data } = entry.data;
     const imageSizes =
-      '(max-width: 1023px) min(100vw, 48rem), (max-width: 1535px) min(90vw, 48rem), min(45vw, 52rem)';
+      '(max-width: 1023px) min(calc(100vw - 3rem), 15rem), 16rem';
     const optimized = await getImage({
       src: heroImage,
       width: LISTING_THUMB.w,
