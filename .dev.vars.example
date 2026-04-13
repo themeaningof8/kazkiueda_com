@@ -1,9 +1,6 @@
-# ローカル用（`wrangler pages dev` / `wrangler dev` など）。コピーして `.dev.vars` を作る。
+# ローカル用（`wrangler pages dev` など）。コピーして `.dev.vars` を作る。
 # `.dev.vars` は Git にコミットしないこと。
 #
-# /portfolio の Basic 認証（パスワード部分）。ユーザー名は任意。
-PREVIEW_SECRET=
-
 # オプション: ポートフォリオの mailto（Astro の `PUBLIC_CONTACT_EMAIL`）
 # PUBLIC_CONTACT_EMAIL=
 # PUBLIC_INSTAGRAM_URL=

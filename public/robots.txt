@@ -1,3 +1,9 @@
-# https://kazkiueda.com — 要件: /portfolio をクローラーに見せない
+# https://kazkiueda.com — /portfolio をクローラーに載せない・読ませない方針
 User-agent: *
+Disallow: /portfolio
+
+User-agent: GPTBot
+Disallow: /portfolio
+
+User-agent: Google-Extended
 Disallow: /portfolio

@@ -12,14 +12,12 @@
     "preview": "astro preview",
     "pages:dev": "bun run build && bunx wrangler pages dev ./dist",
     "deploy:pages": "bun run build && bunx wrangler pages deploy ./dist --project-name=kazkiueda-com",
-    "deploy:cf-worker": "bun run build && wrangler deploy",
-    "deploy": "bun run deploy:cf-worker",
+    "deploy": "bun run deploy:pages",
     "check": "astro check",
     "astro": "astro",
     "generate-types": "wrangler types"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^13.1.8",
     "@fontsource-variable/noto-sans-jp": "^5.2.10",
     "@tabler/icons": "^3.41.1",
     "@tailwindcss/forms": "^0.5.11",
