@@ -14,6 +14,8 @@ const {
   outcomeTitle,
   rowIndex,
   imageSrc,
+  imageSrcset,
+  imageSizes,
   imageAlt,
   sectionId,
   href,
@@ -42,8 +44,8 @@ const layout = {
 const L = layout[preset];
 
 const numberClass = reverse
-  ? 'pointer-events-none absolute -top-16 right-0 z-0 w-full select-none text-right text-[6.5rem] font-bold leading-none text-surface-ui-hover/40 md:-top-24 md:text-[11rem]'
-  : 'pointer-events-none absolute -top-16 left-0 z-0 select-none text-[6.5rem] font-bold leading-none text-surface-ui-hover/40 md:-top-24 md:text-[11rem]';
+  ? 'pointer-events-none absolute -top-16 right-0 z-0 w-full select-none text-right text-[6.5rem] font-semibold leading-none text-surface-ui-hover/25 md:-top-24 md:text-[11rem]'
+  : 'pointer-events-none absolute -top-16 left-0 z-0 select-none text-[6.5rem] font-semibold leading-none text-surface-ui-hover/25 md:-top-24 md:text-[11rem]';
 
 const imageShellClass = [
   'relative w-full overflow-hidden rounded-xl bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
@@ -51,7 +53,7 @@ const imageShellClass = [
 ];
 
 const imgMotionClass =
-  'h-full w-full object-cover grayscale opacity-90 transition-all duration-700 group-hover/img:scale-105 group-hover/img:grayscale-0 motion-reduce:transition-none motion-reduce:group-hover/img:scale-100 forced-colors:grayscale-0 forced-colors:opacity-100';
+  'h-full w-full object-cover grayscale opacity-90 transition-[opacity,transform,filter] duration-500 ease-out group-hover/img:scale-[1.02] group-hover/img:grayscale-0 motion-reduce:transition-none motion-reduce:group-hover/img:scale-100 forced-colors:grayscale-0 forced-colors:opacity-100';
 ---
 
 <article
@@ -78,15 +80,12 @@ const imgMotionClass =
               href={href}
               aria-label={caseStudyAriaLabel}
             >
-              <div class:list={[imageShellClass, 'group-hover/img:shadow-lg']}>
-                <div
-                  class="absolute inset-0 z-[1] bg-accent/5 transition-colors group-hover/img:bg-transparent"
-                  aria-hidden="true"
-                >
-                </div>
+              <div class:list={[imageShellClass, 'group-hover/img:shadow-sm']}>
                 <img
                   class={imgMotionClass}
                   src={imageSrc}
+                  srcset={imageSrcset}
+                  sizes={imageSizes}
                   alt=""
                   width={L.imgWidth}
                   height={L.imgHeight}
@@ -108,7 +107,7 @@ const imgMotionClass =
           >
             <div class="flex flex-wrap items-center gap-2">
               <span
-                class="rounded bg-accent px-2 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-fg-on-accent"
+                class="rounded border border-border-default bg-surface-ui px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
                 >{roleBadge}</span
               >
             </div>
@@ -117,7 +116,7 @@ const imgMotionClass =
             </div>
             <h3
               id={headingId}
-              class="text-2xl font-bold tracking-tight text-fg-strong md:text-3xl"
+              class="min-w-0 max-w-full break-words text-2xl font-bold tracking-tight text-fg-strong md:text-3xl"
             >
               {title}
             </h3>
@@ -125,11 +124,13 @@ const imgMotionClass =
               {description}
             </p>
             <div
-              class="rounded-lg border-l-4 border-accent bg-surface-ui p-4"
+              class="rounded-lg border border-border-subtle bg-surface-subtle p-4"
               aria-label={`${outcomeLabel}: ${outcomeTitle}`}
             >
-              <span class="mb-1 block text-xs font-bold text-accent">{outcomeLabel}</span>
-              <p class="text-lg font-bold text-fg-strong">{outcomeTitle}</p>
+              <span class="mb-1 block text-xs font-semibold tracking-wide text-fg-muted"
+                >{outcomeLabel}</span
+              >
+              <p class="text-lg font-semibold leading-snug text-fg-strong">{outcomeTitle}</p>
             </div>
             <div class="pt-2">
               <a
@@ -147,12 +148,16 @@ const imgMotionClass =
         </>
       ) : (
         <div class="col-span-12 mx-auto w-full max-w-xl space-y-4 sm:max-w-2xl md:max-w-3xl lg:max-w-none">
-          <h3 id={headingId} class="text-2xl font-bold text-fg-strong">{title}</h3>
+          <h3 id={headingId} class="min-w-0 max-w-full break-words text-2xl font-bold text-fg-strong">
+            {title}
+          </h3>
           <p class="text-fg-muted">{description}</p>
           <div class:list={imageShellClass}>
             <img
               class={imgMotionClass}
               src={imageSrc}
+              srcset={imageSrcset}
+              sizes={imageSizes}
               alt={imageAlt}
               width={L.imgWidth}
               height={L.imgHeight}

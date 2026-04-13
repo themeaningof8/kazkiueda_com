@@ -32,11 +32,11 @@ const { workHref, items, workSectionLabel = '制作実績セクションへ' } =
       side="bottom"
       align="start"
       sideOffset={8}
-      class="max-h-[min(24rem,calc(100vh-6rem))] w-72 border-border-subtle bg-surface-canvas p-2 text-fg-strong shadow-lg"
+      class="max-h-[min(24rem,calc(100vh-6rem))] w-72 border-border-subtle bg-surface-canvas p-2 text-fg-strong shadow-sm"
       aria-label="制作実績"
     >
       <a
-        class="block rounded-md px-3 py-2 text-sm text-fg-muted hover:bg-surface-ui hover:text-fg-strong"
+        class="flex min-h-10 items-center rounded-md px-3 py-2 text-sm text-fg-muted hover:bg-surface-ui hover:text-fg-strong"
         href={workHref}
       >
         {workSectionLabel}
@@ -49,11 +49,12 @@ const { workHref, items, workSectionLabel = '制作実績セクションへ' } =
             return (
               <li>
                 <a
-                  class="block rounded-md px-3 py-2 text-sm text-fg-muted hover:bg-surface-ui hover:text-fg-strong"
+                  class="flex min-h-10 items-center rounded-md px-3 py-2 text-sm text-fg-muted hover:bg-surface-ui hover:text-fg-strong"
                   href={href}
                   data-case-anchor={item.anchorId}
+                  title={item.label}
                 >
-                  <span class="case-study-nav-label">{item.label}</span>
+                  <span class="case-study-nav-label line-clamp-2 break-words">{item.label}</span>
                 </a>
               </li>
             );
