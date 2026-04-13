@@ -55,3 +55,12 @@ export interface CaseStudyDetailHeaderProps {
   /** ヘッダ直下に固定表示するタグ（ケーススタディ詳細） */
   tags?: string[];
 }
+
+/** Paper「Portfolio Page」一覧用のコンパクトヘッダ */
+export interface PortfolioListingHeaderProps {
+  brand: string;
+  /** ヘッダ2行目（例: 「ポートフォリオ」） */
+  tagline: string;
+  aboutHref: string;
+  aboutLabel?: string;
+}

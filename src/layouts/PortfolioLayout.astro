@@ -3,8 +3,10 @@ import '../styles/styles.css';
 import { ClientRouter } from 'astro:transitions';
 import PortfolioTopNav from '../components/portfolio/PortfolioTopNav.astro';
 import CaseStudyDetailHeader from '../components/portfolio/CaseStudyDetailHeader.astro';
+import PortfolioListingHeader from '../components/portfolio/PortfolioListingHeader.astro';
 import type {
   CaseStudyDetailHeaderProps,
+  PortfolioListingHeaderProps,
   PortfolioTopNavProps,
 } from '../components/portfolio/portfolio-types';
 
@@ -13,9 +15,12 @@ interface Props {
   topNav?: PortfolioTopNavProps;
   /** 指定時は `PortfolioTopNav` の代わりに詳細用ヘッダを表示（`topNav` より優先） */
   caseStudyDetailHeader?: CaseStudyDetailHeaderProps;
+  /** 一覧用ヘッダ（`caseStudyDetailHeader` 未指定時のみ。`topNav` より優先） */
+  portfolioListingHeader?: PortfolioListingHeaderProps;
 }
 
-const { title = 'Portfolio', topNav, caseStudyDetailHeader } = Astro.props;
+const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHeader } =
+  Astro.props;
 ---
 
 <!doctype html>
@@ -44,8 +49,11 @@ const { title = 'Portfolio', topNav, caseStudyDetailHeader } = Astro.props;
       href="#main-content">本文へスキップ</a
     >
     {
+      /* ヘッダは同時に1つ: 詳細 > 一覧 > トップナビ */
       caseStudyDetailHeader ? (
         <CaseStudyDetailHeader {...caseStudyDetailHeader} />
+      ) : portfolioListingHeader ? (
+        <PortfolioListingHeader {...portfolioListingHeader} />
       ) : (
         topNav && <PortfolioTopNav {...topNav} />
       )
