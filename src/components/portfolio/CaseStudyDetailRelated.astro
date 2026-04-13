@@ -1,0 +1,44 @@
+---
+interface RelatedItem {
+  href: string;
+  title: string;
+  preset: string;
+}
+
+interface Props {
+  items: RelatedItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="sticky top-28 self-start">
+<aside class="case-study-detail-related" aria-label="他のケーススタディ">
+  <p
+    class="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
+  >
+    Other Case Studies
+  </p>
+  {
+    items.length > 0 ? (
+      <ul class="mt-4 space-y-3">
+        {items.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="block rounded-lg border border-border-subtle bg-surface-canvas p-3 transition-colors hover:border-border-default hover:bg-surface-subtle"
+            >
+              <span class="text-xs tabular-nums text-fg-muted">{item.preset}</span>
+              <span class="mt-1 block min-w-0 text-sm font-semibold leading-snug text-fg-strong">
+                {item.title}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="mt-4 text-sm text-fg-muted">他の事例はありません。</p>
+    )
+  }
+</aside>
+</div>

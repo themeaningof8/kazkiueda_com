@@ -1,0 +1,56 @@
+---
+// 左目次の現在地をスクロールに同期する（`a[data-toc-anchor]` と `h2[id]` を対応付け）
+---
+
+<script>
+  let observer: IntersectionObserver | null = null;
+
+  function setActiveAnchor(activeId: string | null) {
+    const links = document.querySelectorAll<HTMLAnchorElement>('a[data-toc-anchor]');
+    for (const link of links) {
+      const id = link.dataset.tocAnchor;
+      const isActive = Boolean(activeId && id === activeId);
+      if (isActive) {
+        link.setAttribute('aria-current', 'location');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+      link.classList.toggle('font-semibold', isActive);
+      link.classList.toggle('text-accent', isActive);
+      link.classList.toggle('text-fg-muted', !isActive);
+    }
+  }
+
+  function initCaseStudyTocScrollSpy() {
+    if (observer) observer.disconnect();
+
+    const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('a[data-toc-anchor]')];
+    if (!navLinks.length) return;
+
+    const ids = [...new Set(navLinks.map((a) => a.dataset.tocAnchor ?? '').filter(Boolean))];
+    const targets = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+    if (!targets.length) return;
+
+    observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (!visible.length) return;
+        setActiveAnchor(visible[0].target.id);
+      },
+      {
+        root: null,
+        rootMargin: '-22% 0px -32% 0px',
+        threshold: [0, 0.15, 0.35, 0.55, 0.75, 1],
+      },
+    );
+
+    for (const t of targets) observer.observe(t);
+    setActiveAnchor(ids[0]);
+  }
+
+  document.addEventListener('astro:page-load', initCaseStudyTocScrollSpy);
+</script>

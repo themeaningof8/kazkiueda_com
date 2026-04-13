@@ -45,3 +45,11 @@ export interface PortfolioTopNavProps {
   /** 一覧・詳細で「制作実績」Popover 内のケースリンク用 */
   caseNavItems?: CaseStudyNavItem[];
 }
+
+/** Paper「Case Study Detail」系のコンパクトヘッダ（詳細ページ専用） */
+export interface CaseStudyDetailHeaderProps {
+  brand: string;
+  caseStudyTitle: string;
+  aboutHref: string;
+  aboutLabel?: string;
+}

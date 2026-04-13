@@ -1,0 +1,33 @@
+---
+import type { CaseStudyDetailHeaderProps } from './portfolio-types';
+
+type Props = CaseStudyDetailHeaderProps;
+
+const { brand, caseStudyTitle, aboutHref, aboutLabel = 'About' } = Astro.props;
+---
+
+<header
+  class="fixed inset-x-0 top-0 z-50 border-b border-border-subtle bg-surface-canvas"
+  role="banner"
+>
+  <div class="mx-auto max-w-[1440px] px-6 lg:px-[72px]">
+    <div
+      class="flex min-h-[50px] items-center justify-between gap-4 py-2 md:min-h-[50px] md:py-0"
+    >
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-xs text-fg-muted">{brand}</p>
+        <p
+          class="line-clamp-2 min-w-0 text-sm font-semibold leading-snug text-fg-strong md:text-base"
+        >
+          ケーススタディ / {caseStudyTitle}
+        </p>
+      </div>
+      <a
+        href={aboutHref}
+        class="shrink-0 text-sm font-medium text-accent underline-offset-4 transition-colors hover:text-accent hover:underline"
+      >
+        {aboutLabel}
+      </a>
+    </div>
+  </div>
+</header>

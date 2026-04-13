@@ -3,11 +3,11 @@ import type { GetStaticPaths } from 'astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import PortfolioLayout from '../../../layouts/PortfolioLayout.astro';
-import PortfolioTag from '../../../components/portfolio/PortfolioTag.astro';
-import type {
-  CaseStudyNavItem,
-  PortfolioTopNavProps,
-} from '../../../components/portfolio/portfolio-types';
+import CaseStudyDetailToc from '../../../components/portfolio/CaseStudyDetailToc.astro';
+import CaseStudyDetailRelated from '../../../components/portfolio/CaseStudyDetailRelated.astro';
+import CaseStudyDetailTocScrollSpy from '../../../components/portfolio/CaseStudyDetailTocScrollSpy.astro';
+import type { CaseStudyDetailHeaderProps } from '../../../components/portfolio/portfolio-types';
+import { tocFromMarkdownH2 } from '../../../lib/case-study-toc';
 
 export const prerender = true;
 
@@ -25,7 +25,7 @@ export interface Props {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const { title, description, tags, preset, heroImage, heroAlt } = entry.data;
+const { title, description, tags, preset, heroImage, heroAlt, summaryRows } = entry.data;
 
 const transitionName = `case-hero-${entry.id}`;
 
@@ -40,73 +40,116 @@ const L = layoutMeta[preset];
 
 const heroImageTransitionAttrs = { 'transition:name': transitionName } as const;
 
-const contactEmail =
-  import.meta.env.PUBLIC_CONTACT_EMAIL?.trim() || 'hello@kazkiueda.com';
-
 const allCaseEntries = await getCollection('caseStudies');
 const sortedForNav = [...allCaseEntries].sort((a, b) => {
   if (a.data.order !== b.data.order) return a.data.order - b.data.order;
   return a.id.localeCompare(b.id);
 });
 
-const caseNavItems: CaseStudyNavItem[] = sortedForNav.map((e) => ({
-  anchorId: `case-${e.id}`,
-  label: e.data.title,
-  mono: e.data.preset,
-  href: `/portfolio#case-${e.id}`,
+const tocItems = tocFromMarkdownH2(entry.body ?? '').map((item) => ({
+  text: item.text,
+  slug: item.slug,
+  href: `#${item.slug}`,
 }));
 
-const topNav = {
-  brand: 'Kazki Ueda',
-  workHref: '/portfolio#work',
+const relatedItems = sortedForNav
+  .filter((e) => e.id !== entry.id)
+  .map((e) => ({
+    href: `/portfolio/work/${e.id}`,
+    title: e.data.title,
+    preset: e.data.preset,
+  }));
+
+const caseStudyDetailHeader = {
+  brand: '植田 一貴',
+  caseStudyTitle: title,
   aboutHref: '/portfolio#about',
-  contactHref: '/portfolio#contact',
-  ctaHref: `mailto:${contactEmail}`,
-  ctaLabel: 'お問い合わせ',
-  caseNavItems,
-} satisfies PortfolioTopNavProps;
+} satisfies CaseStudyDetailHeaderProps;
 ---
 
-<PortfolioLayout title={`${title} | kazkiueda.com`} topNav={topNav}>
+<PortfolioLayout title={`${title} | kazkiueda.com`} caseStudyDetailHeader={caseStudyDetailHeader}>
   <main
     id="main-content"
-    class="mx-auto min-w-0 max-w-portfolio px-6 pb-32 pt-28 md:px-12 md:pb-48 md:pt-32"
+    class="mx-auto min-w-0 pb-32 pt-[5.5rem] md:pb-48 md:pt-24"
   >
-    <article aria-labelledby="case-title">
-      <header class="min-w-0 space-y-6">
-        <div class="mb-0 flex flex-wrap gap-3">
-          {tags.map((t) => <PortfolioTag label={t} />)}
-        </div>
-        <h1
-          id="case-title"
-          class="max-w-4xl min-w-0 break-words text-4xl font-bold tracking-tight text-fg-strong md:text-6xl"
-        >
-          {title}
-        </h1>
-        <p class="max-w-2xl min-w-0 break-words text-lg leading-relaxed text-fg-muted">{description}</p>
-        <div
-          class:list={[
-            'relative w-full max-w-5xl overflow-hidden bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
-            L.aspect,
-          ]}
-        >
-          <Image
-            src={heroImage}
-            alt={heroAlt}
-            width={L.imgWidth}
-            height={L.imgHeight}
-            class="h-full w-full object-cover opacity-20 mix-blend-multiply grayscale transition-opacity duration-500 forced-colors:opacity-100 forced-colors:mix-blend-normal forced-colors:grayscale-0"
-            sizes="(min-width: 768px) 80vw, 100vw"
-            {...heroImageTransitionAttrs}
-          />
-        </div>
-      </header>
+    <div class="mx-auto max-w-[1440px] px-6 lg:px-[72px]">
+      <div class="mx-auto mb-8 max-w-[1296px] flex flex-wrap gap-2">
+        {
+          tags.map((t) => (
+            <span
+              class="inline-block max-w-full break-words rounded-full border border-accent bg-transparent px-3 py-1 text-xs font-medium text-accent"
+            >
+              {t}
+            </span>
+          ))
+        }
+      </div>
 
       <div
-        class="prose prose-neutral prose-lg mt-16 max-w-3xl text-fg-muted prose-headings:text-fg-strong prose-a:text-accent prose-strong:text-fg-strong md:mt-24"
+        class="mx-auto grid max-w-[1296px] grid-cols-1 gap-y-12 lg:grid-cols-[240px_minmax(0,720px)_296px] lg:gap-x-5 lg:gap-y-0"
       >
-        <Content />
+        <div class="hidden lg:block">
+          <CaseStudyDetailToc items={tocItems} />
+        </div>
+
+        <article class="min-w-0" aria-labelledby="case-study-lead">
+          <p
+            id="case-study-lead"
+            class="text-base leading-relaxed text-fg-strong md:text-lg"
+          >
+            {description}
+          </p>
+
+          <div
+            class:list={[
+              'relative mt-8 w-full overflow-hidden rounded-none bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
+              L.aspect,
+            ]}
+          >
+            <Image
+              src={heroImage}
+              alt={heroAlt}
+              width={L.imgWidth}
+              height={L.imgHeight}
+              class="h-full w-full object-cover transition-opacity duration-500"
+              sizes="(min-width: 1024px) 720px, 100vw"
+              {...heroImageTransitionAttrs}
+            />
+          </div>
+
+          <div
+            class="mt-10 border-y border-border-subtle"
+            aria-label="概要"
+          >
+            {
+              summaryRows.map((row) => (
+                <div
+                  class="grid grid-cols-1 gap-2 border-b border-border-subtle py-3 last:border-b-0 sm:grid-cols-[120px_1fr] sm:gap-6"
+                >
+                  <div class="text-sm font-medium text-fg-strong">{row.label}</div>
+                  <div class="min-w-0 text-sm leading-relaxed text-fg-muted">{row.value}</div>
+                </div>
+              ))
+            }
+          </div>
+
+          <div
+            class:list={[
+              'prose prose-neutral prose-lg mt-12 max-w-none text-fg-muted',
+              'prose-headings:scroll-mt-28 prose-headings:font-semibold prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-accent',
+              'prose-h2:mb-3 prose-h2:mt-10 prose-h2:text-base prose-h2:text-accent first:prose-h2:mt-12',
+              'prose-p:leading-relaxed prose-strong:text-fg-strong prose-a:text-accent',
+            ]}
+          >
+            <Content />
+          </div>
+        </article>
+
+        <div class="hidden lg:block">
+          <CaseStudyDetailRelated items={relatedItems} />
+        </div>
       </div>
-    </article>
+    </div>
   </main>
+  <CaseStudyDetailTocScrollSpy />
 </PortfolioLayout>

@@ -2,14 +2,20 @@
 import '../styles/styles.css';
 import { ClientRouter } from 'astro:transitions';
 import PortfolioTopNav from '../components/portfolio/PortfolioTopNav.astro';
-import type { PortfolioTopNavProps } from '../components/portfolio/portfolio-types';
+import CaseStudyDetailHeader from '../components/portfolio/CaseStudyDetailHeader.astro';
+import type {
+  CaseStudyDetailHeaderProps,
+  PortfolioTopNavProps,
+} from '../components/portfolio/portfolio-types';
 
 interface Props {
   title?: string;
   topNav?: PortfolioTopNavProps;
+  /** 指定時は `PortfolioTopNav` の代わりに詳細用ヘッダを表示（`topNav` より優先） */
+  caseStudyDetailHeader?: CaseStudyDetailHeaderProps;
 }
 
-const { title = 'Portfolio', topNav } = Astro.props;
+const { title = 'Portfolio', topNav, caseStudyDetailHeader } = Astro.props;
 ---
 
 <!doctype html>
@@ -37,7 +43,13 @@ const { title = 'Portfolio', topNav } = Astro.props;
       class="fixed z-[100] inline-block translate-y-[calc(-100%-theme(spacing.6))] rounded-lg bg-accent-surface px-4 py-3 font-sans text-sm font-semibold text-fg-on-accent underline outline-offset-2 transition-transform focus:translate-y-0 focus:outline focus:outline-2 focus:outline-fg-strong focus-visible:outline-[3px] forced-colors:focus:outline forced-colors:focus:outline-CanvasText forced-colors:focus-visible:outline-CanvasText"
       href="#main-content">本文へスキップ</a
     >
-    {topNav && <PortfolioTopNav {...topNav} />}
+    {
+      caseStudyDetailHeader ? (
+        <CaseStudyDetailHeader {...caseStudyDetailHeader} />
+      ) : (
+        topNav && <PortfolioTopNav {...topNav} />
+      )
+    }
     <slot />
   </body>
 </html>
