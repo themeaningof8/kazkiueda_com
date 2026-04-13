@@ -4,7 +4,7 @@ description: "受賞建築事務所向けに、インタラクティブな遷移
 tags:
   - "アーキテクチャ"
   - "モーション"
-order: 3
+order: 4
 preset: "03"
 heroImage: "../../assets/case-studies/linear-studio/hero.png"
 heroAlt: "朝の光がコンクリートに落ちる、モダンなブルータリスト建築のクローズアップ（プレースホルダ）"

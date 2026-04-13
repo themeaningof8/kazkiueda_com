@@ -4,7 +4,7 @@ description: "複雑な分析ワークフローを、クラウド運用のため
 tags:
   - "SaaS"
   - "データ可視化"
-order: 2
+order: 3
 preset: "02"
 heroImage: "../../assets/case-studies/nexus-data/hero.png"
 heroAlt: "ソフトなセージと白を基調にした、データ点と接続の抽象ビジュアル（プレースホルダ）"
