@@ -4,7 +4,7 @@ description: "ソフトなタイポグラフィとリサーチに基づく体験
 tags:
   - "フィンテック"
   - "UX リサーチ"
-order: 4
+order: 6
 preset: "04"
 heroImage: "../../assets/case-studies/vera-finance/hero.png"
 heroAlt: "窓からの拡散光と、マグと薄型ノートだけのミニマルなデスク（プレースホルダ）"
