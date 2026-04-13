@@ -1,6 +1,6 @@
 ---
 import PortfolioTag from './PortfolioTag.astro';
-import type { CaseStudy, CaseStudyPreset } from './portfolio-types';
+import type { CaseStudy } from './portfolio-types';
 
 type Props = CaseStudy;
 
@@ -29,21 +29,12 @@ const linkedImageTransitionAttrs = transitionName
   ? ({ 'transition:name': transitionName } as const)
   : {};
 
-const layout = {
-  '01': { aspect: 'aspect-video', imgWidth: 1920, imgHeight: 1080 },
-  '02': { aspect: 'aspect-square', imgWidth: 1080, imgHeight: 1080 },
-  '03': { aspect: 'aspect-[3/4]', imgWidth: 1200, imgHeight: 1600 },
-  '04': { aspect: 'aspect-[4/5]', imgWidth: 1000, imgHeight: 1250 },
-} as const satisfies Record<
-  CaseStudyPreset,
-  { aspect: string; imgWidth: number; imgHeight: number }
->;
-
-const L = layout[preset];
+/** 一覧サムネは正方形（`index` の getImage と同じ 1:1） */
+const THUMB = { w: 1080, h: 1080 } as const;
 
 const imageShellClass = [
   'relative w-full overflow-hidden rounded-xl bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
-  L.aspect,
+  'aspect-square',
 ];
 
 const imgMotionClass =
@@ -76,8 +67,8 @@ const imgMotionClass =
                   srcset={imageSrcset}
                   sizes={imageSizes}
                   alt=""
-                  width={L.imgWidth}
-                  height={L.imgHeight}
+                  width={THUMB.w}
+                  height={THUMB.h}
                   loading="lazy"
                   decoding="async"
                   {...linkedImageTransitionAttrs}
@@ -138,8 +129,8 @@ const imgMotionClass =
               srcset={imageSrcset}
               sizes={imageSizes}
               alt={imageAlt}
-              width={L.imgWidth}
-              height={L.imgHeight}
+              width={THUMB.w}
+              height={THUMB.h}
               loading="lazy"
               decoding="async"
             />
