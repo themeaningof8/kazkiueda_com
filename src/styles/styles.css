@@ -111,6 +111,22 @@
   }
 }
 
+/**
+ * `PortfolioListingHeader` のツールバー高と一致させる（/portfolio の sticky 見出し `top` 用）
+ * 内側 flex: py-2 + min-h-[50px] + py-2（md: py-0 + min-h-[50px]）
+ */
+:root {
+  --portfolio-listing-header-sticky-top: calc(
+    env(safe-area-inset-top, 0px) + 0.5rem + 3.125rem + 0.5rem
+  );
+}
+
+@media (min-width: 768px) {
+  :root {
+    --portfolio-listing-header-sticky-top: calc(env(safe-area-inset-top, 0px) + 3.125rem);
+  }
+}
+
 html.dark,
 .dark {
   --color-surface-canvas: #101211;
