@@ -119,11 +119,21 @@
   --portfolio-listing-header-sticky-top: calc(
     env(safe-area-inset-top, 0px) + 0.5rem + 3.125rem + 0.5rem
   );
+  /**
+   * `CaseStudyDetailHeader`（ツールバー + タグ帯 `pt-1 pb-3` + ピル1行想定）
+   * 左右レールの `position: sticky` の `top` に使用
+   */
+  --case-study-detail-header-sticky-top: calc(
+    var(--portfolio-listing-header-sticky-top) + 2.75rem
+  );
 }
 
 @media (min-width: 768px) {
   :root {
     --portfolio-listing-header-sticky-top: calc(env(safe-area-inset-top, 0px) + 3.125rem);
+    --case-study-detail-header-sticky-top: calc(
+      var(--portfolio-listing-header-sticky-top) + 2.5rem
+    );
   }
 }
 

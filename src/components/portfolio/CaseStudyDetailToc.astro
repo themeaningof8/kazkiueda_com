@@ -12,7 +12,9 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<div class="sticky top-36 self-start">
+<div
+  class="sticky top-[var(--case-study-detail-header-sticky-top)] max-h-[calc(100dvh_-_var(--case-study-detail-header-sticky-top)_-_1.5rem)] self-start overflow-y-auto overscroll-contain"
+>
 <nav
   class="case-study-detail-toc"
   aria-label="このページのセクション"
