@@ -13,16 +13,16 @@ heroAlt: "幾何学パターンとニュートラルトーンの抽象的な平�
 roleBadge: "リードデザイナー / FE"
 outcomeLabel: "OUTCOME"
 outcomeTitle: "属人化した判断が共有財産になり、実装の細部ではなく体験と仕様の議論に集中できるチームへ。"
+summaryRows:
+  - label: "役割"
+    value: "リードデザイナー／フロントエンド実装／ステークホルダー調整"
+  - label: "期間"
+    value: "約1年（保険・金融2事業）"
+  - label: "技術スタック"
+    value: "shadcn/ui・Radix Colors・TailwindCSS・Style Dictionary・Figma Variables"
 ---
 
 > 守秘義務により画面・成果物の掲載は非公開です。
-
-
-| 項目     | 内容                                                                  |
-| ------ | ------------------------------------------------------------------- |
-| 役割     | リードデザイナー／フロントエンド実装／ステークホルダー調整                                       |
-| 期間     | 約1年（保険・金融2事業）                                                       |
-| 技術スタック | shadcn/ui・Radix Colors・TailwindCSS・Style Dictionary・Figma Variables |
 
 
 ## 何が問題だったか
