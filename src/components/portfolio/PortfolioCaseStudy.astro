@@ -5,7 +5,6 @@ import type { CaseStudy } from './portfolio-types';
 type Props = CaseStudy;
 
 const {
-  preset,
   tags,
   title,
   description,
@@ -15,10 +14,15 @@ const {
   sectionId,
   href,
   linkLabel,
+  rowIndex,
 } = Astro.props;
 
 const headingId = `${sectionId}-heading`;
 const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
+
+/** Paper: 左レールの連番（コレクションの preset はアスペクト用のため一覧では使わない） */
+const listNumber = String(rowIndex + 1).padStart(2, '0');
+const listDigits = listNumber.split('');
 ---
 
 <article class="relative mx-auto w-full min-w-0 max-w-[1296px]" aria-labelledby={headingId}>
@@ -27,82 +31,83 @@ const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
   >
     {
       href ? (
-        <div class="flex min-w-0 flex-col gap-4">
-          <div class="flex flex-wrap items-start gap-x-5 gap-y-2">
-            <span
-              class="shrink-0 pt-0.5 text-xs tabular-nums text-fg-muted"
-              aria-hidden="true">{preset}</span
-            >
-            <div class="flex min-w-0 flex-1 flex-wrap gap-2">
+        <div class="flex min-w-0 items-stretch gap-5 md:gap-6">
+          <div
+            class="flex w-[1.625rem] shrink-0 flex-col items-center gap-0.5 pt-0.5 text-xl font-bold tabular-nums leading-none tracking-[0.12em] text-fg-muted"
+            aria-hidden="true"
+          >
+            {listDigits.map((d) => <span class="block">{d}</span>)}
+          </div>
+          <div class="flex min-w-0 flex-1 flex-col gap-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="rounded border border-border-default bg-surface-ui px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
+                >{roleBadge}</span
+              >
               {tags.map((t) => <PortfolioTag label={t} />)}
             </div>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <span
-              class="rounded border border-border-default bg-surface-ui px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
-              >{roleBadge}</span
+            <h3
+              id={headingId}
+              class="min-w-0 max-w-full break-words text-2xl font-bold tracking-tight text-fg-strong md:text-3xl"
             >
-          </div>
-          <h3
-            id={headingId}
-            class="min-w-0 max-w-full break-words text-2xl font-bold tracking-tight text-fg-strong md:text-3xl"
-          >
-            {title}
-          </h3>
-          <p class="text-sm leading-relaxed text-fg-muted md:text-base">
-            {description}
-          </p>
-          <div
-            class="rounded-lg border border-border-subtle bg-surface-subtle p-4"
-            aria-label={`${outcomeLabel}: ${outcomeTitle}`}
-          >
-            <span class="mb-1 block text-xs font-semibold tracking-wide text-fg-muted"
-              >{outcomeLabel}</span
+              {title}
+            </h3>
+            <p class="text-sm leading-relaxed text-fg-muted md:text-base">
+              {description}
+            </p>
+            <div
+              class="rounded-lg border border-border-subtle bg-surface-subtle p-4"
+              aria-label={`${outcomeLabel}: ${outcomeTitle}`}
             >
-            <p class="text-lg font-semibold leading-snug text-fg-strong">{outcomeTitle}</p>
-          </div>
-          <div class="pt-2">
-            <a
-              class="group/detail inline-flex items-center gap-2 text-sm font-semibold text-fg-muted underline decoration-border-default underline-offset-4 transition-colors hover:text-accent"
-              href={href}
-              aria-label={caseStudyAriaLabel}
-            >
-              <span>{linkLabel ?? 'ケーススタディを見る'}</span>
-              <span
-                class="material-symbols-outlined text-base transition-transform group-hover/detail:translate-x-1 motion-reduce:transition-none"
-                aria-hidden="true">arrow_forward</span
+              <span class="mb-1 block text-xs font-semibold tracking-wide text-fg-muted"
+                >{outcomeLabel}</span
               >
-            </a>
+              <p class="text-lg font-semibold leading-snug text-fg-strong">{outcomeTitle}</p>
+            </div>
+            <div class="pt-2">
+              <a
+                class="group/detail inline-flex items-center gap-2 text-sm font-semibold text-fg-muted underline decoration-border-default underline-offset-4 transition-colors hover:text-accent"
+                href={href}
+                aria-label={caseStudyAriaLabel}
+              >
+                <span>{linkLabel ?? 'ケーススタディを見る'}</span>
+                <span
+                  class="material-symbols-outlined text-base transition-transform group-hover/detail:translate-x-1 motion-reduce:transition-none"
+                  aria-hidden="true">arrow_forward</span
+                >
+              </a>
+            </div>
           </div>
         </div>
       ) : (
-        <div class="space-y-4">
-          <div class="flex flex-wrap items-start gap-x-5 gap-y-2">
-            <span class="shrink-0 pt-0.5 text-xs tabular-nums text-fg-muted" aria-hidden="true"
-              >{preset}</span
-            >
-            <div class="flex min-w-0 flex-1 flex-wrap gap-2">
+        <div class="flex min-w-0 items-stretch gap-5 md:gap-6">
+          <div
+            class="flex w-[1.625rem] shrink-0 flex-col items-center gap-0.5 pt-0.5 text-xl font-bold tabular-nums leading-none tracking-[0.12em] text-fg-muted"
+            aria-hidden="true"
+          >
+            {listDigits.map((d) => <span class="block">{d}</span>)}
+          </div>
+          <div class="min-w-0 flex-1 space-y-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="rounded border border-border-default bg-surface-ui px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
+                >{roleBadge}</span
+              >
               {tags.map((t) => <PortfolioTag label={t} />)}
             </div>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <span
-              class="rounded border border-border-default bg-surface-ui px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
-              >{roleBadge}</span
+            <h3 id={headingId} class="min-w-0 max-w-full break-words text-2xl font-bold text-fg-strong">
+              {title}
+            </h3>
+            <p class="text-fg-muted">{description}</p>
+            <div
+              class="rounded-lg border border-border-subtle bg-surface-subtle p-4"
+              aria-label={`${outcomeLabel}: ${outcomeTitle}`}
             >
-          </div>
-          <h3 id={headingId} class="min-w-0 max-w-full break-words text-2xl font-bold text-fg-strong">
-            {title}
-          </h3>
-          <p class="text-fg-muted">{description}</p>
-          <div
-            class="rounded-lg border border-border-subtle bg-surface-subtle p-4"
-            aria-label={`${outcomeLabel}: ${outcomeTitle}`}
-          >
-            <span class="mb-1 block text-xs font-semibold tracking-wide text-fg-muted"
-              >{outcomeLabel}</span
-            >
-            <p class="text-lg font-semibold leading-snug text-fg-strong">{outcomeTitle}</p>
+              <span class="mb-1 block text-xs font-semibold tracking-wide text-fg-muted"
+                >{outcomeLabel}</span
+              >
+              <p class="text-lg font-semibold leading-snug text-fg-strong">{outcomeTitle}</p>
+            </div>
           </div>
         </div>
       )
