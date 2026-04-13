@@ -29,8 +29,11 @@ const { copyright, links } = Astro.props;
           ) : (
             <span
               class="inline-flex min-h-11 min-w-11 max-w-full cursor-default items-center justify-center rounded-lg px-3 text-xs tracking-widest text-border-default uppercase"
-              title="Coming soon">{label}</span
+              title="準備中"
             >
+              {label}
+              <span class="sr-only">（準備中）</span>
+            </span>
           ),
         )
       }

@@ -10,6 +10,10 @@ export interface CaseStudy {
   outcomeTitle: string;
   rowIndex: number;
   imageSrc: string;
+  /** `getImage` の `widths` 由来。無い場合は `src` のみ */
+  imageSrcset?: string;
+  /** `srcset` とセットで渡す `sizes`（省略時はブラウザ既定） */
+  imageSizes?: string;
   imageAlt: string;
   sectionId: string;
   href?: string;

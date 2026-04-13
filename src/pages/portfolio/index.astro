@@ -22,6 +22,14 @@ const contactEmail =
 const portraitSrc =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuB5VDClSm4KRAxtpm8kue7xUbl1G-ksEtVO4ROrWO9sLvWDSkww4tSNQSB51ytU_G7_lD2oWPbAIYAvw_8zBzVigzZ626J1Jwl6G4rW2qxyPuciqam7mOphTZ3M44Bh22jLIw_CFhK993qnNGDY_Xo_iBNjbSPeWmYWLxBF7srzGy23G9uvKexbFqcX22Q2UebBq77gDHYUoiJUEeWDuY6Dlq0QIxQ25q4Wx2rC1gvgAHvqDyfI62jV41wIxUF75fkeqYD9FeLR43A';
 
+/** 一覧カード用: ビューポートに合わせた解像度だけ生成してペイロードを抑える */
+function caseListingImageWidths(maxWidth: number): number[] {
+  const steps = [640, 750, 828, 960, 1080, 1280, 1536, 1920];
+  const out = steps.filter((w) => w <= maxWidth);
+  if (!out.includes(maxWidth)) out.push(maxWidth);
+  return [...new Set(out)].sort((a, b) => a - b);
+}
+
 const rawEntries = await getCollection('caseStudies');
 const sorted = [...rawEntries].sort((a, b) => {
   if (a.data.order !== b.data.order) return a.data.order - b.data.order;
@@ -39,10 +47,20 @@ const caseStudies: CaseStudy[] = await Promise.all(
           : data.preset === '03'
             ? { w: 1200, h: 1600 }
             : { w: 1000, h: 1250 };
-    const optimized = await getImage({ src: heroImage, width: dims.w, height: dims.h });
+    const imageSizes =
+      '(max-width: 1023px) min(100vw, 48rem), (max-width: 1535px) min(90vw, 48rem), min(45vw, 52rem)';
+    const optimized = await getImage({
+      src: heroImage,
+      width: dims.w,
+      height: dims.h,
+      widths: caseListingImageWidths(dims.w),
+      sizes: imageSizes,
+    });
     return {
       ...data,
       imageSrc: optimized.src,
+      imageSrcset: optimized.srcSet.attribute,
+      imageSizes,
       imageAlt: heroAlt,
       sectionId: `case-${entry.id}`,
       href: `/portfolio/work/${entry.id}`,
@@ -129,7 +147,7 @@ const topNav = {
         <h2 id="work-heading" class="text-3xl font-bold tracking-tight text-fg-strong">
           Selected Works
         </h2>
-        <div class="mt-2 h-1 w-12 bg-accent" aria-hidden="true"></div>
+        <div class="mt-3 h-px w-14 bg-border-default" aria-hidden="true"></div>
       </div>
 
       <div class="flex min-w-0 w-full flex-col gap-y-24 md:gap-y-32 lg:gap-y-40">
