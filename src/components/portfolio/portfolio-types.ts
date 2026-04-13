@@ -52,4 +52,6 @@ export interface CaseStudyDetailHeaderProps {
   caseStudyTitle: string;
   aboutHref: string;
   aboutLabel?: string;
+  /** ヘッダ直下に固定表示するタグ（ケーススタディ詳細） */
+  tags?: string[];
 }

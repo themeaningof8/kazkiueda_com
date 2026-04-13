@@ -64,27 +64,16 @@ const caseStudyDetailHeader = {
   brand: '植田 一貴',
   caseStudyTitle: title,
   aboutHref: '/portfolio#about',
+  tags,
 } satisfies CaseStudyDetailHeaderProps;
 ---
 
 <PortfolioLayout title={`${title} | kazkiueda.com`} caseStudyDetailHeader={caseStudyDetailHeader}>
   <main
     id="main-content"
-    class="mx-auto min-w-0 pb-32 pt-[5.5rem] md:pb-48 md:pt-24"
+    class="mx-auto min-w-0 pb-32 pt-[7.25rem] sm:pt-[7.5rem] md:pb-48 md:pt-28"
   >
     <div class="mx-auto max-w-[1440px] px-6 lg:px-[72px]">
-      <div class="mx-auto mb-8 max-w-[1296px] flex flex-wrap gap-2">
-        {
-          tags.map((t) => (
-            <span
-              class="inline-block max-w-full break-words rounded-full border border-accent bg-transparent px-3 py-1 text-xs font-medium text-accent"
-            >
-              {t}
-            </span>
-          ))
-        }
-      </div>
-
       <div
         class="mx-auto grid max-w-[1296px] grid-cols-1 gap-y-12 lg:grid-cols-[240px_minmax(0,720px)_296px] lg:gap-x-5 lg:gap-y-0"
       >
@@ -136,7 +125,7 @@ const caseStudyDetailHeader = {
           <div
             class:list={[
               'prose prose-neutral prose-lg mt-12 max-w-none text-fg-muted',
-              'prose-headings:scroll-mt-28 prose-headings:font-semibold prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-accent',
+              'prose-headings:scroll-mt-40 prose-headings:font-semibold prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-accent',
               'prose-h2:mb-3 prose-h2:mt-10 prose-h2:text-base prose-h2:text-accent first:prose-h2:mt-12',
               'prose-p:leading-relaxed prose-strong:text-fg-strong prose-a:text-accent',
             ]}
