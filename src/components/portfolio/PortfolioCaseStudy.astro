@@ -55,15 +55,16 @@ const imgMotionClass =
       href ? (
         <>
           <div class:list={[thumbColumnClass, 'lg:shrink-0']}>
-            <span class="mb-2 block text-xs tabular-nums text-fg-muted" aria-hidden="true"
-              >{preset}</span
-            >
             <a
               class="group/img block outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
               href={href}
               aria-label={caseStudyAriaLabel}
             >
               <div class:list={[imageShellClass, 'group-hover/img:shadow-sm']}>
+                <span
+                  class="pointer-events-none absolute left-3 top-3 z-10 text-xs tabular-nums text-fg-muted drop-shadow-[0_1px_1px_rgb(255_255_255/0.9)]"
+                  aria-hidden="true">{preset}</span
+                >
                 <img
                   class={imgMotionClass}
                   src={imageSrc}
@@ -124,8 +125,11 @@ const imgMotionClass =
         </>
       ) : (
         <div class="col-span-full space-y-4">
-          <span class="block text-xs tabular-nums text-fg-muted" aria-hidden="true">{preset}</span>
           <div class:list={[thumbColumnClass, ...imageShellClass]}>
+            <span
+              class="pointer-events-none absolute left-3 top-3 z-10 text-xs tabular-nums text-fg-muted drop-shadow-[0_1px_1px_rgb(255_255_255/0.9)]"
+              aria-hidden="true">{preset}</span
+            >
             <img
               class={imgMotionClass}
               src={imageSrc}
