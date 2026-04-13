@@ -12,7 +12,6 @@ const {
   roleBadge,
   outcomeLabel,
   outcomeTitle,
-  rowIndex,
   imageSrc,
   imageSrcset,
   imageSizes,
@@ -25,7 +24,6 @@ const {
 
 const headingId = `${sectionId}-heading`;
 const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
-const reverse = rowIndex % 2 === 1;
 
 const linkedImageTransitionAttrs = transitionName
   ? ({ 'transition:name': transitionName } as const)
@@ -43,38 +41,26 @@ const layout = {
 
 const L = layout[preset];
 
-const numberClass = reverse
-  ? 'pointer-events-none absolute -top-16 right-0 z-0 w-full select-none text-right text-[6.5rem] font-semibold leading-none text-surface-ui-hover/25 md:-top-24 md:text-[11rem]'
-  : 'pointer-events-none absolute -top-16 left-0 z-0 select-none text-[6.5rem] font-semibold leading-none text-surface-ui-hover/25 md:-top-24 md:text-[11rem]';
-
 const imageShellClass = [
   'relative w-full overflow-hidden rounded-xl bg-surface-subtle forced-colors:border forced-colors:border-CanvasText',
   L.aspect,
 ];
 
 const imgMotionClass =
-  'h-full w-full object-cover grayscale opacity-90 transition-[opacity,transform,filter] duration-500 ease-out group-hover/img:scale-[1.02] group-hover/img:grayscale-0 motion-reduce:transition-none motion-reduce:group-hover/img:scale-100 forced-colors:grayscale-0 forced-colors:opacity-100';
+  'h-full w-full object-cover opacity-95 grayscale-[40%] transition-[opacity,transform,filter] duration-500 ease-out group-hover/img:scale-[1.02] group-hover/img:grayscale-0 motion-reduce:transition-none motion-reduce:group-hover/img:scale-100 forced-colors:grayscale-0 forced-colors:opacity-100';
 ---
 
-<article
-  id={sectionId}
-  class="relative min-w-0 scroll-mt-28 md:scroll-mt-32"
-  aria-labelledby={headingId}
->
-  <div class:list={['relative grid grid-cols-12 gap-x-6 gap-y-8 md:gap-x-8 md:gap-y-10 lg:gap-x-10 lg:gap-y-8']}>
-    <span class={numberClass} aria-hidden="true">{preset}</span>
-
+<article class="relative mx-auto w-full min-w-0 max-w-[1296px]" aria-labelledby={headingId}>
+  <div
+    class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,554px)_minmax(0,1fr)] lg:gap-8 lg:items-start"
+  >
     {
       href ? (
         <>
-          <div
-            class:list={[
-              'col-span-12 min-w-0 w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-none',
-              reverse
-                ? 'order-1 mx-auto lg:order-2 lg:mx-0 lg:col-span-5 lg:col-start-8'
-                : 'mx-auto lg:mx-0 lg:col-span-5',
-            ]}
-          >
+          <div class="min-w-0">
+            <span class="mb-2 block text-xs tabular-nums text-fg-muted" aria-hidden="true"
+              >{preset}</span
+            >
             <a
               class="group/img block outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
               href={href}
@@ -97,14 +83,7 @@ const imgMotionClass =
             </a>
           </div>
 
-          <div
-            class:list={[
-              'col-span-12 flex min-w-0 flex-col justify-center gap-4',
-              reverse
-                ? 'order-2 lg:order-1 lg:col-span-6 lg:col-start-1'
-                : 'lg:col-span-6 lg:col-start-7',
-            ]}
-          >
+          <div class="flex min-w-0 flex-col justify-center gap-4">
             <div class="flex flex-wrap items-center gap-2">
               <span
                 class="rounded border border-border-default bg-surface-ui px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted"
@@ -147,11 +126,8 @@ const imgMotionClass =
           </div>
         </>
       ) : (
-        <div class="col-span-12 mx-auto w-full max-w-xl space-y-4 sm:max-w-2xl md:max-w-3xl lg:max-w-none">
-          <h3 id={headingId} class="min-w-0 max-w-full break-words text-2xl font-bold text-fg-strong">
-            {title}
-          </h3>
-          <p class="text-fg-muted">{description}</p>
+        <div class="col-span-full space-y-4">
+          <span class="block text-xs tabular-nums text-fg-muted" aria-hidden="true">{preset}</span>
           <div class:list={imageShellClass}>
             <img
               class={imgMotionClass}
@@ -165,6 +141,10 @@ const imgMotionClass =
               decoding="async"
             />
           </div>
+          <h3 id={headingId} class="min-w-0 max-w-full break-words text-2xl font-bold text-fg-strong">
+            {title}
+          </h3>
+          <p class="text-fg-muted">{description}</p>
         </div>
       )
     }
