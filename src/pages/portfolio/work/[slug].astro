@@ -7,7 +7,7 @@ import CaseStudyDetailToc from '../../../components/portfolio/CaseStudyDetailToc
 import CaseStudyDetailRelated from '../../../components/portfolio/CaseStudyDetailRelated.astro';
 import CaseStudyDetailTocScrollSpy from '../../../components/portfolio/CaseStudyDetailTocScrollSpy.astro';
 import type { CaseStudyDetailHeaderProps } from '../../../components/portfolio/portfolio-types';
-import { tocFromMarkdownH2 } from '../../../lib/case-study-toc';
+import { tocFromMarkdownHeadings } from '../../../lib/case-study-toc';
 
 export const prerender = true;
 
@@ -46,11 +46,7 @@ const sortedForNav = [...allCaseEntries].sort((a, b) => {
   return a.id.localeCompare(b.id);
 });
 
-const tocItems = tocFromMarkdownH2(entry.body ?? '').map((item) => ({
-  text: item.text,
-  slug: item.slug,
-  href: `#${item.slug}`,
-}));
+const tocRoots = tocFromMarkdownHeadings(entry.body ?? '');
 
 const relatedItems = sortedForNav
   .filter((e) => e.id !== entry.id)
@@ -78,7 +74,7 @@ const caseStudyDetailHeader = {
         class="mx-auto grid max-w-[1296px] grid-cols-1 gap-y-12 lg:grid-cols-[240px_minmax(0,720px)_296px] lg:gap-x-5 lg:gap-y-0"
       >
         <div class="hidden min-w-0 lg:block">
-          <CaseStudyDetailToc items={tocItems} />
+          <CaseStudyDetailToc roots={tocRoots} />
         </div>
 
         <article class="min-w-0" aria-labelledby="case-study-lead">

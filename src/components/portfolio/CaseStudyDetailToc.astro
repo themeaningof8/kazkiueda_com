@@ -1,47 +1,36 @@
 ---
-interface TocLink {
-  text: string;
-  slug: string;
-  href: string;
-}
+import CaseStudyDetailTocBranch from './CaseStudyDetailTocBranch.astro';
+import type { TocNode } from '../../lib/case-study-toc';
 
 interface Props {
-  items: TocLink[];
+  roots: TocNode[];
 }
 
-const { items } = Astro.props;
+const { roots } = Astro.props;
 ---
 
 <div
   class="sticky top-[var(--case-study-detail-main-pad-top)] max-h-[calc(100dvh_-_var(--case-study-detail-main-pad-top)_-_1.5rem)] self-start overflow-y-auto overscroll-contain"
 >
-<nav
-  class="case-study-detail-toc"
-  aria-label="このページのセクション"
->
-  <p
-    class="m-0 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted leading-none"
+  <nav
+    class="case-study-detail-toc"
+    aria-label="このページのセクション"
   >
-    On this page
-  </p>
-  {
-    items.length > 0 ? (
-      <ul class="mt-4 space-y-2 border-l border-border-subtle pl-4">
-        {items.map((item) => (
-          <li>
-            <a
-              data-toc-anchor={item.slug}
-              href={item.href}
-              class="case-study-toc-link block py-0.5 text-sm text-fg-muted transition-colors hover:text-fg-strong"
-            >
-              {item.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p class="mt-4 text-sm text-fg-muted">セクション見出しがありません。</p>
-    )
-  }
-</nav>
+    <p
+      class="m-0 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted leading-none"
+    >
+      On this page
+    </p>
+    {
+      roots.length > 0 ? (
+        <ul class="mt-4 space-y-2 border-l border-border-subtle pl-4">
+          {roots.map((node) => (
+            <CaseStudyDetailTocBranch node={node} depth={0} />
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-4 text-sm text-fg-muted">セクション見出しがありません。</p>
+      )
+    }
+  </nav>
 </div>
