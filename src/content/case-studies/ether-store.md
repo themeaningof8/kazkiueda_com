@@ -4,7 +4,7 @@ description: "ブティック向けに、ビジュアルストーリーテリン
 tags:
   - "Eコマース"
   - "ビジュアルストラテジー"
-order: 2
+order: 3
 preset: "01"
 heroImage: "../../assets/case-studies/ether-store/hero.png"
 heroAlt: "高級ブティックの店内を思わせる、明るい自然光と白い陳列のイメージ（プレースホルダ）"
