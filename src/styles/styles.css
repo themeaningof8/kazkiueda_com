@@ -133,7 +133,7 @@
 }
 
 /**
- * `PortfolioListingHeader` のツールバー高と一致させる（/portfolio の sticky 見出し `top` 用）
+ * `PortfolioListingHeader` のツールバー高と一致させる（/case-study 一覧の sticky 見出し `top` 用）
  * 内側 flex: py-2 + min-h-[50px] + py-2（md: py-0 + min-h-[50px]）
  */
 :root {

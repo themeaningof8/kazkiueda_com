@@ -32,4 +32,4 @@ bun run check
 
 - ポートフォリオのレイアウト: `src/layouts/PortfolioLayout.astro`
 - デザイントークン・グローバル CSS: `src/styles/styles.css` の `@theme` と `html.dark` ブロック
-- `/portfolio` は **認証なし**（採用担当へは URL のみ共有）。検索・クローラ抑制は **`robots.txt`**、**`PortfolioLayout` の `meta robots`**、**`public/_headers` の `X-Robots-Tag`** で多層化する。
+- `/case-study`（旧 `/portfolio` は **302** でここへ）は **認証なし**（採用担当へは URL のみ共有）。検索・クローラ抑制は **`robots.txt`**、**`PortfolioLayout` の `meta robots`**、**`public/_headers` の `X-Robots-Tag`** で多層化する。
