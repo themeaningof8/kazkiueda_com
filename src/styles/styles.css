@@ -124,6 +124,14 @@
   @apply relative block py-0.5 text-xs font-normal leading-snug text-fg-muted transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-fg-strong before:pointer-events-none before:absolute before:left-[-0.75rem] before:top-1/2 before:h-3.5 before:w-0.5 before:rounded-sm before:bg-accent before:opacity-0 before:[transform:translateY(-50%)_scaleY(0.35)] before:content-[''] motion-safe:before:transition-[opacity,transform] motion-safe:before:duration-200 motion-safe:before:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:before:transition-none aria-[current=location]:text-fg-strong aria-[current=location]:font-medium aria-[current=location]:before:opacity-100 aria-[current=location]:before:[transform:translateY(-50%)_scaleY(1)];
 }
 
+@utility u-case-study-detail-back-button-enter {
+  @apply inline-flex shrink-0 items-center rounded-sm text-sm font-medium text-fg-muted outline-none transition-colors hover:text-fg-strong focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas motion-safe:overflow-hidden motion-safe:opacity-0 motion-safe:[max-width:0] motion-safe:[margin-inline-end:0];
+}
+
+@utility u-case-study-detail-back-button-enter-active {
+  @apply motion-safe:[animation:case-study-detail-back-button-enter_260ms_cubic-bezier(0.22,1,0.36,1)_420ms_forwards];
+}
+
 /**
  * `PortfolioListingHeader` のツールバー高と一致させる（/portfolio の sticky 見出し `top` 用）
  * 内側 flex: py-2 + min-h-[50px] + py-2（md: py-0 + min-h-[50px]）
@@ -137,6 +145,20 @@
    * 左右レールの `sticky top` に使い、固定時も「最初の位置」とズレないようにする。
    */
   --case-study-detail-main-pad-top: 8rem;
+}
+
+@keyframes case-study-detail-back-button-enter {
+  from {
+    opacity: 0;
+    max-width: 0;
+    margin-inline-end: 0;
+  }
+
+  to {
+    opacity: 1;
+    max-width: 1.25rem;
+    margin-inline-end: 0.5rem;
+  }
 }
 
 @media (min-width: 768px) {
