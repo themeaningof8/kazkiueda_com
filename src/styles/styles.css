@@ -111,6 +111,19 @@
   }
 }
 
+/** ケーススタディ詳細: 動きは Tailwind `@utility`（コンポーネント内の生 `<style>` は使わない） */
+@utility u-case-study-related-card {
+  @apply block rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 transition-[border-color,background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-accent/35 hover:bg-accent/[0.04] motion-safe:hover:-translate-y-px;
+}
+
+@utility u-case-study-toc-link-d0 {
+  @apply relative block py-0.5 text-sm font-medium text-fg-muted transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-fg-strong before:pointer-events-none before:absolute before:left-[-1rem] before:top-1/2 before:h-3.5 before:w-0.5 before:rounded-sm before:bg-accent before:opacity-0 before:[transform:translateY(-50%)_scaleY(0.35)] before:content-[''] motion-safe:before:transition-[opacity,transform] motion-safe:before:duration-200 motion-safe:before:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:before:transition-none aria-[current=location]:text-fg-strong aria-[current=location]:font-semibold aria-[current=location]:before:opacity-100 aria-[current=location]:before:[transform:translateY(-50%)_scaleY(1)];
+}
+
+@utility u-case-study-toc-link-sub {
+  @apply relative block py-0.5 text-xs font-normal leading-snug text-fg-muted transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-fg-strong before:pointer-events-none before:absolute before:left-[-0.75rem] before:top-1/2 before:h-3.5 before:w-0.5 before:rounded-sm before:bg-accent before:opacity-0 before:[transform:translateY(-50%)_scaleY(0.35)] before:content-[''] motion-safe:before:transition-[opacity,transform] motion-safe:before:duration-200 motion-safe:before:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:before:transition-none aria-[current=location]:text-fg-strong aria-[current=location]:font-medium aria-[current=location]:before:opacity-100 aria-[current=location]:before:[transform:translateY(-50%)_scaleY(1)];
+}
+
 /**
  * `PortfolioListingHeader` のツールバー高と一致させる（/portfolio の sticky 見出し `top` 用）
  * 内側 flex: py-2 + min-h-[50px] + py-2（md: py-0 + min-h-[50px]）
@@ -197,10 +210,6 @@ html.dark,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
   *,
   *::before,
   *::after {

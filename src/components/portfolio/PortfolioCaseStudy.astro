@@ -6,7 +6,6 @@ import type { CaseStudy } from './portfolio-types';
 type Props = CaseStudy;
 
 const {
-  preset,
   tags,
   title,
   description,
@@ -24,25 +23,35 @@ const {
 
 const headingId = `${sectionId}-heading`;
 const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
+const showHeroOverlay = Boolean(href && heroImage && heroAlt && transitionName);
 
-const layoutMeta = {
-  '01': { imgWidth: 1920, imgHeight: 1080, aspect: 'aspect-video' },
-  '02': { imgWidth: 1080, imgHeight: 1080, aspect: 'aspect-square' },
-  '03': { imgWidth: 1200, imgHeight: 1600, aspect: 'aspect-[3/4]' },
-  '04': { imgWidth: 1000, imgHeight: 1250, aspect: 'aspect-[4/5]' },
-} as const;
-
-const L = layoutMeta[preset];
-
-/** Paper: 左レールの連番（preset は一覧サムネイルのアスペクトにも使う） */
+/** Paper: 左レールの連番（コレクションの preset はアスペクト用のため一覧では使わない） */
 const listNumber = String(rowIndex + 1).padStart(2, '0');
 const listDigits = listNumber.split('');
 ---
 
 <article class="relative mx-auto w-full min-w-0 max-w-[1296px]" aria-labelledby={headingId}>
   <div
-    class="rounded-2xl border border-border-subtle bg-surface-subtle/50 p-6 md:p-8 lg:p-10"
+    class="relative overflow-hidden rounded-2xl border border-border-subtle bg-surface-subtle/50 p-6 md:p-8 lg:p-10"
   >
+    {
+      showHeroOverlay ? (
+        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+          <Image
+            src={heroImage!}
+            alt=""
+            width={heroImage!.width}
+            height={heroImage!.height}
+            class="h-full w-full object-cover opacity-[0.22] [filter:grayscale(45%)]"
+            sizes="(min-width: 1024px) 1296px, 100vw"
+            transition:name={transitionName}
+            transition:animate="fade"
+          />
+          <div class="absolute inset-0 bg-surface-subtle/68"></div>
+        </div>
+      ) : null
+    }
+    <div class="relative z-10">
     {
       href ? (
         <div class="flex min-w-0 items-stretch gap-5 md:gap-6">
@@ -52,26 +61,6 @@ const listDigits = listNumber.split('');
           >
             {listDigits.map((d) => <span class="block">{d}</span>)}
           </div>
-          {
-            heroImage && heroAlt && transitionName ? (
-              <div
-                class:list={[
-                  'relative w-[140px] shrink-0 overflow-hidden rounded-lg border border-border-subtle md:w-[220px]',
-                  L.aspect,
-                ]}
-              >
-                <Image
-                  src={heroImage}
-                  alt={heroAlt}
-                  width={L.imgWidth}
-                  height={L.imgHeight}
-                  class="h-full w-full object-cover"
-                  sizes="(min-width: 768px) 220px, 35vw"
-                  transition:name={transitionName}
-                />
-              </div>
-            ) : null
-          }
           <div class="flex min-w-0 flex-1 flex-col gap-4">
             <div class="flex flex-wrap items-center gap-2">
               <span
@@ -83,6 +72,7 @@ const listDigits = listNumber.split('');
             <h3
               id={headingId}
               class="min-w-0 max-w-full break-words text-2xl font-bold tracking-tight text-fg-strong md:text-3xl"
+              transition:animate="fade"
             >
               {title}
             </h3>
@@ -129,7 +119,11 @@ const listDigits = listNumber.split('');
               >
               {tags.map((t) => <PortfolioTag label={t} />)}
             </div>
-            <h3 id={headingId} class="min-w-0 max-w-full break-words text-2xl font-bold text-fg-strong">
+            <h3
+              id={headingId}
+              class="min-w-0 max-w-full break-words text-2xl font-bold text-fg-strong"
+              transition:animate="fade"
+            >
               {title}
             </h3>
             <p class="text-fg-muted">{description}</p>
@@ -146,5 +140,6 @@ const listDigits = listNumber.split('');
         </div>
       )
     }
+    </div>
   </div>
 </article>

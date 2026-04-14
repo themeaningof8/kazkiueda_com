@@ -11,8 +11,8 @@ const { node, depth = 0 } = Astro.props;
 
 const linkClass =
   depth === 0
-    ? 'case-study-toc-link block py-0.5 text-sm font-medium text-fg-muted transition-colors hover:text-fg-strong'
-    : 'case-study-toc-link block py-0.5 text-xs font-normal leading-snug text-fg-muted transition-colors hover:text-fg-strong';
+    ? 'case-study-toc-link u-case-study-toc-link-d0'
+    : 'case-study-toc-link u-case-study-toc-link-sub';
 ---
 
 <li>

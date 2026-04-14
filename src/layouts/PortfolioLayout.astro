@@ -24,7 +24,12 @@ const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHead
 ---
 
 <!doctype html>
-<html class="light" lang="ja">
+<html
+  class="light motion-safe:scroll-smooth"
+  lang="ja"
+  transition:name="root"
+  transition:animate="none"
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
