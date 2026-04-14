@@ -12,7 +12,7 @@ heroImage: "../../assets/case-studies/ai-page-production-initiative/hero.png"
 heroAlt: "抽象的なグリッドとノードのパターン（プレースホルダ。実画面・成果物ではない）"
 roleBadge: "設計・実装・AI協業"
 outcomeLabel: "OUTCOME"
-outcomeTitle: "情報設計から初稿作成までのリードタイムを約40〜60%短縮。最終品質の責任は人間が保持しながら、速度と一貫性を両立した制作ワークフローを確立。"
+outcomeTitle: "情報設計から初稿作成までのリードタイムを約60~80%短縮。最終品質の責任は人間が保持しながら、速度と一貫性を両立した制作ワークフローを確立。"
 summaryRows:
   - label: "役割"
     value: "情報設計 / フロントエンド実装 / AI協業ワークフロー設計"
