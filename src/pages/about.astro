@@ -1,0 +1,30 @@
+---
+export const prerender = true;
+
+import PortfolioLayout from '../layouts/PortfolioLayout.astro';
+import type { PortfolioListingHeaderProps } from '../components/portfolio/portfolio-types';
+
+const portfolioListingHeader = {
+  brand: '植田 一貴',
+  tagline: 'ポートフォリオ',
+  aboutHref: '/about',
+} satisfies PortfolioListingHeaderProps;
+---
+
+<PortfolioLayout title="About | kazkiueda.com" portfolioListingHeader={portfolioListingHeader}>
+  <main
+    id="main-content"
+    class="mx-auto min-w-0 max-w-2xl px-6 pb-32 pt-24 md:pb-48 md:pt-28"
+  >
+    <h1 class="text-3xl font-bold tracking-tight text-fg-strong md:text-4xl">About</h1>
+    <div
+      class:list={[
+        'prose prose-neutral prose-lg mt-8 max-w-none text-fg-muted',
+        'prose-p:leading-relaxed prose-strong:text-fg-strong',
+      ]}
+    >
+      <p>私はチームのボトルネックを見つけ、自分がそこを埋めにいくデザイナーです。</p>
+      <p>デザイン・実装・事業戦略の三層を行き来しながら、「誰かがやらないと止まる」場所に自分から入っていくことでキャリアを作ってきました。</p>
+    </div>
+  </main>
+</PortfolioLayout>

@@ -1,3 +1,5 @@
+import type { ImageMetadata } from 'astro';
+
 export type CaseStudyPreset = '01' | '02' | '03' | '04';
 
 export interface CaseStudy {
@@ -9,15 +11,11 @@ export interface CaseStudy {
   outcomeLabel: string;
   outcomeTitle: string;
   rowIndex: number;
-  imageSrc: string;
-  /** `getImage` の `widths` 由来。無い場合は `src` のみ */
-  imageSrcset?: string;
-  /** `srcset` とセットで渡す `sizes`（省略時はブラウザ既定） */
-  imageSizes?: string;
-  imageAlt: string;
   sectionId: string;
   href?: string;
   linkLabel?: string;
+  heroImage?: ImageMetadata;
+  heroAlt?: string;
   transitionName?: string;
 }
 
@@ -44,4 +42,23 @@ export interface PortfolioTopNavProps {
   ctaLabel: string;
   /** 一覧・詳細で「制作実績」Popover 内のケースリンク用 */
   caseNavItems?: CaseStudyNavItem[];
+}
+
+/** Paper「Case Study Detail」系のコンパクトヘッダ（詳細ページ専用） */
+export interface CaseStudyDetailHeaderProps {
+  brand: string;
+  caseStudyTitle: string;
+  aboutHref: string;
+  aboutLabel?: string;
+  /** ヘッダ直下に固定表示するタグ（ケーススタディ詳細） */
+  tags?: string[];
+}
+
+/** Paper「Portfolio Page」一覧用のコンパクトヘッダ */
+export interface PortfolioListingHeaderProps {
+  brand: string;
+  /** ヘッダ2行目（例: 「ポートフォリオ」） */
+  tagline: string;
+  aboutHref: string;
+  aboutLabel?: string;
 }

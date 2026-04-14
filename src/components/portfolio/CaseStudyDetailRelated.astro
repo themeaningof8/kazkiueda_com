@@ -1,0 +1,47 @@
+---
+interface RelatedItem {
+  href: string;
+  title: string;
+  /** ポートフォリオ一覧と同じ連番表示 */
+  listNumber: string;
+}
+
+interface Props {
+  items: RelatedItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<div
+  class="sticky top-[var(--case-study-detail-main-pad-top)] max-h-[calc(100dvh_-_var(--case-study-detail-main-pad-top)_-_1.5rem)] self-start overflow-y-auto overscroll-contain"
+>
+<aside class="case-study-detail-related" aria-label="他のケーススタディ">
+  <p
+    class="m-0 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-fg-muted leading-none"
+  >
+    Other Case Studies
+  </p>
+  {
+    items.length > 0 ? (
+      <ul class="mt-4 space-y-3">
+        {items.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="case-study-related-card u-case-study-related-card"
+            >
+              <span class="text-xs tabular-nums text-fg-muted">{item.listNumber}</span>
+              <span class="mt-1 block min-w-0 text-sm font-semibold leading-snug text-fg-strong">
+                {item.title}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="mt-4 text-sm text-fg-muted">他の事例はありません。</p>
+    )
+  }
+</aside>
+</div>

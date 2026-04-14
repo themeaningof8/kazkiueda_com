@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
+import rehypeSlug from 'rehype-slug';
 
 // https://astro.build/config
 export default defineConfig({
@@ -10,6 +11,9 @@ export default defineConfig({
       status: 302,
       destination: '/portfolio',
     },
+  },
+  markdown: {
+    rehypePlugins: [rehypeSlug],
   },
   vite: {
     plugins: [tailwindcss()],

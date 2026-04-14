@@ -16,6 +16,12 @@ const caseStudies = defineCollection({
       roleBadge: z.string(),
       outcomeLabel: z.string(),
       outcomeTitle: z.string(),
+      summaryRows: z.array(
+        z.object({
+          label: z.string(),
+          value: z.string(),
+        }),
+      ),
       linkLabel: z.string().optional(),
     }),
 });

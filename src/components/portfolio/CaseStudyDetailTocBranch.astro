@@ -1,0 +1,36 @@
+---
+import type { TocNode } from '../../lib/case-study-toc';
+import Self from './CaseStudyDetailTocBranch.astro';
+
+interface Props {
+  node: TocNode;
+  depth?: number;
+}
+
+const { node, depth = 0 } = Astro.props;
+
+const linkClass =
+  depth === 0
+    ? 'case-study-toc-link u-case-study-toc-link-d0'
+    : 'case-study-toc-link u-case-study-toc-link-sub';
+---
+
+<li>
+  <a href={`#${node.slug}`} data-toc-anchor={node.slug} class:list={[linkClass]}>
+    {node.text}
+  </a>
+  {
+    node.children.length > 0 ? (
+      <ul
+        class:list={[
+          'mt-1.5 space-y-1 border-l border-border-subtle/70',
+          depth === 0 ? 'pl-3' : 'ml-0.5 pl-3',
+        ]}
+      >
+        {node.children.map((child) => (
+          <Self node={child} depth={depth + 1} />
+        ))}
+      </ul>
+    ) : null
+  }
+</li>
