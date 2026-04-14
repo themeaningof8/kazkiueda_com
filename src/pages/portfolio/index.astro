@@ -18,12 +18,13 @@ const sorted = [...rawEntries].sort((a, b) => {
 });
 
 const caseStudies: CaseStudy[] = sorted.map((entry, rowIndex) => {
-  const { heroImage: _, heroAlt: __, order: ___, summaryRows: ____, ...listing } = entry.data;
+  const { order: _, summaryRows: __, ...listing } = entry.data;
   return {
     ...listing,
     sectionId: `case-${entry.id}`,
     href: `/portfolio/work/${entry.id}`,
     rowIndex,
+    transitionName: `case-hero-${entry.id}`,
   };
 });
 
