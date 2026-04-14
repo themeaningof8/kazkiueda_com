@@ -83,5 +83,8 @@ const {
     });
   }
 
+  // Ensure animation works on both initial render and ClientRouter navigations.
+  initCaseStudyDetailHeaderEnterMotion();
+  document.addEventListener('astro:after-swap', initCaseStudyDetailHeaderEnterMotion);
   document.addEventListener('astro:page-load', initCaseStudyDetailHeaderEnterMotion);
 </script>
