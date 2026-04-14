@@ -48,6 +48,8 @@ export interface PortfolioTopNavProps {
 export interface CaseStudyDetailHeaderProps {
   brand: string;
   caseStudyTitle: string;
+  backHref?: string;
+  backLabel?: string;
   aboutHref: string;
   aboutLabel?: string;
   /** ヘッダ直下に固定表示するタグ（ケーススタディ詳細） */

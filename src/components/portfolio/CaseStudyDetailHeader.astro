@@ -4,7 +4,15 @@ import type { CaseStudyDetailHeaderProps } from './portfolio-types';
 
 type Props = CaseStudyDetailHeaderProps;
 
-const { brand, caseStudyTitle, aboutHref, aboutLabel = 'About', tags = [] } = Astro.props;
+const {
+  brand,
+  caseStudyTitle,
+  aboutHref,
+  aboutLabel = 'About',
+  backHref = '/portfolio',
+  backLabel = '戻る',
+  tags = [],
+} = Astro.props;
 ---
 
 <header class="fixed inset-x-0 top-0 z-50 bg-surface-canvas" role="banner">
@@ -12,13 +20,34 @@ const { brand, caseStudyTitle, aboutHref, aboutLabel = 'About', tags = [] } = As
     <div
       class="flex min-h-[50px] items-center justify-between gap-4 py-2 md:min-h-[50px] md:py-0"
     >
-      <div class="min-w-0 flex-1">
-        <p class="truncate text-xs text-fg-muted">{brand}</p>
-        <p
-          class="line-clamp-2 min-w-0 text-sm font-semibold leading-snug text-fg-strong md:text-base"
+      <div class="flex min-w-0 flex-1 items-center">
+        <a
+          href={backHref}
+          class="u-case-study-detail-back-button-enter"
+          data-case-study-back-enter
+          aria-label={backLabel}
         >
-          ケーススタディ / {caseStudyTitle}
-        </p>
+          <svg
+            class="size-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
+        </a>
+        <div class="min-w-0">
+          <p class="truncate text-xs text-fg-muted">{brand}</p>
+          <p
+            class="line-clamp-2 min-w-0 text-sm font-semibold leading-snug text-fg-strong md:text-base"
+          >
+            ケーススタディ / {caseStudyTitle}
+          </p>
+        </div>
       </div>
       <a
         href={aboutHref}
@@ -38,3 +67,21 @@ const { brand, caseStudyTitle, aboutHref, aboutLabel = 'About', tags = [] } = As
     }
   </div>
 </header>
+
+<script>
+  function initCaseStudyDetailHeaderEnterMotion() {
+    const back = document.querySelector<HTMLElement>('[data-case-study-back-enter]');
+    if (!back) return;
+
+    back.classList.remove('u-case-study-detail-back-button-enter-active');
+
+    // Force style recalculation so class re-apply retriggers animation on client-side nav.
+    void back.offsetWidth;
+
+    requestAnimationFrame(() => {
+      back.classList.add('u-case-study-detail-back-button-enter-active');
+    });
+  }
+
+  document.addEventListener('astro:page-load', initCaseStudyDetailHeaderEnterMotion);
+</script>
