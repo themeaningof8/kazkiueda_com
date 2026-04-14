@@ -22,7 +22,7 @@ const caseStudies: CaseStudy[] = sorted.map((entry, rowIndex) => {
   return {
     ...listing,
     sectionId: `case-${entry.id}`,
-    href: `/portfolio/work/${entry.id}`,
+    href: `/case-study/${entry.id}`,
     rowIndex,
     transitionName: `case-hero-${entry.id}`,
   };

@@ -2,12 +2,12 @@
 import type { GetStaticPaths } from 'astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
-import PortfolioLayout from '../../../layouts/PortfolioLayout.astro';
-import CaseStudyDetailToc from '../../../components/portfolio/CaseStudyDetailToc.astro';
-import CaseStudyDetailRelated from '../../../components/portfolio/CaseStudyDetailRelated.astro';
-import CaseStudyDetailTocScrollSpy from '../../../components/portfolio/CaseStudyDetailTocScrollSpy.astro';
-import type { CaseStudyDetailHeaderProps } from '../../../components/portfolio/portfolio-types';
-import { tocFromMarkdownHeadings } from '../../../lib/case-study-toc';
+import PortfolioLayout from '../../layouts/PortfolioLayout.astro';
+import CaseStudyDetailToc from '../../components/portfolio/CaseStudyDetailToc.astro';
+import CaseStudyDetailRelated from '../../components/portfolio/CaseStudyDetailRelated.astro';
+import CaseStudyDetailTocScrollSpy from '../../components/portfolio/CaseStudyDetailTocScrollSpy.astro';
+import type { CaseStudyDetailHeaderProps } from '../../components/portfolio/portfolio-types';
+import { tocFromMarkdownHeadings } from '../../lib/case-study-toc';
 
 export const prerender = true;
 
@@ -51,7 +51,7 @@ const tocRoots = tocFromMarkdownHeadings(entry.body ?? '');
 const relatedItems = sortedForNav
   .filter((e) => e.id !== entry.id)
   .map((e) => ({
-    href: `/portfolio/work/${e.id}`,
+    href: `/case-study/${e.id}`,
     title: e.data.title,
     listNumber: String(sortedForNav.findIndex((x) => x.id === e.id) + 1).padStart(2, '0'),
   }));
