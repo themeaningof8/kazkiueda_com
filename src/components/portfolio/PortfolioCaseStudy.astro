@@ -1,10 +1,12 @@
 ---
+import { Image } from 'astro:assets';
 import PortfolioTag from './PortfolioTag.astro';
 import type { CaseStudy } from './portfolio-types';
 
 type Props = CaseStudy;
 
 const {
+  preset,
   tags,
   title,
   description,
@@ -15,12 +17,24 @@ const {
   href,
   linkLabel,
   rowIndex,
+  heroImage,
+  heroAlt,
+  transitionName,
 } = Astro.props;
 
 const headingId = `${sectionId}-heading`;
 const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
 
-/** Paper: 左レールの連番（コレクションの preset はアスペクト用のため一覧では使わない） */
+const layoutMeta = {
+  '01': { imgWidth: 1920, imgHeight: 1080, aspect: 'aspect-video' },
+  '02': { imgWidth: 1080, imgHeight: 1080, aspect: 'aspect-square' },
+  '03': { imgWidth: 1200, imgHeight: 1600, aspect: 'aspect-[3/4]' },
+  '04': { imgWidth: 1000, imgHeight: 1250, aspect: 'aspect-[4/5]' },
+} as const;
+
+const L = layoutMeta[preset];
+
+/** Paper: 左レールの連番（preset は一覧サムネイルのアスペクトにも使う） */
 const listNumber = String(rowIndex + 1).padStart(2, '0');
 const listDigits = listNumber.split('');
 ---
@@ -38,6 +52,26 @@ const listDigits = listNumber.split('');
           >
             {listDigits.map((d) => <span class="block">{d}</span>)}
           </div>
+          {
+            heroImage && heroAlt && transitionName ? (
+              <div
+                class:list={[
+                  'relative w-[140px] shrink-0 overflow-hidden rounded-lg border border-border-subtle md:w-[220px]',
+                  L.aspect,
+                ]}
+              >
+                <Image
+                  src={heroImage}
+                  alt={heroAlt}
+                  width={L.imgWidth}
+                  height={L.imgHeight}
+                  class="h-full w-full object-cover"
+                  sizes="(min-width: 768px) 220px, 35vw"
+                  transition:name={transitionName}
+                />
+              </div>
+            ) : null
+          }
           <div class="flex min-w-0 flex-1 flex-col gap-4">
             <div class="flex flex-wrap items-center gap-2">
               <span
