@@ -10,6 +10,11 @@ import type {
   PortfolioTopNavProps,
 } from '../components/portfolio/portfolio-types';
 
+interface OgMeta {
+  description: string;
+  url?: string;
+}
+
 interface Props {
   title?: string;
   topNav?: PortfolioTopNavProps;
@@ -17,9 +22,11 @@ interface Props {
   caseStudyDetailHeader?: CaseStudyDetailHeaderProps;
   /** 一覧用ヘッダ（`caseStudyDetailHeader` 未指定時のみ。`topNav` より優先） */
   portfolioListingHeader?: PortfolioListingHeaderProps;
+  /** ページ単位の OGP / meta description 設定 */
+  ogMeta?: OgMeta;
 }
 
-const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHeader } =
+const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHeader, ogMeta } =
   Astro.props;
 ---
 
@@ -39,6 +46,11 @@ const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHead
     <meta name="generator" content={Astro.generator} />
     <ClientRouter />
     <title>{title}</title>
+    {ogMeta && <meta name="description" content={ogMeta.description} />}
+    {ogMeta && <meta property="og:title" content={title} />}
+    {ogMeta && <meta property="og:description" content={ogMeta.description} />}
+    {ogMeta && <meta property="og:type" content="article" />}
+    {ogMeta?.url && <meta property="og:url" content={ogMeta.url} />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -27,6 +27,9 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 const { title, description, tags, preset, heroImage, heroAlt, summaryRows } = entry.data;
 
+const pageUrl = new URL(`/case-study/${entry.id}`, Astro.site ?? 'https://kazkiueda.com').href;
+const ogMeta = { description, url: pageUrl };
+
 const transitionName = `case-hero-${entry.id}`;
 
 const layoutMeta = {
@@ -64,7 +67,7 @@ const caseStudyDetailHeader = {
 } satisfies CaseStudyDetailHeaderProps;
 ---
 
-<PortfolioLayout title={`${title} | kazkiueda.com`} caseStudyDetailHeader={caseStudyDetailHeader}>
+<PortfolioLayout title={`${title} | kazkiueda.com`} caseStudyDetailHeader={caseStudyDetailHeader} ogMeta={ogMeta}>
   <main
     id="main-content"
     class="mx-auto min-w-0 pb-32 pt-[var(--case-study-detail-main-pad-top)] md:pb-48"
