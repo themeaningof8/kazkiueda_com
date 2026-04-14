@@ -184,6 +184,10 @@ html.dark,
   }
 }
 
+/* View Transitions: ルートのみ明示チューン。設計・検証手順は
+   docs/superpowers/specs/2026-04-14-view-transitions-design.md を参照。
+   共有要素は transition:name（case-hero-<id>）に任せ、slug ごとの
+   ::view-transition-group(case-hero-*) は定義しない。 */
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(root),
   ::view-transition-new(root) {
