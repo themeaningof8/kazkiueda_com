@@ -1,3 +1,5 @@
+import type { ImageMetadata } from 'astro';
+
 export type CaseStudyPreset = '01' | '02' | '03' | '04';
 
 export interface CaseStudy {
@@ -12,6 +14,9 @@ export interface CaseStudy {
   sectionId: string;
   href?: string;
   linkLabel?: string;
+  heroImage?: ImageMetadata;
+  heroAlt?: string;
+  transitionName?: string;
 }
 
 export interface CaseStudyNavItem {
