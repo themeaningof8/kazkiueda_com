@@ -9,7 +9,7 @@ tags:
 order: 1
 preset: "01"
 heroImage: "../../assets/case-studies/design-system/hero.png"
-heroAlt: "幾何学パターンとニュートラルトーンの抽象的な平面（プレースホルダ。実画面・成果物ではない）"
+heroAlt: "デザインシステムのコンポーネントグリッドとデザイントークンカラーパレットを抽象的に表現したイメージ"
 roleBadge: "リードデザイナー / FE"
 outcomeLabel: "OUTCOME"
 outcomeTitle: "属人化した判断が共有財産になり、実装の細部ではなく体験と仕様の議論に集中できるチームへ。"

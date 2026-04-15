@@ -9,7 +9,7 @@ tags:
 order: 4
 preset: "01"
 heroImage: "../../assets/case-studies/scrum-master-decision-design/hero.png"
-heroAlt: "複数の線が一点に収束する抽象的な構図（プレースホルダ。実画面・成果物ではない）"
+heroAlt: "スプリントボードのカンバン構成を表現した4レーンのタスク管理イメージ"
 roleBadge: "Scrum Master"
 outcomeLabel: "OUTCOME"
 outcomeTitle: "メンバー主導感を保ちながら最終意思決定をPOに集約し、停滞を打破。短期前進を実現した一方、構造課題の未解決により収束は期限主導になった。"

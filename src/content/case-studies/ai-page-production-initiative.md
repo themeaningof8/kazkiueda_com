@@ -9,7 +9,7 @@ tags:
 order: 2
 preset: "01"
 heroImage: "../../assets/case-studies/ai-page-production-initiative/hero.png"
-heroAlt: "抽象的なグリッドとノードのパターン（プレースホルダ。実画面・成果物ではない）"
+heroAlt: "人間とAIのコラボレーションを表現したノードグラフ、暗い背景に光るネットワーク構造"
 roleBadge: "設計・実装・AI協業"
 outcomeLabel: "OUTCOME"
 outcomeTitle: "情報設計から初稿作成までのリードタイムを約60~80%短縮。最終品質の責任は人間が保持しながら、速度と一貫性を両立した制作ワークフローを確立。"

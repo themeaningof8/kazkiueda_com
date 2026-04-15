@@ -9,7 +9,7 @@ tags:
 order: 3
 preset: "01"
 heroImage: "../../assets/case-studies/owners-app-proposal/hero.png"
-heroAlt: "スマートフォンと道路のイメージを抽象化したトーンの平面（プレースホルダ。実画面・成果物ではない）"
+heroAlt: "モバイルアプリのワイヤーフレームと画面構成を表現した抽象的なイメージ"
 roleBadge: "UX施策立案"
 outcomeLabel: "OUTCOME"
 outcomeTitle: "受注。チャット機能と管理画面、仮パスワードを発行できるようにし現場のアプリインストール手順簡略化を開発することになった。"
