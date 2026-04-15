@@ -1,9 +1,12 @@
-# https://kazkiueda.com — /portfolio をクローラーに載せない・読ませない方針
+# https://kazkiueda.com — ケーススタディ領域をクローラーに載せない・読ませない方針（旧 /portfolio は互換リダイレクト）
 User-agent: *
+Disallow: /case-study
 Disallow: /portfolio
 
 User-agent: GPTBot
+Disallow: /case-study
 Disallow: /portfolio
 
 User-agent: Google-Extended
+Disallow: /case-study
 Disallow: /portfolio

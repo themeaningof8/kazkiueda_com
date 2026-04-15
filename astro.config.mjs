@@ -10,7 +10,11 @@ export default defineConfig({
   redirects: {
     '/': {
       status: 302,
-      destination: '/portfolio',
+      destination: '/case-study',
+    },
+    '/portfolio': {
+      status: 302,
+      destination: '/case-study',
     },
   },
   markdown: {

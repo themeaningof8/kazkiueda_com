@@ -28,19 +28,19 @@
 
 `wrangler types` で生成される `worker-configuration.d.ts` は `.gitignore` 済み（リポジトリに含めない）。
 
-## `/portfolio` と検索・クローラ
+## `/case-study` と検索・クローラ
 
 採用担当には **URL のみ**共有する（Basic 認証は**廃止**）。**現職に関する情報**の外部露出を抑えるため、次を組み合わせる（詳細は [要件](docs/requirements.md) §5）。
 
-- **`public/robots.txt`** — `/portfolio` を `Disallow`（主要ボット向けブロックあり）
+- **`public/robots.txt`** — `/case-study` および旧互換の `/portfolio` を `Disallow`（主要ボット向けブロックあり）
 - **`PortfolioLayout`** — `<meta name="robots" content="noindex, nofollow, noarchive">`
-- **`public/_headers`** — `X-Robots-Tag: noindex, nofollow, noarchive`（`/portfolio` 配下）
+- **`public/_headers`** — `X-Robots-Tag: noindex, nofollow, noarchive`（`/case-study` および `/portfolio` 配下）
 
 ## 本番デプロイ
 
 ### GitHub Actions（`main` への push で自動）
 
-[.github/workflows/deploy-cloudflare-pages.yml](.github/workflows/deploy-cloudflare-pages.yml) が **Bun でビルド**し、**`wrangler pages deploy ./dist --project-name=kazkiueda-com`** で **Cloudflare Pages** に載せます。
+[.github/workflows/deploy-cloudflare-pages.yml](.github/workflows/deploy-cloudflare-pages.yml) が **Bun でビルド**し、**`wrangler pages deploy ./dist --project-name=kazkiueda-com`** で **Cloudflare Pages** に載せます。ルート **`/`** は **`/case-study`** へ **302**、旧 **`/portfolio`** も **`/case-study`** へ **302**（`astro.config.mjs` の `redirects`）。
 
 リポジトリの **Settings → Secrets and variables → Actions** に次を登録する。
 

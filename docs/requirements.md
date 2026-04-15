@@ -13,8 +13,8 @@
 
 | パス                                | 要件                                                                                                                                |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `https://kazkiueda.com/`          | 初期は**サイト本体のコンテンツを置かない**。`**/portfolio` へのリダイレクト**とする。リダイレクトは**暫定**のため **HTTP 302 または 307**（恒久的 301 は将来 `/` に本格的なトップを置く可能性を考え避ける）。 |
-| `https://kazkiueda.com/portfolio` | 初期フェーズで**唯一**用意するコンテンツ領域（ポートフォリオ）。転職後も同パスで継続更新。                                                                                   |
+| `https://kazkiueda.com/`            | 初期は**サイト本体のコンテンツを置かない**。`**/case-study` へのリダイレクト**とする。リダイレクトは**暫定**のため **HTTP 302 または 307**（恒久的 301 は将来 `/` に本格的なトップを置く可能性を考え避ける）。 |
+| `https://kazkiueda.com/case-study` | 初期フェーズの**ケーススタディ一覧**および各詳細（`/case-study/[slug]`）のルート。転職後も同領域で継続更新。旧 URL **`/portfolio`** は **`/case-study` へ 302** で互換リダイレクトする。                         |
 
 ## 4. アクセス制御
 
@@ -32,10 +32,10 @@
 
 **明示的なクローラー向けシグナル**を多層で行う（完全排除は保証しないが、インデックスされにくくする）。現職に関する情報の外部露出を**できる限り抑える**。
 
-- **`robots.txt`**: `/portfolio` を **`Disallow`**。主要 AI クローラ向け `User-agent` ブロック（例: `GPTBot`, `Google-Extended`）でも同パスを **`Disallow`**。
+- **`robots.txt`**: `/case-study` および互換のための **`/portfolio`** を **`Disallow`**。主要 AI クローラ向け `User-agent` ブロック（例: `GPTBot`, `Google-Extended`）でも同様に **`Disallow`**。
 - **HTML**: `<meta name="robots" content="noindex, nofollow, noarchive">`（レイアウト共通）。
-- **HTTP ヘッダ**: Cloudflare Pages の **`_headers`** で **`/portfolio`** および **`/portfolio/*`** に **`X-Robots-Tag: noindex, nofollow, noarchive`**（`meta` と値を一致させる）。
-- **サイトマップ**: `/portfolio` を**含めない**（またはサイトマップ自体を出さない方針を維持する）。
+- **HTTP ヘッダ**: Cloudflare Pages の **`_headers`** で **`/case-study`**・**`/case-study/*`**、および旧パス **`/portfolio`**・**`/portfolio/*`** に **`X-Robots-Tag: noindex, nofollow, noarchive`**（`meta` と値を一致させる）。
+- **サイトマップ**: `/case-study` および `/portfolio` を**含めない**（またはサイトマップ自体を出さない方針を維持する）。
 
 ## 6. ホスティング・アーキテクチャ
 
@@ -44,8 +44,8 @@
 
 ## 7. 受け入れ条件（例）
 
-- ブラウザの **Basic 認証ダイアログが出ず**、**URL を開けば** `/portfolio` コンテンツが閲覧できる。
-- `/` は `/portfolio` へ **302 または 307** でリダイレクトされる。
+- ブラウザの **Basic 認証ダイアログが出ず**、**URL を開けば** `/case-study` の一覧および各ケース詳細が閲覧できる。
+- `/` は `/case-study` へ **302 または 307** でリダイレクトされる。旧 **`/portfolio`** は **`/case-study`** へ **302** でリダイレクトされる。
 - `robots.txt`、HTML の **robots `meta`**、および **`X-Robots-Tag`**（導入時）が、本書セクション 5 の方針を満たす。
 
 ## 8. 実装プランに委ねる事項（TBD）
@@ -59,8 +59,8 @@
 
 | 論点           | 決定                                                    |
 | ------------ | ----------------------------------------------------- |
-| `/`          | 暫定で `/portfolio` へリダイレクト（302/307）                     |
-| `/portfolio` | 継続・定期更新。**認証なし**（2026-04）                              |
+| `/`            | 暫定で `/case-study` へリダイレクト（302/307）                     |
+| `/case-study`  | 一覧・詳細の継続・定期更新。**認証なし**（2026-04）。旧 `/portfolio` はここへ 302。 |
 | アクセス        | URL 共有のみ（Basic 廃止）                                    |
 | 検索・AI        | `robots.txt` + `noindex,nofollow,noarchive`（meta + **`X-Robots-Tag`**） |
 | ホスティング       | **Cloudflare Pages**（静的 `dist`）                        |

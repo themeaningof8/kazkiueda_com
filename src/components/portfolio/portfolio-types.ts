@@ -24,7 +24,7 @@ export interface CaseStudyNavItem {
   label: string;
   /** モバイルチップ背面に重ねる番号（例: コレクションの `preset`） */
   mono?: string;
-  /** 省略時は `#${anchorId}`（詳細ページなどで `/portfolio#…` を渡す） */
+  /** 省略時は `#${anchorId}`（詳細ページなどで `/case-study#…` を渡す） */
   href?: string;
 }
 
