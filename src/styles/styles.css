@@ -134,12 +134,10 @@
 
 /**
  * `PortfolioListingHeader` のツールバー高と一致させる（/case-study 一覧の sticky 見出し `top` 用）
- * 内側 flex: py-2 + min-h-[50px] + py-2（md: py-0 + min-h-[50px]）
+ * 内側 flex: min-h-[50px]（box-sizing: border-box のため py-2 はこの中に含まれる）
  */
 :root {
-  --portfolio-listing-header-sticky-top: calc(
-    env(safe-area-inset-top, 0px) + 0.5rem + 3.125rem + 0.5rem
-  );
+  --portfolio-listing-header-sticky-top: calc(env(safe-area-inset-top, 0px) + 3.125rem);
   /**
    * ケーススタディ詳細の `main` の上パディング（`pt-32`）と同一。
    * 左右レールの `sticky top` に使い、固定時も「最初の位置」とズレないようにする。
@@ -158,12 +156,6 @@
     opacity: 1;
     max-width: 1.25rem;
     margin-inline-end: 0.5rem;
-  }
-}
-
-@media (min-width: 768px) {
-  :root {
-    --portfolio-listing-header-sticky-top: calc(env(safe-area-inset-top, 0px) + 3.125rem);
   }
 }
 
