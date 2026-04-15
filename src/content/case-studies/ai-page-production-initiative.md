@@ -38,7 +38,11 @@ summaryRows:
 
 CursorはPaperの操作、コンテンツ草案作成、戦略、コーディングなどに活用しました。ちなみにClaudeCodeでも実装しましたが、Claudeを現在はMaxプランからProプランに変更し、Cursorを使用する運用をテストしているのでこのようになっています。
 
+![Cursorでポートフォリオのパフォーマンス計測（Lighthouse）のベースラインを確認している画面](../../assets/case-studies/ai-page-production-initiative/cursor-lighthouse-baseline.png)
+
 Paperはレイアウトのデザイン、思考を整理するために使いました。ここでFigmaを使わないのは、Paperの軽さと実装時の再現性の高さを気に入っているためです。またPaper Snapshotもレイアウトのアイデアを寝る時に非常に有用です。
+
+![制作時のデザインツール画面。カラーシステムの整理とケーススタディ画面の構成](../../assets/case-studies/ai-page-production-initiative/paper-color-system-layout.png)
 
 この二つによって、要件定義から完成まで4日で完成させることができました。ですがAIエージェントによる開発はまだまだ課題も大きいと感じます。
 
