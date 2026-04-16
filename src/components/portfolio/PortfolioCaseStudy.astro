@@ -17,13 +17,15 @@ const {
   linkLabel,
   rowIndex,
   heroImage,
+  listingImage,
   heroAlt,
   transitionName,
 } = Astro.props;
 
 const headingId = `${sectionId}-heading`;
 const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
-const showHeroOverlay = Boolean(href && heroImage && heroAlt && transitionName);
+const cardBackdropImage = listingImage ?? heroImage;
+const showHeroOverlay = Boolean(href && cardBackdropImage && heroAlt && transitionName);
 const isPriorityHero = rowIndex === 0;
 
 /** Paper: 左レールの連番（コレクションの preset はアスペクト用のため一覧では使わない） */
@@ -39,10 +41,10 @@ const listDigits = listNumber.split('');
       showHeroOverlay ? (
         <div class="pointer-events-none absolute inset-0" aria-hidden="true">
           <Image
-            src={heroImage!}
+            src={cardBackdropImage!}
             alt=""
-            width={heroImage!.width}
-            height={heroImage!.height}
+            width={cardBackdropImage!.width}
+            height={cardBackdropImage!.height}
             class="h-full w-full object-cover opacity-[0.22] [filter:grayscale(45%)]"
             sizes="(min-width: 1024px) 1296px, 100vw"
             loading={isPriorityHero ? 'eager' : 'lazy'}

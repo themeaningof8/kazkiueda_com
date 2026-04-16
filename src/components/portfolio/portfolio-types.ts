@@ -15,6 +15,8 @@ export interface CaseStudy {
   href?: string;
   linkLabel?: string;
   heroImage?: ImageMetadata;
+  /** 一覧のカード背景。省略時は `heroImage` */
+  listingImage?: ImageMetadata;
   heroAlt?: string;
   transitionName?: string;
 }
