@@ -12,6 +12,8 @@ const caseStudies = defineCollection({
       order: z.number().int(),
       preset: z.enum(['01', '02', '03', '04']),
       heroImage: image(),
+      /** 一覧カード背景用。未指定時は `heroImage` を使う */
+      listingImage: image().optional(),
       heroAlt: z.string(),
       roleBadge: z.string(),
       outcomeLabel: z.string(),

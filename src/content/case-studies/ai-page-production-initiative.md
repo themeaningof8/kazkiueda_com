@@ -9,7 +9,7 @@ tags:
 order: 2
 preset: "01"
 heroImage: "../../assets/case-studies/ai-page-production-initiative/hero.png"
-heroAlt: "抽象的なグリッドとノードのパターン（プレースホルダ。実画面・成果物ではない）"
+heroAlt: "六角形のアイコンとコーラル色の星形マークを横並びにしたロゴ組み合わせ"
 roleBadge: "設計・実装・AI協業"
 outcomeLabel: "OUTCOME"
 outcomeTitle: "情報設計から初稿作成までのリードタイムを約60~80%短縮。最終品質の責任は人間が保持しながら、速度と一貫性を両立した制作ワークフローを確立。"
@@ -41,8 +41,6 @@ CursorはPaperの操作、コンテンツ草案作成、戦略、コーディン
 ![Cursorでポートフォリオのパフォーマンス計測（Lighthouse）のベースラインを確認している画面](../../assets/case-studies/ai-page-production-initiative/cursor-lighthouse-baseline.png)
 
 Paperはレイアウトのデザイン、思考を整理するために使いました。ここでFigmaを使わないのは、Paperの軽さと実装時の再現性の高さを気に入っているためです。またPaper Snapshotもレイアウトのアイデアを寝る時に非常に有用です。
-
-![制作時のデザインツール画面。カラーシステムの整理とケーススタディ画面の構成](../../assets/case-studies/ai-page-production-initiative/paper-color-system-layout.png)
 
 この二つによって、要件定義から完成まで4日で完成させることができました。ですがAIエージェントによる開発はまだまだ課題も大きいと感じます。
 
