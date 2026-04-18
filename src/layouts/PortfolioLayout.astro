@@ -1,13 +1,11 @@
 ---
 import '../styles/styles.css';
 import { ClientRouter } from 'astro:transitions';
-import PortfolioTopNav from '../components/portfolio/PortfolioTopNav.astro';
 import CaseStudyDetailHeader from '../components/portfolio/CaseStudyDetailHeader.astro';
 import PortfolioListingHeader from '../components/portfolio/PortfolioListingHeader.astro';
 import type {
   CaseStudyDetailHeaderProps,
   PortfolioListingHeaderProps,
-  PortfolioTopNavProps,
 } from '../components/portfolio/portfolio-types';
 
 interface OgMeta {
@@ -17,17 +15,15 @@ interface OgMeta {
 
 interface Props {
   title?: string;
-  topNav?: PortfolioTopNavProps;
-  /** 指定時は `PortfolioTopNav` の代わりに詳細用ヘッダを表示（`topNav` より優先） */
+  /** 詳細用ヘッダ（`portfolioListingHeader` より優先） */
   caseStudyDetailHeader?: CaseStudyDetailHeaderProps;
-  /** 一覧用ヘッダ（`caseStudyDetailHeader` 未指定時のみ。`topNav` より優先） */
+  /** 一覧用ヘッダ（`caseStudyDetailHeader` 未指定時のみ） */
   portfolioListingHeader?: PortfolioListingHeaderProps;
   /** ページ単位の OGP / meta description 設定 */
   ogMeta?: OgMeta;
 }
 
-const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHeader, ogMeta } =
-  Astro.props;
+const { title = 'Portfolio', caseStudyDetailHeader, portfolioListingHeader, ogMeta } = Astro.props;
 ---
 
 <!doctype html>
@@ -83,14 +79,12 @@ const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHead
       href="#main-content">本文へスキップ</a
     >
     {
-      /* ヘッダは同時に1つ: 詳細 > 一覧 > トップナビ */
+      /* ヘッダは同時に1つ: 詳細 > 一覧 */
       caseStudyDetailHeader ? (
         <CaseStudyDetailHeader {...caseStudyDetailHeader} />
       ) : portfolioListingHeader ? (
         <PortfolioListingHeader {...portfolioListingHeader} />
-      ) : (
-        topNav && <PortfolioTopNav {...topNav} />
-      )
+      ) : null
     }
     <slot />
     <script>
