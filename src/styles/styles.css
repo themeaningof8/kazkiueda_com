@@ -197,6 +197,17 @@
   }
 }
 
+@layer components {
+  /**
+   * `prose-neutral` の blockquote は `--tw-prose-quotes`（ほぼ黒）固定。
+   * `prose-invert` 未使用のダーク UI では本文と同様に Sage の fg に寄せる。
+   */
+  html.dark .prose :where(blockquote) {
+    color: var(--color-fg-muted);
+    border-inline-start-color: var(--color-border-default);
+  }
+}
+
 /* View Transitions: ルートのみ明示チューン。設計・検証手順は
    docs/superpowers/specs/2026-04-14-view-transitions-design.md を参照。
    共有要素は transition:name（case-hero-<id>）に任せ、slug ごとの
