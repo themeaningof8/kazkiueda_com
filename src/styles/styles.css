@@ -1,13 +1,17 @@
 @import 'tailwindcss';
+@import '@radix-ui/colors/sage.css';
+@import '@radix-ui/colors/sage-dark.css';
+@import '@radix-ui/colors/indigo.css';
+@import '@radix-ui/colors/indigo-dark.css';
 @import 'tw-animate-css';
 @import '@fontsource-variable/noto-sans-jp';
 @plugin '@tailwindcss/typography';
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Radix Colors
- * - Sage: 面・境界・本文まわり（サイトの正）
- * - Grass: 差し色（リンク・フォーカス・填色の CTA 帯など）
+ * Radix Colors（@radix-ui/colors を @import — 手書き hex は置かない）
+ * - Sage: 面・境界・本文まわり
+ * - Indigo: アクセント（リンク・フォーカス・ソリッド CTA）
  * Starwind の `bg-background` / `bg-popover` 等は下記エイリアスで Sage に寄せる
  */
 @theme {
@@ -24,24 +28,24 @@
   --text-decoration-thickness-portfolio-link: 4px;
   --text-underline-offset-portfolio-link: 0.75rem;
 
-  --color-surface-canvas: #fbfdfc;
-  --color-surface-subtle: #f7f9f8;
-  --color-surface-ui: #eef1f0;
-  --color-surface-ui-hover: #e6e9e8;
-  --color-surface-ui-active: #dfe2e0;
-  --color-border-subtle: #d7dad9;
-  --color-border-default: #cbcfcd;
-  --color-border-strong: #b8bcba;
-  /* Grass 11/12 — キャンバス上のテキスト・リング（WCAG 向け） */
-  --color-accent: #2a7e3b;
-  --color-accent-hover: #203c25;
-  /* Grass 9/10 — ボタン・帯などのソリッド */
-  --color-accent-surface: #46a758;
-  --color-accent-surface-hover: #3e9b4f;
-  --color-fg-muted: #5f6563;
-  --color-fg-strong: #1a211e;
-  /* ソリッド Grass 上の文字（スキップリンク・ナビ CTA・Contact 帯） */
-  --color-fg-on-accent: #ffffff;
+  --color-surface-canvas: var(--sage-1);
+  --color-surface-subtle: var(--sage-2);
+  --color-surface-ui: var(--sage-3);
+  --color-surface-ui-hover: var(--sage-4);
+  --color-surface-ui-active: var(--sage-5);
+  --color-border-subtle: var(--sage-6);
+  --color-border-default: var(--sage-7);
+  --color-border-strong: var(--sage-8);
+  /* Indigo 11/12 — キャンバス上のリンクテキスト・リング */
+  --color-accent: var(--indigo-11);
+  --color-accent-hover: var(--indigo-12);
+  /* Indigo 9/10 — ソリッド CTA */
+  --color-accent-surface: var(--indigo-9);
+  --color-accent-surface-hover: var(--indigo-10);
+  --color-fg-muted: var(--sage-11);
+  --color-fg-strong: var(--sage-12);
+  /* ソリッド Indigo 上の文字 */
+  --color-fg-on-accent: white;
 
   --radius-DEFAULT: 0.125rem;
   --radius-lg: 0.25rem;
@@ -61,7 +65,7 @@
   --color-secondary-foreground: var(--color-fg-strong);
   --color-muted: var(--color-surface-ui);
   --color-muted-foreground: var(--color-fg-muted);
-  /* `bg-accent-surface`（Grass）上の文字 */
+  /* `bg-accent-surface`（Indigo）上の文字 */
   --color-accent-foreground: var(--color-fg-on-accent);
   --color-border: var(--color-border-subtle);
   --color-input: var(--color-border-default);
@@ -72,8 +76,9 @@
   --color-success-foreground: var(--color-fg-strong);
   --color-warning: var(--color-surface-ui-hover);
   --color-warning-foreground: var(--color-fg-strong);
-  --color-error: #9d4745;
-  --color-error-foreground: #ffffff;
+  /* Sage / Indigo のみ: 強調エラーは Indigo ソリッド相当 */
+  --color-error: var(--indigo-9);
+  --color-error-foreground: white;
 
   --radius-xs: 0.125rem;
   --radius-md: 0.25rem;
@@ -157,25 +162,6 @@
     max-width: 1.25rem;
     margin-inline-end: 0.5rem;
   }
-}
-
-html.dark,
-.dark {
-  --color-surface-canvas: #101211;
-  --color-surface-subtle: #171918;
-  --color-surface-ui: #202221;
-  --color-surface-ui-hover: #272a29;
-  --color-surface-ui-active: #2e3130;
-  --color-border-subtle: #373b39;
-  --color-border-default: #444947;
-  --color-border-strong: #5b625f;
-  --color-accent: #71d083;
-  --color-accent-hover: #c2f0c2;
-  --color-accent-surface: #46a758;
-  --color-accent-surface-hover: #53b365;
-  --color-fg-muted: #adb5b2;
-  --color-fg-strong: #eceeed;
-  --color-fg-on-accent: #ffffff;
 }
 
 @layer base {

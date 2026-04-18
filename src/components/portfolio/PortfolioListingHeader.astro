@@ -1,4 +1,5 @@
 ---
+import ThemeToggleButton from './ThemeToggleButton.astro';
 import type { PortfolioListingHeaderProps } from './portfolio-types';
 
 type Props = PortfolioListingHeaderProps;
@@ -19,12 +20,15 @@ const { brand, tagline, aboutHref, aboutLabel = 'About' } = Astro.props;
           {tagline}
         </p>
       </div>
-      <a
-        href={aboutHref}
-        class="shrink-0 rounded-sm text-sm font-medium text-accent outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
-      >
-        {aboutLabel}
-      </a>
+      <div class="flex shrink-0 items-center gap-3">
+        <ThemeToggleButton />
+        <a
+          href={aboutHref}
+          class="rounded-sm text-sm font-medium text-accent outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
+        >
+          {aboutLabel}
+        </a>
+      </div>
     </div>
   </div>
 </header>

@@ -16,12 +16,14 @@
     "check": "astro check",
     "knip": "knip",
     "jscpd": "jscpd",
-    "verify": "bun run check && bun run knip && bun run jscpd",
+    "verify:color-semantics": "bash scripts/check-color-semantics.sh",
+    "verify": "bun run check && bun run verify:color-semantics && bun run knip && bun run jscpd",
     "astro": "astro",
     "generate-types": "wrangler types"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-jp": "^5.2.10",
+    "@radix-ui/colors": "3.0.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.1.5",

@@ -2,6 +2,7 @@
 import type { PortfolioTopNavProps } from './portfolio-types';
 import PortfolioCaseStudyScrollSpy from './PortfolioCaseStudyScrollSpy.astro';
 import PortfolioWorkNavPopover from './PortfolioWorkNavPopover.astro';
+import ThemeToggleButton from './ThemeToggleButton.astro';
 
 type Props = PortfolioTopNavProps;
 
@@ -45,6 +46,7 @@ const hasCaseNav = Boolean(caseNavItems?.length);
             </a>
           )
         }
+        <ThemeToggleButton />
         <a
           href={aboutHref}
           class="text-sm tracking-wide text-fg-muted transition-colors hover:text-fg-strong"
@@ -79,6 +81,9 @@ const hasCaseNav = Boolean(caseNavItems?.length);
           >
             制作実績
           </a>
+        </li>
+        <li class="flex items-center">
+          <ThemeToggleButton />
         </li>
         <li>
           <a
