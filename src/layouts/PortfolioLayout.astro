@@ -1,13 +1,11 @@
 ---
 import '../styles/styles.css';
 import { ClientRouter } from 'astro:transitions';
-import PortfolioTopNav from '../components/portfolio/PortfolioTopNav.astro';
 import CaseStudyDetailHeader from '../components/portfolio/CaseStudyDetailHeader.astro';
 import PortfolioListingHeader from '../components/portfolio/PortfolioListingHeader.astro';
 import type {
   CaseStudyDetailHeaderProps,
   PortfolioListingHeaderProps,
-  PortfolioTopNavProps,
 } from '../components/portfolio/portfolio-types';
 
 interface OgMeta {
@@ -17,17 +15,15 @@ interface OgMeta {
 
 interface Props {
   title?: string;
-  topNav?: PortfolioTopNavProps;
-  /** 指定時は `PortfolioTopNav` の代わりに詳細用ヘッダを表示（`topNav` より優先） */
+  /** 詳細用ヘッダ（`portfolioListingHeader` より優先） */
   caseStudyDetailHeader?: CaseStudyDetailHeaderProps;
-  /** 一覧用ヘッダ（`caseStudyDetailHeader` 未指定時のみ。`topNav` より優先） */
+  /** 一覧用ヘッダ（`caseStudyDetailHeader` 未指定時のみ） */
   portfolioListingHeader?: PortfolioListingHeaderProps;
   /** ページ単位の OGP / meta description 設定 */
   ogMeta?: OgMeta;
 }
 
-const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHeader, ogMeta } =
-  Astro.props;
+const { title = 'Portfolio', caseStudyDetailHeader, portfolioListingHeader, ogMeta } = Astro.props;
 ---
 
 <!doctype html>
@@ -83,19 +79,53 @@ const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHead
       href="#main-content">本文へスキップ</a
     >
     {
-      /* ヘッダは同時に1つ: 詳細 > 一覧 > トップナビ */
+      /* ヘッダは同時に1つ: 詳細 > 一覧 */
       caseStudyDetailHeader ? (
         <CaseStudyDetailHeader {...caseStudyDetailHeader} />
       ) : portfolioListingHeader ? (
         <PortfolioListingHeader {...portfolioListingHeader} />
-      ) : (
-        topNav && <PortfolioTopNav {...topNav} />
-      )
+      ) : null
     }
     <slot />
     <script>
       (function () {
         var KEY = 'kazkiueda-theme';
+
+        function resolveStoredTheme(): 'light' | 'dark' {
+          var stored = null;
+          try {
+            if (typeof localStorage !== 'undefined') {
+              stored = localStorage.getItem(KEY);
+            }
+          } catch (_) {
+            stored = null;
+          }
+          if (stored === 'light' || stored === 'dark') return stored;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function applyThemeToRoot(root: HTMLElement, theme: 'light' | 'dark') {
+          root.classList.remove('light', 'dark');
+          root.classList.add(theme);
+          root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+        }
+
+        /** 現在ドキュメント用（初回・page-load） */
+        function applyStoredTheme() {
+          applyThemeToRoot(document.documentElement, resolveStoredTheme());
+        }
+
+        /**
+         * 差し替え「前」に届くドキュメントへテーマを焼き込む。
+         * これがないと、遷移先の静的 HTML が一瞬だけ既定配色になりちらつく（View Transitions 公式でも同様の手を案内）。
+         * @see https://docs.astro.build/en/guides/view-transitions/#astrobefore-swap
+         */
+        /** @see https://docs.astro.build/en/guides/view-transitions/#astrobefore-swap */
+        function onBeforeSwap(event: Event) {
+          var newDocument = (event as Event & { newDocument?: Document }).newDocument;
+          if (!newDocument?.documentElement) return;
+          applyThemeToRoot(newDocument.documentElement, resolveStoredTheme());
+        }
 
         function syncThemeToggleIcons() {
           var root = document.documentElement;
@@ -131,6 +161,7 @@ const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHead
         }
 
         function bindThemeToggleUi() {
+          applyStoredTheme();
           syncThemeToggleIcons();
         }
 
@@ -138,6 +169,7 @@ const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHead
         if (!win.__kazkiThemeToggleUi) {
           win.__kazkiThemeToggleUi = true;
           document.addEventListener('click', onToggleClick);
+          document.addEventListener('astro:before-swap', onBeforeSwap);
           document.addEventListener('astro:page-load', bindThemeToggleUi);
         }
         bindThemeToggleUi();

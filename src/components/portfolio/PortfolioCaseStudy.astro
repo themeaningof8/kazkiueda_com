@@ -19,12 +19,12 @@ const {
   heroImage,
   listingImage,
   heroAlt,
-  transitionName,
 } = Astro.props;
 
 const headingId = `${sectionId}-heading`;
 const cardBackdropImage = listingImage ?? heroImage;
-const showHeroOverlay = Boolean(href && cardBackdropImage && heroAlt && transitionName);
+/** 一覧サムネは `transition:name` しない（詳細ヒーローとの共有要素モーフが GPU 負荷でカクつきやすい） */
+const showHeroOverlay = Boolean(href && cardBackdropImage && heroAlt);
 const isPriorityHero = rowIndex === 0;
 
 /** Paper: 左レールの連番（コレクションの preset はアスペクト用のため一覧では使わない） */
@@ -48,8 +48,7 @@ const listDigits = listNumber.split('');
             sizes="(min-width: 1024px) 1296px, 100vw"
             loading={isPriorityHero ? 'eager' : 'lazy'}
             fetchpriority={isPriorityHero ? 'high' : 'low'}
-            transition:name={transitionName}
-            transition:animate="fade"
+            transition:animate="none"
           />
           <div class="absolute inset-0 bg-surface-subtle/68"></div>
         </div>

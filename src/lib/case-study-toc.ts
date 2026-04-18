@@ -1,32 +1,48 @@
-import GithubSlugger from 'github-slugger';
+/**
+ * ケーススタディ左カラム目次用。UI は `TocNode` の木を想定。
+ *
+ * 見出しの `slug` / テキストは **`render(entry)` が返す `headings`** からだけ取る。
+ * これは Astro が Markdown を処理した結果（`getHeadings()` と同系）なので、
+ * 本文に `rehype-slug` が付与する `id` とズレにくい。
+ *
+ * @see https://docs.astro.build/en/reference/modules/astro-content/#render
+ */
 
-/** マークダウン見出し（`##`〜`######`）から組み立てた TOC ノード */
+/** 左カラム目次の 1 ノード（`##`〜`######` の階層） */
 export interface TocNode {
   text: string;
   slug: string;
   children: TocNode[];
 }
 
+/** `render()` / `getHeadings()` が返す見出しの最小形 */
+type RenderHeading = {
+  depth: number;
+  slug: string;
+  text: string;
+};
+
 /**
- * 本文から `##`〜`######` を抽出し、`rehype-slug` と同様に `github-slugger` で slug 化したツリーを返す。
- * 階層は見出しレベルに従い、h2 をルート、h3 以降は親の子になる。
+ * `render(entry).headings` を、h2 をルートとする `TocNode` の木に変換する。
+ * depth 2〜6 のみ対象（h1 は目次に含めない）。
  */
-export function tocFromMarkdownHeadings(body: string): TocNode[] {
-  const slugger = new GithubSlugger();
+export function tocTreeFromRenderHeadings(headings: readonly RenderHeading[]): TocNode[] {
+  const flat = headings
+    .filter((h) => h.depth >= 2 && h.depth <= 6)
+    .map((h) => ({
+      depth: h.depth,
+      text: h.text.trim(),
+      slug: h.slug,
+    }))
+    .filter((h) => h.text.length > 0);
+
   const roots: TocNode[] = [];
   const stack: { level: number; node: TocNode }[] = [];
 
-  for (const line of body.split('\n')) {
-    const trimmed = line.trim();
-    const m = /^(#{2,6})\s+(.+)$/.exec(trimmed);
-    if (!m) continue;
-    const level = m[1].length;
-    const text = m[2].trim();
-    if (!text) continue;
-    const slug = slugger.slug(text);
+  for (const { depth, text, slug } of flat) {
     const node: TocNode = { text, slug, children: [] };
 
-    while (stack.length > 0 && stack[stack.length - 1].level >= level) {
+    while (stack.length > 0 && stack[stack.length - 1].level >= depth) {
       stack.pop();
     }
 
@@ -35,7 +51,8 @@ export function tocFromMarkdownHeadings(body: string): TocNode[] {
     } else {
       stack[stack.length - 1].node.children.push(node);
     }
-    stack.push({ level, node });
+
+    stack.push({ level: depth, node });
   }
 
   return roots;

@@ -167,7 +167,7 @@
 @layer base {
   html {
     font-feature-settings: 'palt' 1;
-    /* モバイルはヘッダー2段（PortfolioTopNav）ぶん多めに確保 */
+    /* モバイルは固定ヘッダー2段ぶん多めに確保 */
     scroll-padding-top: 7.5rem;
   }
 
@@ -194,6 +194,17 @@
   /* Starwind トリガー用（グローバル * に border は当てない） */
   button[data-slot='button'] {
     cursor: pointer;
+  }
+}
+
+@layer components {
+  /**
+   * `prose-neutral` の blockquote は `--tw-prose-quotes`（ほぼ黒）固定。
+   * `prose-invert` 未使用のダーク UI では本文と同様に Sage の fg に寄せる。
+   */
+  html.dark .prose :where(blockquote) {
+    color: var(--color-fg-muted);
+    border-inline-start-color: var(--color-border-default);
   }
 }
 
