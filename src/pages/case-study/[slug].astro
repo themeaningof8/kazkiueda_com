@@ -7,7 +7,7 @@ import CaseStudyDetailToc from '../../components/portfolio/CaseStudyDetailToc.as
 import CaseStudyDetailRelated from '../../components/portfolio/CaseStudyDetailRelated.astro';
 import CaseStudyDetailTocScrollSpy from '../../components/portfolio/CaseStudyDetailTocScrollSpy.astro';
 import type { CaseStudyDetailHeaderProps } from '../../components/portfolio/portfolio-types';
-import { tocFromMarkdownHeadings } from '../../lib/case-study-toc';
+import { tocTreeFromRenderHeadings } from '../../lib/case-study-toc';
 
 export const prerender = true;
 
@@ -24,7 +24,8 @@ export interface Props {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+// `headings` は本文と同じ Markdown パイプライン由来（rehype-slug の id と整合しやすい）
+const { Content, headings } = await render(entry);
 const { title, description, tags, preset, heroImage, heroAlt, summaryRows } = entry.data;
 
 const pageUrl = new URL(`/case-study/${entry.id}`, Astro.site ?? 'https://kazkiueda.com').href;
@@ -51,8 +52,7 @@ const sortedForNav = [...allCaseEntries].sort((a, b) => {
 
 const indexById = new Map(sortedForNav.map((e, i) => [e.id, i]));
 
-// entry.body は glob ローダーにより frontmatter 除去済み
-const tocRoots = tocFromMarkdownHeadings(entry.body ?? '');
+const tocRoots = tocTreeFromRenderHeadings(headings);
 
 const relatedItems = sortedForNav
   .filter((e) => e.id !== entry.id)

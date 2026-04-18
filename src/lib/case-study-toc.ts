@@ -1,45 +1,40 @@
-import GithubSlugger from 'github-slugger';
-import type { Heading, Root } from 'mdast';
-import { toString } from 'mdast-util-to-string';
-import remarkGfm from 'remark-gfm';
-import remarkParse from 'remark-parse';
-import remarkSmartypants from 'remark-smartypants';
-import { unified } from 'unified';
-import { visit } from 'unist-util-visit';
+/**
+ * ケーススタディ左カラム目次用。UI は `TocNode` の木を想定。
+ *
+ * 見出しの `slug` / テキストは **`render(entry)` が返す `headings`** からだけ取る。
+ * これは Astro が Markdown を処理した結果（`getHeadings()` と同系）なので、
+ * 本文に `rehype-slug` が付与する `id` とズレにくい。
+ *
+ * @see https://docs.astro.build/en/reference/modules/astro-content/#render
+ */
 
-/** マークダウン見出し（`##`〜`######`）から組み立てた TOC ノード */
+/** 左カラム目次の 1 ノード（`##`〜`######` の階層） */
 export interface TocNode {
   text: string;
   slug: string;
   children: TocNode[];
 }
 
-type HeadingInfo = { depth: number; text: string; slug: string };
+/** `render()` / `getHeadings()` が返す見出しの最小形 */
+type RenderHeading = {
+  depth: number;
+  slug: string;
+  text: string;
+};
 
 /**
- * 本文の mdast から `##`〜`######` を抽出し、`rehype-slug` と同様にプレーン見出しテキストを
- * `github-slugger` で slug 化したツリーを返す。
- * 階層は見出しレベルに従い、h2 をルート、h3 以降は親の子になる。
- *
- * @param body フロントマターなしの Markdown 本文。Astro Content の `entry.body` が該当する。
- *   remark の段階は `@astrojs/markdown-remark` の既定（GFM + Smartypants）に合わせる。
+ * `render(entry).headings` を、h2 をルートとする `TocNode` の木に変換する。
+ * depth 2〜6 のみ対象（h1 は目次に含めない）。
  */
-export function tocFromMarkdownHeadings(body: string): TocNode[] {
-  const tree = unified()
-    .use(remarkParse)
-    .use(remarkGfm)
-    .use(remarkSmartypants, {})
-    .parse(body) as Root;
-  const slugger = new GithubSlugger();
-  const flat: HeadingInfo[] = [];
-
-  visit(tree, 'heading', (node: Heading) => {
-    if (node.depth < 2 || node.depth > 6) return;
-    const text = toString(node).trim();
-    if (!text) return;
-    const slug = slugger.slug(text);
-    flat.push({ depth: node.depth, text, slug });
-  });
+export function tocTreeFromRenderHeadings(headings: readonly RenderHeading[]): TocNode[] {
+  const flat = headings
+    .filter((h) => h.depth >= 2 && h.depth <= 6)
+    .map((h) => ({
+      depth: h.depth,
+      text: h.text.trim(),
+      slug: h.slug,
+    }))
+    .filter((h) => h.text.length > 0);
 
   const roots: TocNode[] = [];
   const stack: { level: number; node: TocNode }[] = [];
