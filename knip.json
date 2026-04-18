@@ -3,10 +3,9 @@
   "paths": {
     "@/*": ["src/*"]
   },
+  "ignore": ["src/components/starwind/button/index.ts"],
   "ignoreFiles": [".claude/**"],
   "ignoreIssues": {
-    "src/components/starwind/button/index.ts": ["exports"],
-    "src/components/starwind/popover/index.ts": ["exports"],
-    "src/lib/utils/starwind/positioning.ts": ["types"]
+    "src/components/starwind/button/Button.astro": ["exports"]
   }
 }
