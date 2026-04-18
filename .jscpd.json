@@ -1,0 +1,18 @@
+{
+  "path": ["src"],
+  "minTokens": 60,
+  "threshold": null,
+  "reporters": ["console"],
+  "gitignore": true,
+  "absolute": true,
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.astro/**",
+    "**/*.min.*"
+  ],
+  "format": ["typescript", "javascript", "css", "markup"],
+  "formatsExts": {
+    "markup": ["astro"]
+  }
+}
