@@ -16,7 +16,8 @@
     "check": "astro check",
     "knip": "knip",
     "jscpd": "jscpd",
-    "verify": "bun run check && bun run knip && bun run jscpd",
+    "verify:color-semantics": "bash scripts/check-color-semantics.sh",
+    "verify": "bun run check && bun run verify:color-semantics && bun run knip && bun run jscpd",
     "astro": "astro",
     "generate-types": "wrangler types"
   },
