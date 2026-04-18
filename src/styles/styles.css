@@ -198,13 +198,40 @@
 }
 
 /**
- * `prose-neutral` の blockquote は `--tw-prose-quotes`（ほぼ黒）固定。
- * Typography は `@layer components` 相当で後勝ちするため、`utilities` で上書きする。
+ * `prose-neutral` はライト向け `--tw-prose-*`（本文・引用・コード等）を当てる。
+ * Typography は components レイヤで後勝ちしやすいので、ダーク用の上書きは `@layer utilities` に置く。
+ * （`text-fg-muted` 等のユーティリティは勝てるが、`code` / `blockquote` は要素に直接 `--tw-prose-*` が付くため別対応）
  */
 @layer utilities {
   html.dark .prose :where(blockquote):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
     color: var(--color-fg-muted);
     border-inline-start-color: var(--color-border-default);
+  }
+
+  /** `--tw-prose-code` = neutral[900] — pre 内は `pre code` が inherit */
+  html.dark
+    .prose
+    :where(code):not(:where(pre *, [class~='not-prose'], [class~='not-prose'] *)) {
+    color: var(--color-fg-strong);
+  }
+
+  html.dark .prose :where(a code):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    color: inherit;
+  }
+
+  html.dark .prose :where(blockquote code):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    color: inherit;
+  }
+
+  html.dark
+    .prose
+    :where(h1 code, h2 code, h3 code, h4 code):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    color: inherit;
+  }
+
+  /** `--tw-prose-kbd` = neutral[900] */
+  html.dark .prose :where(kbd):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    color: var(--color-fg-strong);
   }
 }
 
