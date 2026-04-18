@@ -23,7 +23,6 @@ const {
 } = Astro.props;
 
 const headingId = `${sectionId}-heading`;
-const caseStudyAriaLabel = linkLabel ?? `ケーススタディ: ${title}`;
 const cardBackdropImage = listingImage ?? heroImage;
 const showHeroOverlay = Boolean(href && cardBackdropImage && heroAlt && transitionName);
 const isPriorityHero = rowIndex === 0;
@@ -97,7 +96,6 @@ const listDigits = listNumber.split('');
               <a
                 class="group/detail inline-flex items-center gap-2 rounded-full bg-accent-surface px-4 py-2.5 text-sm font-semibold text-fg-on-accent shadow-sm outline-none transition-colors hover:bg-accent-surface-hover focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas"
                 href={href}
-                aria-label={caseStudyAriaLabel}
               >
                 <span>{linkLabel ?? 'ケーススタディを見る'}</span>
                 <span
