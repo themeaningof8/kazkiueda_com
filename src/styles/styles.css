@@ -167,7 +167,7 @@
 @layer base {
   html {
     font-feature-settings: 'palt' 1;
-    /* モバイルはヘッダー2段（PortfolioTopNav）ぶん多めに確保 */
+    /* モバイルは固定ヘッダー2段ぶん多めに確保 */
     scroll-padding-top: 7.5rem;
   }
 
