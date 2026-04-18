@@ -37,7 +37,14 @@ const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHead
     <script is:inline>
       (function () {
         var k = 'kazkiueda-theme';
-        var stored = typeof localStorage !== 'undefined' ? localStorage.getItem(k) : null;
+        var stored = null;
+        try {
+          if (typeof localStorage !== 'undefined') {
+            stored = localStorage.getItem(k);
+          }
+        } catch (_) {
+          stored = null;
+        }
         var theme =
           stored === 'light' || stored === 'dark'
             ? stored
@@ -131,9 +138,9 @@ const { title = 'Portfolio', topNav, caseStudyDetailHeader, portfolioListingHead
         if (!win.__kazkiThemeToggleUi) {
           win.__kazkiThemeToggleUi = true;
           document.addEventListener('click', onToggleClick);
+          document.addEventListener('astro:page-load', bindThemeToggleUi);
         }
         bindThemeToggleUi();
-        document.addEventListener('astro:page-load', bindThemeToggleUi);
       })();
     </script>
   </body>
