@@ -49,6 +49,8 @@ const sortedForNav = [...allCaseEntries].sort((a, b) => {
   return a.id.localeCompare(b.id);
 });
 
+const indexById = new Map(sortedForNav.map((e, i) => [e.id, i]));
+
 const tocRoots = tocFromMarkdownHeadings(entry.body ?? '');
 
 const relatedItems = sortedForNav
@@ -56,7 +58,7 @@ const relatedItems = sortedForNav
   .map((e) => ({
     href: `/case-study/${e.id}`,
     title: e.data.title,
-    listNumber: String(sortedForNav.findIndex((x) => x.id === e.id) + 1).padStart(2, '0'),
+    listNumber: String((indexById.get(e.id) ?? 0) + 1).padStart(2, '0'),
   }));
 
 const caseStudyDetailHeader = {
