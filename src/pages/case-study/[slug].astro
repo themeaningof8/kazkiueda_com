@@ -11,19 +11,37 @@ import { tocTreeFromRenderHeadings } from '../../lib/case-study-toc';
 
 export const prerender = true;
 
+/** `caseStudies` はビルド時に一度だけ取得し、各詳細へ `relatedItems` を渡す（詳細側で再 getCollection しない） */
 export const getStaticPaths = (async () => {
   const entries = await getCollection('caseStudies');
-  return entries.map((entry) => ({
-    params: { slug: entry.id },
-    props: { entry },
-  }));
+  const sorted = [...entries].sort((a, b) => {
+    if (a.data.order !== b.data.order) return a.data.order - b.data.order;
+    return a.id.localeCompare(b.id);
+  });
+  const indexById = new Map(sorted.map((e, i) => [e.id, i]));
+
+  return sorted.map((entry) => {
+    const relatedItems = sorted
+      .filter((e) => e.id !== entry.id)
+      .map((e) => ({
+        href: `/case-study/${e.id}`,
+        title: e.data.title,
+        listNumber: String(indexById.get(e.id)! + 1).padStart(2, '0'),
+      }));
+
+    return {
+      params: { slug: entry.id },
+      props: { entry, relatedItems },
+    };
+  });
 }) satisfies GetStaticPaths;
 
 export interface Props {
   entry: CollectionEntry<'caseStudies'>;
+  relatedItems: { href: string; title: string; listNumber: string }[];
 }
 
-const { entry } = Astro.props;
+const { entry, relatedItems } = Astro.props;
 // `headings` は本文と同じ Markdown パイプライン由来（rehype-slug の id と整合しやすい）
 const { Content, headings } = await render(entry);
 const { title, description, tags, preset, heroImage, heroAlt, summaryRows } = entry.data;
@@ -44,23 +62,7 @@ const L = layoutMeta[preset];
 
 const heroImageTransitionAttrs = { 'transition:name': transitionName } as const;
 
-const allCaseEntries = await getCollection('caseStudies');
-const sortedForNav = [...allCaseEntries].sort((a, b) => {
-  if (a.data.order !== b.data.order) return a.data.order - b.data.order;
-  return a.id.localeCompare(b.id);
-});
-
-const indexById = new Map(sortedForNav.map((e, i) => [e.id, i]));
-
 const tocRoots = tocTreeFromRenderHeadings(headings);
-
-const relatedItems = sortedForNav
-  .filter((e) => e.id !== entry.id)
-  .map((e) => ({
-    href: `/case-study/${e.id}`,
-    title: e.data.title,
-    listNumber: String(indexById.get(e.id)! + 1).padStart(2, '0'),
-  }));
 
 const caseStudyDetailHeader = {
   brand: '植田 一貴',
