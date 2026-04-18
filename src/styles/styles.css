@@ -116,6 +116,50 @@
   }
 }
 
+/**
+ * Typography の色モディファイアを Radix Sage（@theme の `--color-*`）に統一する。
+ * `html.dark` 時は sage-dark の `--sage-*` が効くため `prose-invert` なしで読める。
+ * @see https://github.com/tailwindlabs/tailwindcss-typography#adding-custom-color-themes
+ */
+@utility prose-sage {
+  --tw-prose-body: var(--color-fg-muted);
+  --tw-prose-headings: var(--color-fg-strong);
+  --tw-prose-lead: var(--color-fg-muted);
+  --tw-prose-links: var(--color-accent);
+  --tw-prose-bold: var(--color-fg-strong);
+  --tw-prose-counters: var(--color-fg-muted);
+  --tw-prose-bullets: var(--color-border-strong);
+  --tw-prose-hr: var(--color-border-subtle);
+  --tw-prose-quotes: var(--color-fg-muted);
+  --tw-prose-quote-borders: var(--color-border-default);
+  --tw-prose-captions: var(--color-fg-muted);
+  --tw-prose-kbd: var(--color-fg-strong);
+  --tw-prose-kbd-shadows: color-mix(in oklab, var(--color-fg-strong) 14%, transparent);
+  --tw-prose-code: var(--color-fg-strong);
+  --tw-prose-pre-code: var(--color-fg-strong);
+  --tw-prose-pre-bg: var(--color-surface-ui);
+  --tw-prose-th-borders: var(--color-border-default);
+  --tw-prose-td-borders: var(--color-border-subtle);
+  --tw-prose-invert-body: var(--color-fg-muted);
+  --tw-prose-invert-headings: var(--color-fg-strong);
+  --tw-prose-invert-lead: var(--color-fg-muted);
+  --tw-prose-invert-links: var(--color-accent);
+  --tw-prose-invert-bold: var(--color-fg-strong);
+  --tw-prose-invert-counters: var(--color-fg-muted);
+  --tw-prose-invert-bullets: var(--color-border-strong);
+  --tw-prose-invert-hr: var(--color-border-subtle);
+  --tw-prose-invert-quotes: var(--color-fg-muted);
+  --tw-prose-invert-quote-borders: var(--color-border-default);
+  --tw-prose-invert-captions: var(--color-fg-muted);
+  --tw-prose-invert-kbd: var(--color-fg-strong);
+  --tw-prose-invert-kbd-shadows: color-mix(in oklab, var(--color-fg-strong) 14%, transparent);
+  --tw-prose-invert-code: var(--color-fg-strong);
+  --tw-prose-invert-pre-code: var(--color-fg-strong);
+  --tw-prose-invert-pre-bg: var(--color-surface-ui);
+  --tw-prose-invert-th-borders: var(--color-border-default);
+  --tw-prose-invert-td-borders: var(--color-border-subtle);
+}
+
 /** ケーススタディ詳細: 動きは Tailwind `@utility`（コンポーネント内の生 `<style>` は使わない） */
 @utility u-case-study-related-card {
   @apply block rounded-xl border border-border-subtle bg-surface-subtle/50 p-3 transition-[border-color,background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-accent/35 hover:bg-accent/[0.04] motion-safe:hover:-translate-y-px;
@@ -194,17 +238,6 @@
   /* Starwind トリガー用（グローバル * に border は当てない） */
   button[data-slot='button'] {
     cursor: pointer;
-  }
-}
-
-@layer components {
-  /**
-   * `prose-neutral` の blockquote は `--tw-prose-quotes`（ほぼ黒）固定。
-   * `prose-invert` 未使用のダーク UI では本文と同様に Sage の fg に寄せる。
-   */
-  html.dark .prose :where(blockquote) {
-    color: var(--color-fg-muted);
-    border-inline-start-color: var(--color-border-default);
   }
 }
 
