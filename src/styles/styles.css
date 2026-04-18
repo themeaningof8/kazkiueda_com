@@ -197,12 +197,12 @@
   }
 }
 
-@layer components {
-  /**
-   * `prose-neutral` の blockquote は `--tw-prose-quotes`（ほぼ黒）固定。
-   * `prose-invert` 未使用のダーク UI では本文と同様に Sage の fg に寄せる。
-   */
-  html.dark .prose :where(blockquote) {
+/**
+ * `prose-neutral` の blockquote は `--tw-prose-quotes`（ほぼ黒）固定。
+ * Typography は `@layer components` 相当で後勝ちするため、`utilities` で上書きする。
+ */
+@layer utilities {
+  html.dark .prose :where(blockquote):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
     color: var(--color-fg-muted);
     border-inline-start-color: var(--color-border-default);
   }
