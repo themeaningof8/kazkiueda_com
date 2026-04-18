@@ -1,7 +1,9 @@
 import GithubSlugger from 'github-slugger';
 import type { Heading, Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
+import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
+import remarkSmartypants from 'remark-smartypants';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 
@@ -18,9 +20,16 @@ type HeadingInfo = { depth: number; text: string; slug: string };
  * 本文の mdast から `##`〜`######` を抽出し、`rehype-slug` と同様にプレーン見出しテキストを
  * `github-slugger` で slug 化したツリーを返す。
  * 階層は見出しレベルに従い、h2 をルート、h3 以降は親の子になる。
+ *
+ * @param body フロントマターなしの Markdown 本文。Astro Content の `entry.body` が該当する。
+ *   remark の段階は `@astrojs/markdown-remark` の既定（GFM + Smartypants）に合わせる。
  */
 export function tocFromMarkdownHeadings(body: string): TocNode[] {
-  const tree = unified().use(remarkParse).parse(body) as Root;
+  const tree = unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkSmartypants, {})
+    .parse(body) as Root;
   const slugger = new GithubSlugger();
   const flat: HeadingInfo[] = [];
 
