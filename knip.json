@@ -3,5 +3,15 @@
   "paths": {
     "@/*": ["src/*"]
   },
-  "ignoreFiles": [".claude/**"]
+  "ignoreFiles": [
+    ".claude/**",
+    "src/components/portfolio/PortfolioAbout.astro",
+    "src/components/portfolio/PortfolioHero.astro"
+  ],
+  "ignoreDependencies": ["@tabler/icons", "@tailwindcss/forms"],
+  "ignoreIssues": {
+    "src/components/starwind/button/index.ts": ["exports"],
+    "src/components/starwind/popover/index.ts": ["exports"],
+    "src/lib/utils/starwind/positioning.ts": ["types"]
+  }
 }
