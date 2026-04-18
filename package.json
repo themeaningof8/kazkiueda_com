@@ -14,13 +14,14 @@
     "deploy:pages": "bun run build && bunx wrangler pages deploy ./dist --project-name=kazkiueda-com",
     "deploy": "bun run deploy:pages",
     "check": "astro check",
+    "knip": "knip",
+    "jscpd": "jscpd",
+    "verify": "bun run check && bun run knip && bun run jscpd",
     "astro": "astro",
     "generate-types": "wrangler types"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-jp": "^5.2.10",
-    "@tabler/icons": "^3.41.1",
-    "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.1.5",
@@ -34,6 +35,8 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.8",
     "@types/node": "^25.6.0",
+    "jscpd": "^4.0.9",
+    "knip": "^6.4.1",
     "typescript": "^5.9.3",
     "wrangler": "^4.81.1"
   },
