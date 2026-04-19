@@ -9,22 +9,164 @@ const portfolioListingHeader = {
   tagline: 'ポートフォリオ',
   aboutHref: '/about',
 } satisfies PortfolioListingHeaderProps;
+
+const ogMeta = {
+  description:
+    'デザイン・フロントエンド・デザイン戦略の三層を往復するデザイナー / リードデザイナー（株式会社エイチームライフデザイン）。事業ファースト、意思決定を前に進める、三つの軸、いま探している役割について。',
+};
+
+type CareerRow = {
+  period: string;
+  title: string;
+  note: string;
+};
+
+const careerRows: CareerRow[] = [
+  {
+    period: '2008 – 2017',
+    title: '株式会社音動（創業メンバー）',
+    note: 'カメラマン・映像編集 → Web デザイナー。創業期の小規模チームで、案件ごとに必要な役割を自分で取りに行くスタイルを身につけた。',
+  },
+  {
+    period: '2017 – 現在',
+    title: '株式会社エイチームライフデザイン（大阪） / リードデザイナー',
+    note: '金融系サービス（保険含む）を中心に複数事業でデザインリーダーを務め、デザインシステム再設計、停滞プロジェクトへのスクラムマスター自薦参画、AI 協業の社内展開などに取り組む。現在は自動車事業部（ナビクルアシスト・ネクステージアプリ）で 6 名のチームをリード。',
+  },
+];
 ---
 
-<PortfolioLayout title="About | kazkiueda.com" portfolioListingHeader={portfolioListingHeader}>
+<PortfolioLayout
+  title="About | kazkiueda.com"
+  portfolioListingHeader={portfolioListingHeader}
+  ogMeta={ogMeta}
+>
   <main
     id="main-content"
     class="mx-auto min-w-0 max-w-2xl px-6 pb-32 pt-24 md:pb-48 md:pt-28"
   >
     <h1 class="text-3xl font-bold tracking-tight text-fg-strong md:text-4xl">About</h1>
+
     <div
       class:list={[
         'prose prose-sage prose-lg mt-8 max-w-none text-fg-muted',
         'prose-p:leading-relaxed prose-strong:text-fg-strong',
       ]}
     >
-      <p>実装で前進させ、意思決定で停滞をほどくデザイナーです。</p>
-      <p>デザイン・実装・事業戦略の三層を行き来しながら、「誰かがやらないと止まる」場所に自分から入っていくことでキャリアを作ってきました。チームのボトルネックを見つけ、ツールと言語化の両方で解消することを得意としています。</p>
+      <p>はじめまして、植田 一貴（Kazki Ueda）です！</p>
+      <p>
+        大阪を拠点に、<strong>デザイン・フロントエンド・デザイン戦略の三層を往復する</strong>デザイナーをしています。施策立案から UI のスケッチ、本番コードまで<strong>一気通貫で行うこと</strong>を強みに、現在は<strong>株式会社エイチームライフデザイン</strong>のリードデザイナーとして勤務しています。
+      </p>
+      <p>
+        キャリアは 2008 年、<strong>友人と立ち上げた映像制作会社</strong>の創業メンバーとして始まりました。カメラマン・映像編集からキャリアを始め、<strong>転機は自社 Web サイトの制作を担当したこと</strong>。そこから Web デザイナーへ役割を広げ、Web 制作事業を展開しました。その後、結婚を機に 2017 年に<strong>株式会社エイチーム</strong>へ入社。主に金融系サービスを中心に複数の事業でデザインリーダーを務め、現在は自動車事業部に所属しています。
+      </p>
+    </div>
+
+    <section class="mt-10" aria-labelledby="about-career-heading">
+      <h2
+        id="about-career-heading"
+        class="text-sm font-medium uppercase tracking-[0.12em] text-fg-muted"
+      >
+        Career
+      </h2>
+      <div
+        class="mt-3 overflow-hidden rounded-2xl border border-border-subtle bg-surface-subtle/50"
+      >
+        {
+          careerRows.map((row) => (
+            <div class="grid grid-cols-1 gap-2 border-b border-border-subtle px-4 py-4 last:border-b-0 sm:grid-cols-[140px_1fr] sm:gap-6 sm:px-6">
+              <div class="text-sm font-medium text-fg-strong">{row.period}</div>
+              <div class="min-w-0 space-y-1">
+                <div class="text-sm font-semibold text-fg-strong">{row.title}</div>
+                <p class="text-sm leading-relaxed text-fg-muted">{row.note}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <p class="mt-3 text-sm text-fg-muted">
+        個別案件の判断・成果は <a
+          class="text-accent underline-offset-4 hover:underline"
+          href="/case-study">ケーススタディ</a
+        > にまとめています。
+      </p>
+    </section>
+
+    <div
+      class:list={[
+        'prose prose-sage prose-lg mt-16 max-w-none text-fg-muted',
+        'prose-p:leading-relaxed prose-strong:text-fg-strong',
+        'prose-h2:mt-14 prose-h2:text-2xl prose-h2:font-semibold prose-h2:tracking-tight',
+        'prose-h3:mt-10 prose-h3:text-lg prose-h3:font-semibold',
+        'prose-li:leading-relaxed',
+      ]}
+    >
+      <h2>事業ファースト</h2>
+      <p>私は「<strong>事業ファースト</strong>」を掲げています。</p>
+      <p>
+        それは初めに<strong>友人と起業した会社</strong>で、「事業がうまくいかないと、クオリティに対するモラルが下がったり、最悪、仕事がなくなってしまう」ということを経験したからでした。
+      </p>
+      <p>
+        しかし、それはデザインを軽視するということではありません。むしろ、関わったサービスは全てこだわりたい。ただ事業においては、初期は足りない機能の開発や改善施策など他に優先度が高いタスクがたくさんある中で、デザイナーは<strong>事業におけるデザインの価値を定量的に説明できず、他職能と意思疎通が噛み合わない</strong>ことも多いと感じています。
+      </p>
+      <p>
+        私は、「事業ファースト」でデザイナーとして事業に貢献するためにどのようなアクションが必要かを考え、行動し、一方で<strong>どの事業フェーズにおいても、いかにデザインのクオリティを維持できるか</strong>を考えて行動してきました。
+      </p>
+
+      <h2>意思決定を前に進める</h2>
+      <p>
+        現職で学んだのは、<strong>複数人で運営年数の長いサービスのデザインならではの悩み</strong>です。
+      </p>
+      <p>
+        意思疎通の問題、そして技術負債や実装スキルの違いから生まれる、<strong>事業成長を阻害する「しがらみ」</strong>。以前は一人で決められることも多かった簡単な意思決定ですら、簡単には決められない——これが日々起きます。
+      </p>
+      <p>
+        逆説的にいうと、<strong>これを前に進められる人材は希少価値を持つ</strong>のだろう、と思うようになりました。そうなるために、仕組みを作ったり、ファシリテートできる経験を積むために、機会があれば<strong>自分から手を挙げて</strong>きました。
+      </p>
+
+      <h2>三つの軸</h2>
+      <p>
+        仕事のなかでは、<strong>デザイン・フロントエンド・デザイン戦略</strong>の三つに現れるボトルネックをどうすれば解消できるか、を一貫して考えてきました。
+      </p>
+
+      <h3>デザイン</h3>
+      <p>
+        <strong>複数人が関わることで発生するコミュニケーションコスト</strong>と、<strong>スキルの違いから来る品質のばらつき</strong>——これを、デザインシステムという枠組みで解消することを試みてきました。
+      </p>
+
+      <h3>フロントエンド</h3>
+      <p>
+        <strong>CSS 設計の破綻による不具合率とリードタイムの高さ</strong>に対しては、CSS 設計を作り込む方向ではなく、<strong>TailwindCSS を早期に導入</strong>することで解消を図りました。加えて、UI ライブラリの中にアクセシビリティ準拠とカラーシステムを標準実装し、<strong>「運用ではなく規約で」高いレベルで守られる仕組み</strong>を模索してきました。
+      </p>
+
+      <h3>デザイン戦略</h3>
+      <p>
+        チームの中で常に<strong>「誰の、どの課題を解決することで、何が解消するか」</strong>を問い、<strong>その場その場で適切なタスクに手を置く</strong>よう努めてきました。
+      </p>
+
+      <h2>いま探している役割</h2>
+      <p>
+        次は<strong>事業会社（80〜200 名規模のメガベンチャー）</strong>で、事業やプロダクトの成長に<strong>デザインの観点から深く関われる役割</strong>を探しています。Design Engineer / Principal Designer / デザインリード、あるいは PdM など、職種名そのものにはあまりこだわっていません。
+      </p>
+      <p>
+        共通して大事にしたいのは、デザインの意思決定、フロントエンド実装、AI 協業のワークフローといった領域を横断しながら、<strong>できるだけ手を動かして標準を引き上げていける</strong>こと。純粋な組織マネジメントだけに寄るよりは、<strong>現場で一緒にものをつくれるポジション</strong>を希望しています。
+      </p>
+
+      <h3>AI とデザイナーのこれから</h3>
+      <p>
+        この役割を探すうえで、<strong>AI とデザイナーの関係</strong>についても触れておきたいと思います。
+      </p>
+      <p>
+        AI の登場で、事業環境も雇用環境も大きく変わりました。「デザイナーの仕事は残るのか」と不安を感じる人もいると思いますが、私自身はむしろ<strong>今の状況にワクワクしています</strong>。人間の想像力やクリエイティビティは、これからの時代においてもっと大きな武器になると信じているからです。
+      </p>
+      <p>
+        2 年前に GPT の登場に大きな可能性を感じてから、<strong>AI を前提にしたワークフロー</strong>に踏み込み、社内展開にも取り組んできました。そのなかで実感しているのは、<strong>デザイナーの仕事は言語化が難しい</strong>ということ。感覚で掴んでいる部分が多く、そのままでは AI に委ねきれません。
+      </p>
+      <p>
+        ただ、<strong>そこにこそデザイナーの強み</strong>があるとも思っています。言葉にしづらい部分を丁寧にほどき、AI と協業する仕組みに落とし込んでいく——その積み重ねが、これからのデザイナーにとって大きな武器になるはずだと考えています。
+      </p>
+      <p>
+        そして最後に——私は、<strong>AI とこうして向き合っていく未来そのもの</strong>に、強く興味を惹かれています。同時に、その未来を<strong>一緒に探してくれる仲間</strong>も探しています。こうした景色に共感してくださる方がいれば、ぜひ一緒に働きたいです。
+      </p>
     </div>
   </main>
 </PortfolioLayout>
