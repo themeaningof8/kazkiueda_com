@@ -188,10 +188,12 @@
 :root {
   --portfolio-listing-header-sticky-top: calc(env(safe-area-inset-top, 0px) + 3.125rem);
   /**
-   * ケーススタディ詳細の `main` の上パディング（`pt-32`）と同一。
-   * 左右レールの `sticky top` に使い、固定時も「最初の位置」とズレないようにする。
+   * ケーススタディ詳細の `main` の上パディング。JS（ResizeObserver）がヘッダー実高から上書きする。
+   * タグが折り返して高さが変わっても本文がヘッダーに埋まらないよう動的に追従する。
+   * 左右レールの `sticky top` にも同じ値を使い、固定時も「最初の位置」とズレないようにする。
    */
   --case-study-detail-main-pad-top: 8rem;
+  --case-study-detail-scroll-mt: 10rem;
 }
 
 @keyframes case-study-detail-back-button-enter {
