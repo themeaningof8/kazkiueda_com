@@ -16,7 +16,7 @@ const {
 } = Astro.props;
 ---
 
-<header class="fixed inset-x-0 top-0 z-50 bg-surface-canvas" role="banner">
+<header id="case-study-detail-header" class="fixed inset-x-0 top-0 z-50 bg-surface-canvas" role="banner">
   <div class="mx-auto max-w-[1440px] px-6 lg:px-[72px]">
     <div
       class="flex min-h-[50px] items-center justify-between gap-4 py-2 md:min-h-[50px] md:py-0"
@@ -87,8 +87,34 @@ const {
     });
   }
 
+  // Sync fixed header height → CSS custom property so main padding-top always clears the header,
+  // even when tags wrap to multiple lines on narrow viewports.
+  let _headerRo: ResizeObserver | null = null;
+
+  function initHeaderHeightSync() {
+    _headerRo?.disconnect();
+    _headerRo = null;
+
+    const header = document.getElementById('case-study-detail-header');
+    if (!header) return;
+
+    const root = document.documentElement;
+    const update = () => {
+      const h = header.getBoundingClientRect().height;
+      root.style.setProperty('--case-study-detail-main-pad-top', `calc(${h}px + 1.5rem)`);
+      root.style.setProperty('--case-study-detail-scroll-mt', `calc(${h}px + 2rem)`);
+    };
+
+    _headerRo = new ResizeObserver(update);
+    _headerRo.observe(header);
+    update();
+  }
+
   // Ensure animation works on both initial render and ClientRouter navigations.
   initCaseStudyDetailHeaderEnterMotion();
+  initHeaderHeightSync();
   document.addEventListener('astro:after-swap', initCaseStudyDetailHeaderEnterMotion);
+  document.addEventListener('astro:after-swap', initHeaderHeightSync);
   document.addEventListener('astro:page-load', initCaseStudyDetailHeaderEnterMotion);
+  document.addEventListener('astro:page-load', initHeaderHeightSync);
 </script>
