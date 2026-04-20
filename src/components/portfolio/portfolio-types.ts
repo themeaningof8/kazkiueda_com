@@ -44,4 +44,6 @@ export interface PortfolioListingHeaderProps {
   tagline: string;
   aboutHref: string;
   aboutLabel?: string;
+  backHref?: string;
+  backLabel?: string;
 }

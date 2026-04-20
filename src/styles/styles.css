@@ -174,7 +174,7 @@
 }
 
 @utility u-case-study-detail-back-button-enter {
-  @apply inline-flex shrink-0 items-center rounded-sm text-sm font-medium text-fg-muted outline-none transition-colors hover:text-fg-strong focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas motion-safe:overflow-hidden motion-safe:opacity-0 motion-safe:[max-width:0] motion-safe:[margin-inline-end:0];
+  @apply inline-flex shrink-0 items-center rounded-sm text-sm font-medium text-fg-muted outline-none transition-colors hover:text-fg-strong focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas me-2 motion-safe:opacity-0;
 }
 
 @utility u-case-study-detail-back-button-enter-active {
@@ -197,14 +197,12 @@
 @keyframes case-study-detail-back-button-enter {
   from {
     opacity: 0;
-    max-width: 0;
-    margin-inline-end: 0;
+    transform: translateX(-0.25rem);
   }
 
   to {
     opacity: 1;
-    max-width: 1.25rem;
-    margin-inline-end: 0.5rem;
+    transform: translateX(0);
   }
 }
 
