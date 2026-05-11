@@ -11,7 +11,7 @@ tags:
   - "プロトタイピング"
   - "デザインリード"
 order: 2
-preset: "02"
+preset: "01"
 heroImage: "../../assets/case-studies/ooui/hero.png"
 heroAlt: "OOUIのモデル図（顧客を中心に店舗・担当者・メッセージ・車両との関係）と、顧客のコレクション画面・シングル画面それぞれの属性・絞り込み・操作を整理したインタラクション図"
 roleBadge: "画面設計リード / ORCA分析 / プロトタイプ実装"
